@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "health",
     "accounts",
+    "diary",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
