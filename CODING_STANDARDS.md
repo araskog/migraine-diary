@@ -21,7 +21,7 @@ Within the agreed feature test boundaries, test observable behavior rather than 
 
 When using TDD, work in small slices: failing behavior test, implementation, then verification.
 
-Select formatting, linting, type-checking, and test tools during foundation setup; automate mechanical checks in CI and document verified commands. No such tooling exists yet.
+The frontend uses Oxlint and TypeScript checks; the backend uses Ruff and Django checks/tests. CI runs these with a PostgreSQL service. Verified commands are in [README](README.md).
 
 Reviewers distinguish rule violations from optional design suggestions and explain their impact. Follow the [workflow](docs/agents/workflow.md).
 

@@ -2,7 +2,7 @@
 
 ## Project and Navigation
 
-Migraine Diary tracks migraine days. The repository contains documentation only; application directories and verified development, build, test, and lint commands do not exist yet. Add actual paths and commands when implemented.
+Migraine Diary tracks migraine days. The runnable local foundation lives in `frontend/` (React/TypeScript/Vite) and `backend/` (Django REST Framework/PostgreSQL). See [README](README.md) for verified setup and checks. Accounts and diary recording are not implemented yet.
 
 - Before starting work, read the [workflow](docs/agents/workflow.md) for scope, delivery, and review rules.
 - For structure or dependency decisions, read the [architecture](docs/architecture.md).

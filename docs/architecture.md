@@ -2,18 +2,18 @@
 
 ## Stack and Responsibilities
 
-| Component | Planned technology and responsibility |
+| Component | Technology and responsibility |
 |---|---|
 | `frontend/` | React, TypeScript, and Vite: diary interaction, display, and user feedback. |
 | `backend/` | Python, Django, and Django REST Framework: authentication, authorization, validation, API, and persistence. |
 | Database | PostgreSQL: durable records associated with their owners. |
 | `docs/` | Architecture, feature specifications, and agent workflow. |
 
-Application directories do not exist yet. Establish their internal structure, supported versions, and verified commands during foundation setup.
+`frontend/src/` contains the React application. `backend/config/` contains Django settings and routing; `backend/health/` contains the readiness API and tests. The foundation uses Node.js 24, Python 3.13, Django 5.2 LTS, and PostgreSQL 17. Dependency versions are locked in `frontend/package-lock.json` and `backend/uv.lock`. See [README](../README.md) for setup and verified commands.
 
 The browser calls the backend API, never PostgreSQL directly. Client validation improves feedback; the backend enforces validation and ownership checks.
 
-Local development uses an isolated Python environment managed by uv and local PostgreSQL. A Vite development proxy to Django is proposed. Choose authentication configuration and define the API contract when implementing the relevant feature.
+Local development uses an isolated Python environment managed by uv and local PostgreSQL. A Vite development proxy forwards `/api` to Django on loopback port 8000. `GET /api/health/` checks database readiness without exposing connection details. Choose authentication configuration and define the API contract when implementing the relevant feature.
 
 ## Later Direction
 
