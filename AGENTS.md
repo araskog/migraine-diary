@@ -2,9 +2,9 @@
 
 ## Project and Navigation
 
-Migraine Diary tracks migraine days. The runnable local foundation lives in `frontend/` (React/TypeScript/Vite) and `backend/` (Django REST Framework/PostgreSQL). See [README](README.md) for verified setup and checks. Account access is implemented; password recovery and diary recording are not implemented yet.
+Migraine Diary tracks migraine days. The application lives in `frontend/` (React/TypeScript/Vite) and `backend/` (Django REST Framework/PostgreSQL). See [README](README.md) for verified setup and checks.
 
-- Before starting work, read the [workflow](docs/agents/workflow.md) for agent roles, attribution, scope, delivery, and review rules.
+- Before starting work, read the [workflow](docs/agents/workflow.md) for agent roles, attribution, scope, delivery, and review rules. For committed PR reviews, use the [review-pr skill](.agents/skills/review-pr/SKILL.md).
 - For structure, dependency, or interface design decisions, read the [architecture](docs/architecture.md).
 - When writing or reviewing code, read the [coding standards](CODING_STANDARDS.md).
 - When defining behavior or tests, read the relevant specification and [glossary](GLOSSARY.md).
