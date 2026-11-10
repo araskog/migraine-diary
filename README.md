@@ -31,7 +31,7 @@ npm ci
 npm run dev
 ```
 
-Open [http://127.0.0.1:5173](http://127.0.0.1:5173). Vite proxies `/api` to Django on port 8000. Both development servers bind to the loopback interface. The page reports the service/database connection and provides a retry button. `GET /api/health/` returns `200 {"status":"ok"}` after a PostgreSQL query, or `503 {"status":"unavailable"}` if the database is unavailable. Other methods receive 405. No account or diary data is exposed.
+Open [http://127.0.0.1:5173](http://127.0.0.1:5173). Vite proxies `/api` to Django on port 8000. Both development servers bind to the loopback interface. The page reports the service/database connection and provides a retry button. `GET /api/health/` returns `200 {"status":"ok"}` after a PostgreSQL query, or `503 {"status":"unavailable"}` if the database is unavailable. Unsupported write methods receive 405; DRF also permits `OPTIONS` for endpoint metadata. No account or diary data is exposed.
 
 These are local development settings, including a public development-only secret key. Deployment configuration and authentication will be addressed in later increments. Vite preview serves the built frontend only; the API proxy is for development.
 
