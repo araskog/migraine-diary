@@ -82,7 +82,7 @@ function App() {
     } catch { setErrors(['Unable to sign out. Please try again.']) }
     finally { setBusy(false) }
   }
-  return <main>
+  return <main className="app">
     <header><p className="brand">Migraine Diary</p><span className="local">Local preview · synthetic data only</span></header>
     {page === 'loading' && <p role="status">Checking your session…</p>}
     {page === 'unavailable' && <section><h1>Unable to connect</h1><p>Check that the local service is running, then try again.</p><button onClick={() => { setPage('loading'); setAttempt(value => value + 1) }}>Try again</button></section>}
