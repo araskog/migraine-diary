@@ -20,6 +20,14 @@ Include sign-out, password recovery, and correcting or removing entries. Entries
 | D8 | Removing an entry requires confirmation. Cancelling leaves it unchanged; confirming removes it persistently. A failed removal is reported and is not shown as successful. |
 | D9 | Registration, sign-in, recovery, recording, correction, and removal work on mobile-sized screens and can be demonstrated locally with synthetic accounts and records. |
 
+## Account Access Increment
+
+The approved first account increment implements D1 and the account portions of D9: email/password self-registration, sign-in, sign-out, and a protected Your diary placeholder. Successful registration signs the user in. Email identifies accounts case-insensitively. Server sessions restore access on reload, and logout invalidates access. Password recovery (D2) follows in the next increment; diary recording is not included here.
+
+The approved visual direction is a neutral white page, soft sage buttons, and dark green main actions and selected controls, with clear labels, loading states, errors, and retry feedback on mobile screens. No theme feature or design library is included.
+
+Agreed tests cover backend registration validation/password validation, authentication, session persistence, protected access after logout, and anonymous/authenticated CSRF. Manual browser checks cover mobile forms, validation errors, reload, and sign-out. Existing frontend and backend checks and PostgreSQL CI remain required.
+
 ## Delivery and Verification
 
 Build in focused increments: runnable local foundation, accounts, then diary recording. Each PR links to the criteria it implements. Agree test boundaries before implementing each feature; check ownership, validation, and persistence through the backend, and verify the core user interactions in the browser.
