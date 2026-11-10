@@ -1,14 +1,14 @@
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from .models import User
+from .test_helpers import generated_password
 
 
 class AccountAdminTests(TestCase):
-    password = "Synthetic!River82-Paper"
-
     @classmethod
     def setUpTestData(cls):
+        cls.password = generated_password()
         cls.owner = User.objects.create_superuser("owner@example.test", cls.password)
         cls.member = User.objects.create_user("member@example.test", cls.password)
 
@@ -103,3 +103,30 @@ class AccountAdminTests(TestCase):
             },
         )
         self.assertRedirects(response, "/admin/")
+
+    def test_admin_password_change_hashes_password_and_revokes_member_session(self):
+        member_client = Client()
+        self.assertTrue(
+            member_client.login(email=self.member.email, password=self.password)
+        )
+        self.assertEqual(member_client.get("/api/diary/").status_code, 200)
+        self.client.force_login(self.owner)
+        new_password = generated_password()
+        response = self.client.post(
+            reverse("admin:auth_user_password_change", args=[self.member.pk]),
+            {
+                "password1": new_password,
+                "password2": new_password,
+                "set-password": "Set password",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.member.refresh_from_db()
+        self.assertNotEqual(self.member.password, new_password)
+        self.assertTrue(self.member.check_password(new_password))
+        self.assertFalse(self.member.check_password(self.password))
+        self.assertEqual(member_client.get("/api/diary/").status_code, 403)
+        self.assertTrue(
+            member_client.login(email=self.member.email, password=new_password)
+        )
+        self.assertEqual(member_client.get("/api/diary/").status_code, 200)

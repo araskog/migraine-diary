@@ -2,12 +2,12 @@ from django.db import IntegrityError, transaction
 from django.test import Client, TestCase
 
 from .models import User
+from .test_helpers import generated_password
 
 
 class AccountTests(TestCase):
-    password = "Synthetic!River82-Paper"
-
     def setUp(self):
+        self.password = generated_password()
         self.client = Client(enforce_csrf_checks=True)
         self.token = self.client.get("/api/session/").json()["csrfToken"]
 
@@ -66,7 +66,9 @@ class AccountTests(TestCase):
         self.assertEqual(self.register().status_code, 201)
         self.assertEqual(self.register("SYNTHETIC@example.test").status_code, 400)
         with self.assertRaises(IntegrityError), transaction.atomic():
-            User.objects.create(email="SYNTHETIC@example.test", password="unused")
+            User.objects.create(
+                email="SYNTHETIC@example.test", password=generated_password()
+            )
         self.assertEqual(User.objects.count(), 1)
 
     def test_login_logout_and_old_session_rejection(self):
