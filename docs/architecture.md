@@ -15,6 +15,12 @@ The browser calls the backend API, never PostgreSQL directly. Client validation 
 
 Local development uses an isolated Python environment managed by uv and local PostgreSQL. A Vite development proxy forwards `/api` to Django on loopback port 8000. `GET /api/health/` checks database readiness without exposing connection details. Accounts use a custom email user, Django password validators, database sessions, and explicit CSRF protection for anonymous account writes. DRF defaults to authenticated access; the health and account entry endpoints explicitly allow anonymous access.
 
+## Interface Design
+
+Use the approved clear, approachable direction: a neutral page, soft sage backgrounds on secondary controls, and dark green for primary actions and selected states. Keep typography simple, spacing generous, and forms uncluttered, with visible keyboard focus and a mobile-friendly layout.
+
+Continue from the existing account screens and shared CSS custom properties in `frontend/src/App.css` and `frontend/src/index.css`. Reuse these visual conventions across new components rather than introducing a new palette or component library without agreement.
+
 ## Later Direction
 
 AI summaries follow the usable diary; reports follow summaries. No LLM framework is selected. Render with Neon PostgreSQL is a hosting proposal, not an implemented deployment.
