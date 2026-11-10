@@ -42,6 +42,7 @@ uv run --env-file .env python manage.py createsuperuser
 From `frontend/`:
 
 ```sh
+npm run format:check
 npm run lint
 npm run typecheck
 npm run build
