@@ -22,7 +22,7 @@ Start two separate agents with fresh contexts (`fork_turns: none`). Give each th
 
 ## Report and follow up
 
-Keep reports separate, headed with the exact role name. Each includes reviewed commit IDs, sources actually checked, findings, and verification gaps. A finding gives a file/line, evidence, consequence, and applicable rule or requirement. Distinguish defects, clarification questions, and optional suggestions. Prioritize by actual impact. There is no finding quota: report no findings when justified, without hiding gaps or claiming perfection.
+Keep reports separate, headed with the exact role name. Each includes reviewed commit IDs, sources actually checked, findings, and verification gaps. A finding gives a file/line, evidence, consequence, and applicable rule or requirement. Distinguish defects, clarification questions, and optional suggestions. Prioritize by actual impact. Missing agreed checks or regression coverage required by repository standards are actionable findings; other unverified behavior is a gap, not proof of a bug. There is no finding quota: report no findings when justified, without hiding gaps or claiming perfection.
 
 Publish reports only within the agreed task authorization, disclosing coordinator publication as required by the workflow. The Builder addresses findings in focused commits. On corrections or changed base/head, record the new IDs, inspect the updated diff, rerun affected checks, and request rechecks of findings and newly affected behavior. Do not carry approval forward to unreviewed changes. Escalate unresolved disagreements to the owner; never merge.
 
