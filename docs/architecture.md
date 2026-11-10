@@ -13,7 +13,7 @@
 
 The browser calls the backend API, never PostgreSQL directly. Client validation improves feedback; the backend enforces validation and ownership checks.
 
-Local development uses an isolated Python environment managed by uv and local PostgreSQL. A Vite development proxy forwards `/api` to Django on loopback port 8000. `GET /api/health/` checks database readiness without exposing connection details. Choose authentication configuration and define the API contract when implementing the relevant feature.
+Local development uses an isolated Python environment managed by uv and local PostgreSQL. A Vite development proxy forwards `/api` to Django on loopback port 8000. `GET /api/health/` checks database readiness without exposing connection details. Accounts use a custom email user, Django password validators, database sessions, and explicit CSRF protection for anonymous account writes. DRF defaults to authenticated access; the health and account entry endpoints explicitly allow anonymous access.
 
 ## Later Direction
 

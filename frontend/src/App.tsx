@@ -1,52 +1,106 @@
 import { useEffect, useState } from 'react'
+import AccountForm from './AccountForm'
+import DiaryPage from './DiaryPage'
+import { getSession } from './session'
+import type { Session } from './session'
 import './App.css'
 
-type Status = 'checking' | 'connected' | 'unavailable'
+async function checkDiary() {
+  const response = await fetch('/api/diary/', { cache: 'no-store' })
+  const body: unknown = await response.json()
+  if (
+    !response.ok ||
+    typeof body !== 'object' ||
+    body === null ||
+    !('recordingAvailable' in body) ||
+    body.recordingAvailable !== false
+  )
+    throw new Error('Diary unavailable')
+}
 
 function App() {
-  const [status, setStatus] = useState<Status>('checking')
+  const [session, setSession] = useState<Session | null>(null)
+  const [page, setPage] = useState<
+    'loading' | 'account' | 'diary' | 'unavailable'
+  >('loading')
+  const [notice, setNotice] = useState('')
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
-    const controller = new AbortController()
-    async function checkConnection() {
+    let active = true
+    async function restoreSession() {
       try {
-        const response = await fetch('/api/health/', { signal: controller.signal })
-        const body: unknown = await response.json()
-        if (!response.ok || typeof body !== 'object' || body === null ||
-            !('status' in body) || body.status !== 'ok') {
-          throw new Error('Service unavailable')
+        const next = await getSession()
+        if (next.user) await checkDiary()
+        if (active) {
+          setSession(next)
+          setPage(next.user ? 'diary' : 'account')
         }
-        setStatus('connected')
       } catch {
-        if (!controller.signal.aborted) setStatus('unavailable')
+        if (active) setPage('unavailable')
       }
     }
-    void checkConnection()
-    return () => controller.abort()
+    void restoreSession()
+    return () => {
+      active = false
+    }
   }, [attempt])
 
-  const messages: Record<Status, string> = {
-    checking: 'Checking local connection…',
-    connected: 'Connected to the local service and database.',
-    unavailable: 'The local service is unavailable. Check that Django and PostgreSQL are running.',
+  async function openDiary(next: Session) {
+    setSession(next)
+    try {
+      if (!next.user) throw new Error('Missing authenticated user')
+      await checkDiary()
+      setPage('diary')
+    } catch {
+      setPage('unavailable')
+    }
+  }
+
+  function finishSignOut(next: Session) {
+    setSession(next)
+    setPage('account')
+    setNotice('You have signed out.')
   }
 
   return (
-    <main>
-      <p className="eyebrow">Local development</p>
-      <h1>Migraine Diary</h1>
-      <p>The foundation is ready for the next step. Accounts and diary recording are coming later.</p>
-      <section aria-label="Connection status">
-        <h2>Connection</h2>
-        <p role="status">{messages[status]}</p>
-        <button disabled={status === 'checking'} onClick={() => {
-          setStatus('checking')
-          setAttempt(value => value + 1)
-        }}>Check again</button>
-      </section>
+    <main className="app">
+      <header>
+        <p className="brand">Migraine Diary</p>
+        <span className="local">Local preview · synthetic data only</span>
+      </header>
+      {page === 'loading' && <p role="status">Checking your session…</p>}
+      {page === 'unavailable' && (
+        <section>
+          <h1>Unable to connect</h1>
+          <p>Check that the local service is running, then try again.</p>
+          <button
+            onClick={() => {
+              setPage('loading')
+              setAttempt((value) => value + 1)
+            }}
+          >
+            Try again
+          </button>
+        </section>
+      )}
+      {page === 'account' && session && (
+        <AccountForm
+          csrfToken={session.csrfToken}
+          notice={notice}
+          onAuthenticated={openDiary}
+          onSessionRefreshed={setSession}
+        />
+      )}
+      {page === 'diary' && session?.user && (
+        <DiaryPage
+          email={session.user.email}
+          csrfToken={session.csrfToken}
+          onSignedOut={finishSignOut}
+          onSessionRefreshed={setSession}
+        />
+      )}
     </main>
   )
 }
-
 export default App

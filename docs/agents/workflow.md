@@ -11,7 +11,7 @@ Agree on important test boundaries per feature. Use a short plan for bounded tas
 ## Delivery
 
 1. Work on a task branch. Reuse the branch for its existing task.
-2. One implementation agent implements only the approved increment, runs relevant checks, reports results, and stops when that increment is complete.
+2. One implementation agent reads the coding standards before writing code, implements only the approved increment, runs required checks, reports results, and stops when that increment is complete.
 3. Prefer small, focused commits, each representing one coherent change, so reviewers can follow the work. Keep related code and tests together and avoid mixing unrelated changes. Use Conventional Commits, push, and open a PR. Describe the problem, behavior changes, requirements or spec link, checks, and local testing steps. Include screenshots for UI changes.
 4. Run the two independent reviews below against the committed PR changes. Give both reviewers the same base and head commit IDs and the source documents for that revision.
 5. Publish findings as PR comments, identifying the review role and revision. Address findings, rerun affected checks, push corrections, and have reviewers recheck affected findings and changes. Record reasons for rejecting or deferring findings; refer unresolved disagreements to the owner.
@@ -28,7 +28,11 @@ Use two separate agents with fresh contexts, without inherited implementation di
 | Standards | Check correctness, security, maintainability, test quality, repository rules, and applicable official guidance. |
 | Requirements | Check the PR requirements or linked specification for missing behavior, incorrect behavior, and scope expansion. |
 
-Both reviewers receive the committed diff, relevant surrounding code, repository instructions, applicable requirements, and check evidence. They do not edit project files.
+The Standards reviewer compares changes against the committed coding standards. The Requirements reviewer compares changes against the agreed PR requirements or linked specification.
+
+Both receive the committed diff, relevant surrounding code, repository instructions, their applicable source documents, and check evidence. They do not edit project files.
+
+Review scope and simplicity: check for duplicate documentation, unnecessary configuration, and implementation notes that belong in the PR rather than stable specifications.
 
 Keep reports separate. Each identifies the reviewed commits, sources checked, and verification gaps. Findings include a file location, evidence, consequence, and applicable rule or requirement. Distinguish defects from questions and optional suggestions; do not invent findings to meet a quota. Missing evidence is a gap, not a pass.
 

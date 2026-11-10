@@ -1,28 +1,33 @@
 # Coding Standards
 
-## Boundaries and Data
+## Boundaries and Errors
 
-- Use TypeScript for frontend application code and Python for Django code.
-- Enforce authorization and authoritative validation on the backend. Derive record ownership from the authenticated user, never a client-supplied owner identifier.
-- Treat diary dates as calendar dates, not timestamps. Follow the agreed specification for allowed dates and timezone behavior.
-- Use the [glossary](GLOSSARY.md) consistently. Missing entries do not establish migraine-free days.
-- Keep privileged credentials on the server and outside version control.
+Use TypeScript for frontend application code and Python for Django code. Keep changes focused and use existing framework capabilities; add dependencies and abstractions only for current needs.
 
-## Code and Errors
+Enforce validation, authorization, and ownership on the backend. Derive ownership from the authenticated user, never client-supplied identifiers. Define API contracts and narrow external input at the boundary. Return useful errors without exposing secrets or internal details. Show success only after an operation succeeds and support retrying failures.
 
-- Do not use TypeScript `any` or non-null assertions such as `value!`. Use explicit types or `unknown`, and narrow values with checks before use. Ordinary logical negation (`!condition`) is allowed.
-- Prefer focused changes and existing framework capabilities. Add abstractions for current needs.
-- Define API contracts explicitly and validate external input at the boundary.
-- Return useful errors without exposing secrets or internal details. Do not swallow failures or show a successful save before it succeeds; support retrying failed actions.
+Treat diary dates as calendar dates, following the specification's timezone rules. Use the [glossary](GLOSSARY.md); missing entries never establish migraine-free days. Keep privileged credentials outside version control.
 
-## Tests and Tooling
+## React and TypeScript
 
-Within the agreed feature test boundaries, test observable behavior rather than internal wiring. Prioritize persistence, date validation, user isolation, and failure handling. Use deterministic synthetic data and expected results derived from requirements. Add regression tests for bug fixes where appropriate. Do not mock away the behavior under test.
+Follow [Thinking in React](https://react.dev/learn/thinking-in-react) and the [Rules of React](https://react.dev/reference/rules): components have focused responsibilities, rendering stays pure, and Hooks run unconditionally at component or custom Hook top level. Define components at module scope.
 
-When using TDD, work in small slices: failing behavior test, implementation, then verification.
+Extract distinct or reused UI into cohesive components with typed props; avoid arbitrary line limits, trivial label components, and generic frameworks. Keep state with its closest responsible owner, lifting shared state to a common parent. Do not mutate props or state. Keep side effects outside rendering and clean up Effects.
 
-The frontend uses Oxlint and TypeScript checks; the backend uses Ruff and Django checks/tests. CI runs these with a PostgreSQL service. Verified commands are in [README](README.md).
+Do not use explicit `any` or non-null assertions. Use explicit types or `unknown` with narrowing. Oxlint enforces these restrictions and the Hooks rule. TypeScript checks complement linting.
 
-Reviewers distinguish rule violations from optional design suggestions and explain their impact. Follow the [workflow](docs/agents/workflow.md).
+## CSS and Formatting
 
-Testing guidance adapts [Matt Pocock's TDD principles](https://github.com/mattpocock/skills/blob/main/skills/engineering/tdd/SKILL.md).
+Follow [MDN's CSS organization guidance](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Organizing): use readable, consistent rules and low-specificity selectors scoped to the component root. Reserve global styles for document defaults and resets. Reuse CSS custom properties for shared colors and radii. Preserve responsive layouts, accessible labels, and visible keyboard focus.
+
+Use local [Prettier](https://prettier.io/docs/install) for frontend source and configuration: two-space indentation, single quotes, and no semicolons. Run the formatting check alongside lint, types, and build.
+
+## Python and Django
+
+Apply the relevant application conventions from [Django 5.2 coding style](https://docs.djangoproject.com/en/5.2/internals/contributing/writing-code/coding-style/): PEP 8 naming, four-space indentation, and grouped standard-library, third-party, and local imports. Use Ruff for linting, import ordering, and formatting rather than Django core's Black/flake8 tooling; other core contribution rules are not blanket application requirements.
+
+## Tests and Checks
+
+Test observable behavior within agreed boundaries, especially persistence, ownership, validation, and failures. Keep behavioral inputs deterministic; generate valid synthetic credentials with standard-library helpers. Fixed invalid credentials are appropriate for failure tests. Add regression tests for fixes; do not mock away the behavior under test.
+
+Use the checks in [README](README.md) and the [review workflow](docs/agents/workflow.md). Report unavailable checks and distinguish defects from optional suggestions.
