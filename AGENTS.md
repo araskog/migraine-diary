@@ -4,13 +4,13 @@
 
 Migraine Diary tracks migraine days. The runnable local foundation lives in `frontend/` (React/TypeScript/Vite) and `backend/` (Django REST Framework/PostgreSQL). See [README](README.md) for verified setup and checks. Account access is implemented; password recovery and diary recording are not implemented yet.
 
-- Before starting work, read the [workflow](docs/agents/workflow.md) for scope, delivery, and review rules.
+- Before starting work, read the [workflow](docs/agents/workflow.md) for agent roles, attribution, scope, delivery, and review rules.
 - For structure, dependency, or interface design decisions, read the [architecture](docs/architecture.md).
 - When writing or reviewing code, read the [coding standards](CODING_STANDARDS.md).
 - When defining behavior or tests, read the relevant specification and [glossary](GLOSSARY.md).
 - The initial milestone is [First Usable Diary](docs/specs/first-usable-diary.md).
 
-README covers setup and checks; AGENTS.md provides repository context; specifications define agreed behavior; commits and PRs document increment scope, rationale, and verification evidence. Avoid duplicating these sources.
+README covers setup and checks; AGENTS.md provides repository context; specifications define agreed behavior; PR descriptions cover the problem, final behavior, and scope. Commit messages and review comments hold rationale, verification results, and review follow-ups. Avoid duplicating these sources.
 
 ## Working Rules
 
