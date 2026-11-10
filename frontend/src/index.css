@@ -1,10 +1,5 @@
-:root {
-  font-family: system-ui, sans-serif;
-  color: #27332f;
-  background: #f5f7f3;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-}
+:root { font-family: system-ui, sans-serif; color: #263b31; background: #fff; font-synthesis: none; text-rendering: optimizeLegibility; }
 body { margin: 0; min-width: 320px; }
 * { box-sizing: border-box; }
-button { font: inherit; }
+button, input { font: inherit; }
+button:focus-visible, input:focus-visible { outline: 3px solid #ac732b; outline-offset: 3px; }

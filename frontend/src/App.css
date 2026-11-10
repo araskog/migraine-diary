@@ -1,9 +1,25 @@
-main { max-width: 680px; margin: 10vh auto; padding: 24px; }
-h1 { font-size: clamp(2rem, 7vw, 3rem); margin: 12px 0; }
-h2 { font-size: 1.2rem; }
+main { max-width: 960px; margin: 0 auto; padding: 28px 24px 60px; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 24px; border-bottom: 1px solid #e0e7e1; }
+.brand { font-weight: 700; font-size: 1.15rem; margin: 0; }
+.local, .footnote { color: #617067; font-size: .82rem; }
+section { max-width: 460px; margin: 64px auto 0; }
+h1 { font-size: clamp(2rem, 7vw, 2.6rem); letter-spacing: -.04em; line-height: 1.15; margin: 12px 0; }
+h2 { font-size: 1.15rem; }
 p { line-height: 1.6; }
-.eyebrow { color: #496756; }
-section { margin-top: 32px; padding: 24px; border: 1px solid #cbd6ce; border-radius: 12px; background: white; }
-button { padding: 10px 16px; border: 0; border-radius: 6px; color: white; background: #315c46; cursor: pointer; }
+.eyebrow { font-size: .85rem; color: #54735e; }
+.intro { color: #617067; margin-bottom: 28px; }
+.switch { display: flex; gap: 6px; padding: 5px; border-radius: 10px; background: #edf2ed; margin-bottom: 28px; }
+button { padding: 12px 18px; border: 0; border-radius: 7px; color: #294c38; background: #e1ecdf; cursor: pointer; font-weight: 600; }
+.switch button { flex: 1; background: transparent; }
+.switch button[aria-pressed="true"], .primary { color: #fff; background: #315c46; }
+form { display: flex; flex-direction: column; }
+label { margin: 0 0 8px; font-size: .95rem; font-weight: 600; }
+input { width: 100%; border: 1px solid #a7b7ab; border-radius: 7px; background: #fff; padding: 13px; margin-bottom: 22px; color: #263b31; }
+.help { font-size: .85rem; color: #617067; margin: -10px 0 22px; }
 button:disabled { opacity: .6; cursor: wait; }
-button:focus-visible { outline: 3px solid #b36a22; outline-offset: 3px; }
+.errors { color: #8b2e24; border-left: 3px solid #b95443; padding-left: 12px; margin-bottom: 20px; }
+.errors p { margin: 5px 0; }
+.footnote { margin-top: 24px; }
+.placeholder { border: 1px solid #d4dfd5; border-radius: 12px; padding: 20px 24px; margin: 28px 0; }
+strong { overflow-wrap: anywhere; }
+@media (max-width: 540px) { main { padding: 22px 22px 40px; } header { align-items: flex-start; flex-direction: column; gap: 8px; } section { margin-top: 38px; } }
