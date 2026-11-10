@@ -1,8 +1,8 @@
-from django.urls import path
 from django.contrib import admin
+from django.urls import path
 
-from health.views import health
 from accounts import views
+from health.views import health
 
 urlpatterns = [
     path("admin/", admin.site.urls),
