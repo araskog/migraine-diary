@@ -28,7 +28,9 @@ Use two separate agents with fresh contexts, without inherited implementation di
 | Standards | Check correctness, security, maintainability, test quality, repository rules, and applicable official guidance. |
 | Requirements | Check the PR requirements or linked specification for missing behavior, incorrect behavior, and scope expansion. |
 
-Both reviewers read and compare the changes against the same committed coding standards. They receive the committed diff, relevant surrounding code, repository instructions, applicable requirements, and check evidence. They do not edit project files.
+The Standards reviewer compares changes against the committed coding standards. The Requirements reviewer compares changes against the agreed PR requirements or linked specification.
+
+Both receive the committed diff, relevant surrounding code, repository instructions, their applicable source documents, and check evidence. They do not edit project files.
 
 Review scope and simplicity: check for duplicate documentation, unnecessary configuration, and implementation notes that belong in the PR rather than stable specifications.
 
