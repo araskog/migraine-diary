@@ -30,6 +30,8 @@ Use two separate agents with fresh contexts, without inherited implementation di
 
 Both reviewers receive the committed diff, relevant surrounding code, repository instructions, applicable requirements, and check evidence. They do not edit project files.
 
+Review scope and simplicity: check for duplicate documentation, unnecessary configuration, and implementation notes that belong in the PR rather than stable specifications.
+
 Keep reports separate. Each identifies the reviewed commits, sources checked, and verification gaps. Findings include a file location, evidence, consequence, and applicable rule or requirement. Distinguish defects from questions and optional suggestions; do not invent findings to meet a quota. Missing evidence is a gap, not a pass.
 
 ## Sources

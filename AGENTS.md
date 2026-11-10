@@ -10,6 +10,8 @@ Migraine Diary tracks migraine days. The runnable local foundation lives in `fro
 - When defining behavior or tests, read the relevant specification and [glossary](GLOSSARY.md).
 - The initial milestone is [First Usable Diary](docs/specs/first-usable-diary.md).
 
+README covers setup and checks; AGENTS.md provides repository context; specifications define agreed behavior; commits and PRs document increment scope, rationale, and verification evidence. Avoid duplicating these sources.
+
 ## Working Rules
 
 Use English for repository content and Conventional Commits, such as `feat(diary): record migraine days`.

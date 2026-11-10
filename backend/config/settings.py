@@ -5,7 +5,7 @@ import os
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY", "local-development-only-not-for-deployment"
 )
-DEBUG = False
+DEBUG = os.environ.get("DJANGO_DEBUG") == "1"
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
 INSTALLED_APPS = [
     "django.contrib.admin",

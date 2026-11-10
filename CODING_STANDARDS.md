@@ -12,12 +12,13 @@
 
 - Do not use TypeScript `any` or non-null assertions such as `value!`. Use explicit types or `unknown`, and narrow values with checks before use. Ordinary logical negation (`!condition`) is allowed.
 - Prefer focused changes and existing framework capabilities. Add abstractions for current needs.
+- Scope component CSS to its root and reuse shared CSS custom properties for repeated colors and radii.
 - Define API contracts explicitly and validate external input at the boundary.
 - Return useful errors without exposing secrets or internal details. Do not swallow failures or show a successful save before it succeeds; support retrying failed actions.
 
 ## Tests and Tooling
 
-Within the agreed feature test boundaries, test observable behavior rather than internal wiring. Prioritize persistence, date validation, user isolation, and failure handling. Use deterministic synthetic data and expected results derived from requirements. Add regression tests for bug fixes where appropriate. Do not mock away the behavior under test.
+Within the agreed feature test boundaries, test observable behavior rather than internal wiring. Prioritize persistence, date validation, user isolation, and failure handling. Use synthetic data and expected results derived from requirements. Keep behavioral inputs deterministic; generate valid test credentials with standard-library helpers. Fixed deliberately invalid credentials are appropriate when testing validation or authentication failures. Add regression tests for bug fixes where appropriate. Do not mock away the behavior under test.
 
 When using TDD, work in small slices: failing behavior test, implementation, then verification.
 
