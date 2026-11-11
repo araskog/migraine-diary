@@ -18,6 +18,11 @@
   color: var(--mantine-color-sage-7);
 }
 
+.diary-entries [data-selected][data-status='migraine'] {
+  background-color: var(--mantine-color-red-8);
+  color: var(--mantine-color-white);
+}
+
 .diary-entries [data-selected] .calendar-marker {
   color: inherit;
 }

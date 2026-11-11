@@ -89,6 +89,7 @@ export default function DiaryEntries({
           weekendDays={[]}
           getDayProps={(day) => ({
             disabled: disabled || day > today,
+            'data-status': statuses.get(day),
             'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
           })}
           renderDay={(day) => (
@@ -109,10 +110,16 @@ export default function DiaryEntries({
         />
         <Group gap="md" mt="md" wrap="wrap">
           <Text size="xs">
-            <span aria-hidden="true">● </span>Migraine
+            <span className="migraine" aria-hidden="true">
+              ●{' '}
+            </span>
+            Migraine
           </Text>
           <Text size="xs">
-            <span aria-hidden="true">○ </span>Migraine-free
+            <span className="migraine_free" aria-hidden="true">
+              ○{' '}
+            </span>
+            Migraine-free
           </Text>
           <Text size="xs">
             <span aria-hidden="true">– </span>Unrecorded
