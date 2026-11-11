@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import type { FormEvent } from 'react'
 import { Button, Radio, Stack, Text, Title } from '@mantine/core'
 import ErrorMessages from './ErrorMessages'
 import { dateLabel, localDate, saveEntry, statusLabel } from './diary'
@@ -33,9 +32,9 @@ export default function DiaryEntryForm({
   const [errors, setErrors] = useState<string[]>([])
   const [notice, setNotice] = useState('')
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    if (saving || disabled || !status) return
+  async function save(nextStatus: DiaryStatus) {
+    if (saving || disabled) return
+    setStatus(nextStatus)
     setErrors([])
     setNotice('')
     if (date > localDate()) {
@@ -45,7 +44,7 @@ export default function DiaryEntryForm({
     setSaving(true)
     onSavingChange(true)
     try {
-      const saved = await saveEntry(date, status, csrfToken)
+      const saved = await saveEntry(date, nextStatus, csrfToken)
       onSaved(saved)
       setNotice(`Saved: ${statusLabel(saved.status)}.`)
     } catch {
@@ -66,58 +65,59 @@ export default function DiaryEntryForm({
   }
 
   return (
-    <form
-      onSubmit={(event) => {
-        void submit(event)
-      }}
-    >
-      <Stack gap="md">
-        <Title order={2} size="h4">
-          {dateLabel(date)}
-        </Title>
-        <Text size="sm" c="dimmed">
-          {entry
-            ? `Recorded: ${statusLabel(entry.status)}. You can update this day.`
-            : 'This day is unrecorded.'}
-        </Text>
-        <Radio.Group
-          name="diary-status"
-          label="How was this day?"
-          value={status}
-          onChange={(value) => {
-            if (value !== 'migraine' && value !== 'migraine_free') return
-            setStatus(value)
-            setErrors([])
-            setNotice('')
+    <Stack gap="md">
+      <Title order={2} size="h4">
+        {dateLabel(date)}
+      </Title>
+      <Text size="sm" c="dimmed">
+        {entry
+          ? `Recorded: ${statusLabel(entry.status)}. You can update this day.`
+          : 'This day is unrecorded.'}
+      </Text>
+      <Radio.Group
+        name="diary-status"
+        label="How was this day?"
+        value={status}
+        onChange={(value) => {
+          if (value !== 'migraine' && value !== 'migraine_free') return
+          void save(value)
+        }}
+      >
+        <Stack gap="sm" mt="sm">
+          <Radio
+            value="migraine"
+            label="Migraine"
+            disabled={saving || disabled}
+          />
+          <Radio
+            value="migraine_free"
+            label="Migraine-free"
+            disabled={saving || disabled}
+          />
+        </Stack>
+      </Radio.Group>
+      <ErrorMessages messages={errors} />
+      {errors.length > 0 && status && (
+        <Button
+          size="md"
+          disabled={saving || disabled}
+          onClick={() => {
+            void save(status)
           }}
         >
-          <Stack gap="sm" mt="sm">
-            <Radio
-              value="migraine"
-              label="Migraine"
-              disabled={saving || disabled}
-            />
-            <Radio
-              value="migraine_free"
-              label="Migraine-free"
-              disabled={saving || disabled}
-            />
-          </Stack>
-        </Radio.Group>
-        <ErrorMessages messages={errors} />
-        <Button
-          type="submit"
-          size="md"
-          disabled={saving || disabled || !status}
-        >
-          {saving ? 'Saving…' : entry ? 'Update day' : 'Save day'}
+          Try again
         </Button>
-        {notice && (
-          <Text role="status" size="sm">
-            {notice}
-          </Text>
-        )}
-      </Stack>
-    </form>
+      )}
+      {saving && (
+        <Text role="status" size="sm">
+          Saving…
+        </Text>
+      )}
+      {notice && (
+        <Text role="status" size="sm">
+          {notice}
+        </Text>
+      )}
+    </Stack>
   )
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Stack, Text, Title } from '@mantine/core'
+import { Button, Group, Stack, Text, Title } from '@mantine/core'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
 import { getSession, isSession } from './session'
@@ -57,7 +57,19 @@ export default function DiaryPage({
         <Text size="sm" c="dimmed">
           Your space
         </Text>
-        <Title order={1}>Your diary</Title>
+        <Group justify="space-between" align="center">
+          <Title order={1}>Your diary</Title>
+          <Button
+            size="md"
+            variant="light"
+            disabled={busy || saving}
+            onClick={() => {
+              void signOut()
+            }}
+          >
+            {busy ? 'Signing out…' : 'Sign out'}
+          </Button>
+        </Group>
         <Text c="dimmed" className="identity">
           Signed in as <strong>{email}</strong>
         </Text>
@@ -70,16 +82,6 @@ export default function DiaryPage({
         onSessionRefreshed={onSessionRefreshed}
       />
       <ErrorMessages messages={errors} />
-      <Button
-        size="md"
-        variant="light"
-        disabled={busy || saving}
-        onClick={() => {
-          void signOut()
-        }}
-      >
-        {busy ? 'Signing out…' : 'Sign out'}
-      </Button>
     </Stack>
   )
 }
