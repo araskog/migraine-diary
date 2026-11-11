@@ -8,10 +8,6 @@
   margin: calc(var(--mantine-spacing-xl) * 2) auto 0;
 }
 
-.app .identity {
-  overflow-wrap: anywhere;
-}
-
 @media (max-width: 540px) {
   .app .page {
     margin-top: var(--mantine-spacing-xl);
