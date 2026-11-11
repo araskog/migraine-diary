@@ -74,6 +74,7 @@ export default function DiaryPage({
       <ErrorMessages messages={errors} />
       <Button
         size="md"
+        variant="light"
         disabled={busy}
         onClick={() => {
           void signOut()

@@ -92,6 +92,7 @@ function App() {
           </Text>
           <Button
             size="md"
+            variant="light"
             onClick={() => {
               setPage('loading')
               setAttempt((value) => value + 1)

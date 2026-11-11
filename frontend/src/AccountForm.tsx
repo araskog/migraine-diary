@@ -101,7 +101,9 @@ export default function AccountForm({
         </Text>
       </Stack>
       <SegmentedControl
-        size="md"
+        size="lg"
+        fullWidth
+        bg="sage.0"
         value={mode}
         disabled={busy}
         aria-label="Account options"
@@ -138,25 +140,35 @@ export default function AccountForm({
             maxLength={254}
             disabled={busy}
           />
-          <TextInput
-            key={mode}
-            id="password"
-            name="password"
-            label="Password"
-            type="password"
-            size="md"
-            autoComplete={
-              mode === 'register' ? 'new-password' : 'current-password'
-            }
-            required
-            maxLength={1024}
-            disabled={busy}
-            description={
-              mode === 'register'
-                ? 'Use at least 8 characters. Avoid common passwords, only numbers, or a password similar to your email.'
-                : undefined
-            }
-          />
+          <Stack gap="xs">
+            <TextInput
+              key={mode}
+              id="password"
+              name="password"
+              label="Password"
+              type="password"
+              size="md"
+              autoComplete={
+                mode === 'register' ? 'new-password' : 'current-password'
+              }
+              required
+              maxLength={1024}
+              disabled={busy}
+              aria-describedby={
+                mode === 'register' ? 'password-help' : undefined
+              }
+            />
+            <Text
+              id="password-help"
+              size="xs"
+              c="gray.7"
+              aria-hidden={mode !== 'register'}
+              style={{ visibility: mode === 'register' ? 'visible' : 'hidden' }}
+            >
+              Use at least 8 characters. Avoid common passwords, only numbers,
+              or a password similar to your email.
+            </Text>
+          </Stack>
           <ErrorMessages messages={errors} />
           <Button size="md" disabled={busy} type="submit">
             {busy

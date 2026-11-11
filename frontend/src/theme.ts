@@ -7,15 +7,15 @@ export const theme = createTheme({
   black: '#263b31',
   components: {
     Button: Button.extend({
-      defaultProps: { color: 'sage.1', autoContrast: true },
+      defaultProps: { color: 'sage', autoContrast: true },
     }),
     SegmentedControl: SegmentedControl.extend({
-      defaultProps: { color: 'sage.1', autoContrast: true },
+      defaultProps: { color: 'sage', autoContrast: true },
     }),
   },
   colors: {
     sage: [
-      '#f3f7f2',
+      '#edf2ed',
       '#e1ecdf',
       '#c8dbc5',
       '#a8c3a5',
