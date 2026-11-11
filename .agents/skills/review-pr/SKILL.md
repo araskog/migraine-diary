@@ -26,7 +26,7 @@ Keep reports separate and concise. Use the exact reviewer role as the heading, f
 
 Each finding gives a file/line, concrete problem and consequence, with the relevant rule or requirement where needed. Distinguish defects from questions or optional suggestions and prioritize by actual impact. Missing required checks are findings; other unverified behavior is not proof of a bug. Do not invent findings to meet a quota.
 
-Submit each report as a GitHub review, with actionable findings as inline comments on the relevant diff lines. If a finding cannot be attached inline, include it in the review summary. Use the review outcome supported by the findings; if account restrictions prevent that outcome, report the limitation. For coordinator publication, append “(via coordinator)” to the role heading.
+Submit each report as a GitHub review, with actionable findings as inline comments on the relevant diff lines. If a finding cannot be attached inline, include it in the review summary. Use the review outcome supported by the findings; if account restrictions prevent that outcome, report the limitation.
 
 The Builder addresses findings in focused commits and replies directly to each specific comment with the fix commit and verification, or a reason for deferring or rejecting it. Resolve an inline thread only after reviewer confirmation. For summary findings without a reply thread, post a linked Builder response. On corrections or changed base/head, record the new IDs, inspect the updated diff, rerun affected checks, and request rechecks of findings and newly affected behavior. Do not carry approval forward to unreviewed changes. Record reasons for rejecting or deferring findings and escalate unresolved disagreements to the owner; never merge.
 
