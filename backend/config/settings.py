@@ -1,4 +1,4 @@
-"""Local development settings. Deployment is outside this foundation."""
+"""Shared application settings and local development defaults."""
 
 import os
 
