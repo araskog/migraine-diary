@@ -1,4 +1,5 @@
 import { Button, createTheme, SegmentedControl } from '@mantine/core'
+import type { CSSVariablesResolver } from '@mantine/core'
 
 export const theme = createTheme({
   primaryColor: 'sage',
@@ -27,4 +28,10 @@ export const theme = createTheme({
       '#203f31',
     ],
   },
+})
+
+export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
+  variables: {},
+  light: { '--mantine-color-dimmed': theme.colors.gray[7] },
+  dark: {},
 })
