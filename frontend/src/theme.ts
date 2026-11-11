@@ -33,11 +33,13 @@ export const theme = createTheme({
 export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
   variables: {},
   light: {
+    '--app-brand-text': theme.black,
     '--mantine-color-dimmed': theme.colors.gray[7],
     '--app-control-background': theme.colors.sage[0],
     '--app-color-positive': theme.colors.sage[8],
   },
   dark: {
+    '--app-brand-text': theme.colors.sage[0],
     '--app-control-background': theme.colors.dark[6],
     '--app-color-positive': theme.colors.sage[3],
   },

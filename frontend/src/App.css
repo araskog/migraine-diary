@@ -24,6 +24,7 @@
   color: var(--app-color-positive);
 }
 .app .app-brand-name {
+  color: var(--app-brand-text);
   font-family: Georgia, 'Times New Roman', serif;
   font-size: clamp(1.1rem, 3.8vw, 1.65rem);
   line-height: 1.2;
