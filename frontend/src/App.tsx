@@ -87,6 +87,9 @@ function App() {
           onSessionRefreshed={setSession}
         />
       )}
+      <Text c="dimmed" size="xs" mt="xl" ta="center">
+        Local preview · synthetic data only
+      </Text>
     </Container>
   )
 }

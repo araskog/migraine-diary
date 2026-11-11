@@ -1,15 +1,11 @@
 .app .app-header {
   padding-bottom: var(--mantine-spacing-lg);
-  border-bottom: 1px solid var(--mantine-color-gray-3);
+  border-bottom: 1px solid var(--mantine-color-default-border);
 }
 
 .app .page {
   max-width: 440px;
   margin: calc(var(--mantine-spacing-xl) * 2) auto 0;
-}
-
-.app .identity {
-  overflow-wrap: anywhere;
 }
 
 @media (max-width: 540px) {

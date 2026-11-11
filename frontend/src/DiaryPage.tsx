@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Group, Stack, Text, Title } from '@mantine/core'
+import { ActionIcon, Menu, Stack, Text, Title } from '@mantine/core'
 import AppHeader from './AppHeader'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
@@ -55,20 +55,51 @@ export default function DiaryPage({
   return (
     <>
       <AppHeader>
-        <Group gap="sm">
-          <Text c="dimmed" size="sm" className="identity">
-            Signed in as <strong>{email}</strong>
-          </Text>
-          <Button
-            variant="light"
-            disabled={busy || saving}
-            onClick={() => {
-              void signOut()
-            }}
-          >
-            {busy ? 'Signing out…' : 'Sign out'}
-          </Button>
-        </Group>
+        <Menu position="bottom-end" width={260} shadow="md">
+          <Menu.Target>
+            <ActionIcon
+              variant="default"
+              size={44}
+              radius="xl"
+              aria-label="Account menu"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
+              </svg>
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Label>
+              Signed in as
+              <Text
+                size="sm"
+                c="var(--mantine-color-text)"
+                style={{ overflowWrap: 'anywhere' }}
+              >
+                {email}
+              </Text>
+            </Menu.Label>
+            <Menu.Divider />
+            <Menu.Item
+              disabled={busy || saving}
+              onClick={() => {
+                void signOut()
+              }}
+            >
+              {busy ? 'Signing out…' : 'Sign out'}
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </AppHeader>
       <Stack component="section" gap="lg" className="page">
         <Title order={1}>Your diary</Title>

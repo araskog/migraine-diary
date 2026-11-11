@@ -14,7 +14,7 @@ createRoot(root).render(
     <MantineProvider
       theme={theme}
       cssVariablesResolver={cssVariablesResolver}
-      forceColorScheme="light"
+      defaultColorScheme="dark"
     >
       <App />
     </MantineProvider>

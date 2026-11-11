@@ -11,11 +11,11 @@
 }
 
 .diary-entries .migraine {
-  color: var(--mantine-color-red-8);
+  color: light-dark(var(--mantine-color-red-8), var(--mantine-color-red-4));
 }
 
 .diary-entries .migraine_free {
-  color: var(--mantine-color-sage-7);
+  color: light-dark(var(--mantine-color-sage-7), var(--mantine-color-sage-3));
 }
 
 .diary-entries [data-selected] .calendar-marker:not(.migraine) {
