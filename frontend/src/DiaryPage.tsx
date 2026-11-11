@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Button, Paper, Stack, Text, Title } from '@mantine/core'
 import ErrorMessages from './ErrorMessages'
 import { getSession, isSession } from './session'
 import type { Session } from './session'
@@ -49,28 +50,38 @@ export default function DiaryPage({
   }
 
   return (
-    <section>
-      <p className="eyebrow">Your space</p>
-      <h1>Your diary</h1>
-      <p>
-        Signed in as <strong>{email}</strong>
-      </p>
-      <div className="placeholder">
-        <h2>A place to keep track</h2>
-        <p>
-          Your account is ready. Recording migraine days and migraine-free days
-          is coming in the next diary increment.
-        </p>
-      </div>
+    <Stack component="section" gap="lg" className="page">
+      <Stack gap="xs">
+        <Text size="sm" c="dimmed">
+          Your space
+        </Text>
+        <Title order={1}>Your diary</Title>
+        <Text c="dimmed" className="identity">
+          Signed in as <strong>{email}</strong>
+        </Text>
+      </Stack>
+      <Paper withBorder p="lg">
+        <Stack gap="sm">
+          <Title order={2} size="h4">
+            A place to keep track
+          </Title>
+          <Text c="dimmed">
+            Your account is ready. Recording migraine days and migraine-free
+            days is coming in the next diary increment.
+          </Text>
+        </Stack>
+      </Paper>
       <ErrorMessages messages={errors} />
-      <button
+      <Button
+        size="md"
+        variant="light"
         disabled={busy}
         onClick={() => {
           void signOut()
         }}
       >
         {busy ? 'Signing out…' : 'Sign out'}
-      </button>
-    </section>
+      </Button>
+    </Stack>
   )
 }

@@ -1,4 +1,12 @@
 import { useState } from 'react'
+import {
+  Button,
+  SegmentedControl,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
 import type { FormEvent } from 'react'
 import ErrorMessages from './ErrorMessages'
 import { getSession, isSession } from './session'
@@ -78,78 +86,102 @@ export default function AccountForm({
   }
 
   return (
-    <section>
-      <p className="eyebrow">A little space for you</p>
-      <h1>{mode === 'register' ? 'Create your account' : 'Welcome back'}</h1>
-      <p className="intro">
-        {mode === 'register'
-          ? 'Start with an email and password.'
-          : 'Sign in to open your diary.'}
-      </p>
-      <div className="switch" aria-label="Account options">
-        {(['sign-in', 'register'] as const).map((option) => (
-          <button
-            key={option}
-            aria-pressed={mode === option}
-            disabled={busy}
-            onClick={() => {
-              setMode(option)
-              setErrors([])
-              setShowNotice(false)
-            }}
-          >
-            {option === 'register' ? 'Create account' : 'Sign in'}
-          </button>
-        ))}
-      </div>
-      {showNotice && notice && <p role="status">{notice}</p>}
+    <Stack component="section" gap="lg" className="page">
+      <Stack gap="xs">
+        <Text size="sm" c="dimmed">
+          A little space for you
+        </Text>
+        <Title order={1}>
+          {mode === 'register' ? 'Create your account' : 'Welcome back'}
+        </Title>
+        <Text c="dimmed">
+          {mode === 'register'
+            ? 'Start with an email and password.'
+            : 'Sign in to open your diary.'}
+        </Text>
+      </Stack>
+      <SegmentedControl
+        size="lg"
+        fullWidth
+        bg="sage.0"
+        value={mode}
+        disabled={busy}
+        aria-label="Account options"
+        data={[
+          { value: 'sign-in', label: 'Sign in' },
+          { value: 'register', label: 'Create account' },
+        ]}
+        onChange={(value) => {
+          if (value !== 'sign-in' && value !== 'register') return
+          setMode(value)
+          setErrors([])
+          setShowNotice(false)
+        }}
+      />
+      {showNotice && notice && (
+        <Text role="status" c="sage.8">
+          {notice}
+        </Text>
+      )}
       <form
         onSubmit={(event) => {
           void submit(event)
         }}
       >
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          maxLength={254}
-          disabled={busy}
-        />
-        <label htmlFor="password">Password</label>
-        <input
-          key={mode}
-          id="password"
-          name="password"
-          type="password"
-          autoComplete={
-            mode === 'register' ? 'new-password' : 'current-password'
-          }
-          required
-          maxLength={1024}
-          aria-describedby={mode === 'register' ? 'password-help' : undefined}
-          disabled={busy}
-        />
-        {mode === 'register' && (
-          <p className="help" id="password-help">
-            Use at least 8 characters. Avoid common passwords, only numbers, or
-            a password similar to your email.
-          </p>
-        )}
-        <ErrorMessages messages={errors} />
-        <button className="primary" disabled={busy} type="submit">
-          {busy
-            ? 'Please wait…'
-            : mode === 'register'
-              ? 'Create account'
-              : 'Sign in'}
-        </button>
+        <Stack gap="lg">
+          <TextInput
+            id="email"
+            name="email"
+            label="Email"
+            type="email"
+            size="md"
+            autoComplete="email"
+            required
+            maxLength={254}
+            disabled={busy}
+          />
+          <Stack gap="xs">
+            <TextInput
+              key={mode}
+              id="password"
+              name="password"
+              label="Password"
+              type="password"
+              size="md"
+              autoComplete={
+                mode === 'register' ? 'new-password' : 'current-password'
+              }
+              required
+              maxLength={1024}
+              disabled={busy}
+              aria-describedby={
+                mode === 'register' ? 'password-help' : undefined
+              }
+            />
+            <Text
+              id="password-help"
+              size="xs"
+              c="gray.7"
+              aria-hidden={mode !== 'register'}
+              style={{ visibility: mode === 'register' ? 'visible' : 'hidden' }}
+            >
+              Use at least 8 characters. Avoid common passwords, only numbers,
+              or a password similar to your email.
+            </Text>
+          </Stack>
+          <ErrorMessages messages={errors} />
+          <Button size="md" disabled={busy} type="submit">
+            {busy
+              ? 'Please wait…'
+              : mode === 'register'
+                ? 'Create account'
+                : 'Sign in'}
+          </Button>
+        </Stack>
       </form>
-      <p className="footnote">
+      <Text size="sm" c="dimmed">
         Password recovery is not available in this local preview yet.
-      </p>
-    </section>
+      </Text>
+    </Stack>
   )
 }
