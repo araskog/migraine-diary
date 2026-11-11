@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Button, Container, Group, Stack, Text, Title } from '@mantine/core'
+import { Button, Container, Stack, Text, Title } from '@mantine/core'
 import AccountForm from './AccountForm'
+import AppHeader from './AppHeader'
 import DiaryPage from './DiaryPage'
 import { getSession } from './session'
 import type { Session } from './session'
@@ -46,19 +47,7 @@ function App() {
 
   return (
     <Container component="main" size={960} px="lg" py="xl" className="app">
-      <Group
-        component="header"
-        justify="space-between"
-        gap="sm"
-        className="app-header"
-      >
-        <Text fw={700} size="lg">
-          Migraine Diary
-        </Text>
-        <Text c="dimmed" size="xs">
-          Local preview · synthetic data only
-        </Text>
-      </Group>
+      {page !== 'diary' && <AppHeader />}
       {page === 'loading' && (
         <Text role="status" mt="xl">
           Checking your session…

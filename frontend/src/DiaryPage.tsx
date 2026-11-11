@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button, Group, Stack, Text, Title } from '@mantine/core'
+import AppHeader from './AppHeader'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
 import { getSession, isSession } from './session'
@@ -52,15 +53,13 @@ export default function DiaryPage({
   }
 
   return (
-    <Stack component="section" gap="lg" className="page">
-      <Stack gap="xs">
-        <Text size="sm" c="dimmed">
-          Your space
-        </Text>
-        <Group justify="space-between" align="center">
-          <Title order={1}>Your diary</Title>
+    <>
+      <AppHeader>
+        <Group gap="sm">
+          <Text c="dimmed" size="sm" className="identity">
+            Signed in as <strong>{email}</strong>
+          </Text>
           <Button
-            size="md"
             variant="light"
             disabled={busy || saving}
             onClick={() => {
@@ -70,18 +69,18 @@ export default function DiaryPage({
             {busy ? 'Signing out…' : 'Sign out'}
           </Button>
         </Group>
-        <Text c="dimmed" className="identity">
-          Signed in as <strong>{email}</strong>
-        </Text>
+      </AppHeader>
+      <Stack component="section" gap="lg" className="page">
+        <Title order={1}>Your diary</Title>
+        <DiaryEntries
+          csrfToken={csrfToken}
+          disabled={busy || saving}
+          onSavingChange={setSaving}
+          onSignedOut={onSignedOut}
+          onSessionRefreshed={onSessionRefreshed}
+        />
+        <ErrorMessages messages={errors} />
       </Stack>
-      <DiaryEntries
-        csrfToken={csrfToken}
-        disabled={busy || saving}
-        onSavingChange={setSaving}
-        onSignedOut={onSignedOut}
-        onSessionRefreshed={onSessionRefreshed}
-      />
-      <ErrorMessages messages={errors} />
-    </Stack>
+    </>
   )
 }

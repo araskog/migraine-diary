@@ -89,7 +89,6 @@ export default function DiaryEntries({
           weekendDays={[]}
           getDayProps={(day) => ({
             disabled: disabled || day > today,
-            'data-status': statuses.get(day),
             'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
           })}
           renderDay={(day) => (
