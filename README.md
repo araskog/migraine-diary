@@ -44,6 +44,7 @@ From `frontend/`:
 ```sh
 npm run format:check
 npm run lint
+npm test
 npm run typecheck
 npm run build
 ```
