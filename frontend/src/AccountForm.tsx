@@ -15,7 +15,7 @@ import type { Session } from './session'
 type AccountFormProps = {
   csrfToken: string
   notice: string
-  onAuthenticated: (session: Session) => Promise<void>
+  onAuthenticated: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
 }
 
@@ -77,7 +77,7 @@ export default function AccountForm({
       }
       if (!isSession(body)) throw new Error('Unexpected response')
       form.reset()
-      await onAuthenticated(body)
+      onAuthenticated(body)
     } catch {
       setErrors(['Unable to connect. Please try again.'])
     } finally {

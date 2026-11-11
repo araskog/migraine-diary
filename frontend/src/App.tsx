@@ -6,19 +6,6 @@ import { getSession } from './session'
 import type { Session } from './session'
 import './App.css'
 
-async function checkDiary() {
-  const response = await fetch('/api/diary/', { cache: 'no-store' })
-  const body: unknown = await response.json()
-  if (
-    !response.ok ||
-    typeof body !== 'object' ||
-    body === null ||
-    !('recordingAvailable' in body) ||
-    body.recordingAvailable !== false
-  )
-    throw new Error('Diary unavailable')
-}
-
 function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [page, setPage] = useState<
@@ -32,7 +19,6 @@ function App() {
     async function restoreSession() {
       try {
         const next = await getSession()
-        if (next.user) await checkDiary()
         if (active) {
           setSession(next)
           setPage(next.user ? 'diary' : 'account')
@@ -47,15 +33,9 @@ function App() {
     }
   }, [attempt])
 
-  async function openDiary(next: Session) {
+  function openDiary(next: Session) {
     setSession(next)
-    try {
-      if (!next.user) throw new Error('Missing authenticated user')
-      await checkDiary()
-      setPage('diary')
-    } catch {
-      setPage('unavailable')
-    }
+    setPage(next.user ? 'diary' : 'account')
   }
 
   function finishSignOut(next: Session) {

@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Button, Paper, Stack, Text, Title } from '@mantine/core'
+import { Button, Stack, Text, Title } from '@mantine/core'
 import ErrorMessages from './ErrorMessages'
+import DiaryEntries from './DiaryEntries'
 import { getSession, isSession } from './session'
 import type { Session } from './session'
 
@@ -18,6 +19,7 @@ export default function DiaryPage({
   onSessionRefreshed,
 }: DiaryPageProps) {
   const [busy, setBusy] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
 
   async function signOut() {
@@ -60,22 +62,18 @@ export default function DiaryPage({
           Signed in as <strong>{email}</strong>
         </Text>
       </Stack>
-      <Paper withBorder p="lg">
-        <Stack gap="sm">
-          <Title order={2} size="h4">
-            A place to keep track
-          </Title>
-          <Text c="dimmed">
-            Your account is ready. Recording migraine days and migraine-free
-            days is coming in the next diary increment.
-          </Text>
-        </Stack>
-      </Paper>
+      <DiaryEntries
+        csrfToken={csrfToken}
+        disabled={busy || saving}
+        onSavingChange={setSaving}
+        onSignedOut={onSignedOut}
+        onSessionRefreshed={onSessionRefreshed}
+      />
       <ErrorMessages messages={errors} />
       <Button
         size="md"
         variant="light"
-        disabled={busy}
+        disabled={busy || saving}
         onClick={() => {
           void signOut()
         }}
