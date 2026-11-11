@@ -23,7 +23,7 @@ Use [Mantine](https://mantine.dev/) components and theme tokens for controls, ty
 
 ## Later Direction
 
-AI summaries follow the usable diary; reports follow summaries. No LLM framework is selected. Render with Neon PostgreSQL is a hosting proposal, not an implemented deployment.
+AI summaries follow the usable diary; reports follow summaries. No LLM framework is selected. The deployment configuration targets one Render web service in Frankfurt with Neon PostgreSQL. Django serves the built React app and static assets on the same origin. `render.yaml` defines the free service and deployment commands; credentials are supplied through the hosting dashboard.
 
 ## References
 
