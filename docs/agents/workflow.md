@@ -12,7 +12,7 @@ Agree on important test boundaries per feature. Use a short plan for bounded tas
 
 1. Work on a task branch. Reuse the branch for its existing task.
 2. One implementation agent reads the coding standards before writing code, implements only the approved increment, runs required checks, reports results, and stops when that increment is complete.
-3. Prefer small, focused commits, each representing one coherent change, so reviewers can follow the work. Keep related code and tests together and avoid mixing unrelated changes. Use Conventional Commits, push, and open a PR. The PR description covers the problem, final behavior, scope, and requirements or spec link. Put test results and review follow-ups in commit messages and review comments. Attach screenshots to the PR for UI changes; do not commit screenshot files.
+3. Prefer small, focused commits, each representing one coherent change, so reviewers can follow the work. Keep related code and tests together and avoid mixing unrelated changes. Use Conventional Commits, push, and open a PR. The PR description covers the problem, final behavior, scope, and requirements or spec link. Put test results and review follow-ups in commit messages and review comments. Attach screenshots to the PR for UI changes; do not commit screenshot files. Verify attachments render in the PR and report any missing attachment as incomplete.
 4. Use the [review-pr skill](../../.agents/skills/review-pr/SKILL.md) for the two independent reviews, PR comments, and correction rechecks.
 5. Present checks and both review reports. The owner decides and performs the merge. Agents never merge, enable auto-merge, bypass branch protections, or push directly to `main`.
 
