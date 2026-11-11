@@ -32,4 +32,4 @@ The [review-pr skill](../../.agents/skills/review-pr/SKILL.md) defines the Code 
 
 Builder commits use the Git name `Builder Agent` and the repository's existing commit email, applied per commit. Do not change global Git settings or rewrite earlier commits. Reviewers remain read-only and do not create commits.
 
-Git author metadata does not change the account authenticating pushes or GitHub comments. With the current connection, those actions use the owner's GitHub account. Head review reports with the exact reviewer role name and identify when the coordinating agent publishes another agent's report. Distinct GitHub actors require separately authorized accounts or a GitHub App; do not claim that role labels create separate accounts.
+Git author metadata does not change the account authenticating pushes or GitHub comments. With the current connection, those actions use the owner's GitHub account. Head review reports with the exact reviewer role name. Distinct GitHub actors require separately authorized accounts or a GitHub App; do not claim that role labels create separate accounts.
