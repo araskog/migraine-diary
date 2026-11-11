@@ -103,7 +103,7 @@ export default function AccountForm({
       <SegmentedControl
         size="lg"
         fullWidth
-        bg="sage.0"
+        bg="var(--app-control-background)"
         value={mode}
         disabled={busy}
         aria-label="Account options"
@@ -119,7 +119,7 @@ export default function AccountForm({
         }}
       />
       {showNotice && notice && (
-        <Text role="status" c="sage.8">
+        <Text role="status" c="var(--app-color-positive)">
           {notice}
         </Text>
       )}
@@ -161,7 +161,7 @@ export default function AccountForm({
             <Text
               id="password-help"
               size="xs"
-              c="gray.7"
+              c="dimmed"
               aria-hidden={mode !== 'register'}
               style={{ visibility: mode === 'register' ? 'visible' : 'hidden' }}
             >

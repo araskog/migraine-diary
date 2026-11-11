@@ -1,6 +1,6 @@
 .app .app-header {
   padding-bottom: var(--mantine-spacing-lg);
-  border-bottom: 1px solid var(--mantine-color-gray-3);
+  border-bottom: 1px solid var(--mantine-color-default-border);
 }
 
 .app .page {

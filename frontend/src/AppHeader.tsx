@@ -1,9 +1,19 @@
 import type { ReactNode } from 'react'
-import { Group, Stack, Text } from '@mantine/core'
+import {
+  Button,
+  Group,
+  Stack,
+  Text,
+  useComputedColorScheme,
+  useMantineColorScheme,
+} from '@mantine/core'
 
 type AppHeaderProps = { children?: ReactNode }
 
 export default function AppHeader({ children }: AppHeaderProps) {
+  const { toggleColorScheme } = useMantineColorScheme()
+  const colorScheme = useComputedColorScheme('dark')
+
   return (
     <Group
       component="header"
@@ -19,7 +29,12 @@ export default function AppHeader({ children }: AppHeaderProps) {
           Local preview · synthetic data only
         </Text>
       </Stack>
-      {children}
+      <Group gap="sm">
+        <Button variant="light" size="xs" onClick={() => toggleColorScheme()}>
+          Switch to {colorScheme === 'dark' ? 'light' : 'dark'} mode
+        </Button>
+        {children}
+      </Group>
     </Group>
   )
 }
