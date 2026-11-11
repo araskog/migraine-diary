@@ -1,10 +1,18 @@
-import { createTheme } from '@mantine/core'
+import { Button, createTheme, SegmentedControl } from '@mantine/core'
 
 export const theme = createTheme({
   primaryColor: 'sage',
   primaryShade: 7,
   defaultRadius: 'md',
   black: '#263b31',
+  components: {
+    Button: Button.extend({
+      defaultProps: { color: 'sage.1', autoContrast: true },
+    }),
+    SegmentedControl: SegmentedControl.extend({
+      defaultProps: { color: 'sage.1', autoContrast: true },
+    }),
+  },
   colors: {
     sage: [
       '#f3f7f2',

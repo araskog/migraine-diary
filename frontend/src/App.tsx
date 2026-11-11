@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Button, Container, Group, Stack, Text, Title } from '@mantine/core'
 import AccountForm from './AccountForm'
 import DiaryPage from './DiaryPage'
 import { getSession } from './session'
@@ -64,25 +65,41 @@ function App() {
   }
 
   return (
-    <main className="app">
-      <header>
-        <p className="brand">Migraine Diary</p>
-        <span className="local">Local preview · synthetic data only</span>
-      </header>
-      {page === 'loading' && <p role="status">Checking your session…</p>}
+    <Container component="main" size={960} px="lg" py="xl" className="app">
+      <Group
+        component="header"
+        justify="space-between"
+        gap="sm"
+        className="app-header"
+      >
+        <Text fw={700} size="lg">
+          Migraine Diary
+        </Text>
+        <Text c="dimmed" size="xs">
+          Local preview · synthetic data only
+        </Text>
+      </Group>
+      {page === 'loading' && (
+        <Text role="status" mt="xl">
+          Checking your session…
+        </Text>
+      )}
       {page === 'unavailable' && (
-        <section>
-          <h1>Unable to connect</h1>
-          <p>Check that the local service is running, then try again.</p>
-          <button
+        <Stack component="section" gap="lg" className="page">
+          <Title order={1}>Unable to connect</Title>
+          <Text c="dimmed">
+            Check that the local service is running, then try again.
+          </Text>
+          <Button
+            size="md"
             onClick={() => {
               setPage('loading')
               setAttempt((value) => value + 1)
             }}
           >
             Try again
-          </button>
-        </section>
+          </Button>
+        </Stack>
       )}
       {page === 'account' && session && (
         <AccountForm
@@ -100,7 +117,7 @@ function App() {
           onSessionRefreshed={setSession}
         />
       )}
-    </main>
+    </Container>
   )
 }
 export default App

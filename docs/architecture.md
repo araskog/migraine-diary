@@ -17,9 +17,9 @@ Local development uses an isolated Python environment managed by uv and local Po
 
 ## Interface Design
 
-Use the approved clear, approachable direction: a neutral page, soft sage backgrounds on secondary controls, and dark green for primary actions and selected states. Keep typography simple, spacing generous, and forms uncluttered, with visible keyboard focus and a mobile-friendly layout.
+Use the approved clear, approachable direction: a white page and pale sage controls with dark text for primary actions and selected states. Keep typography simple, spacing generous, and forms uncluttered, with visible keyboard focus and a mobile-friendly layout.
 
-Continue from the existing account screens and shared CSS custom properties in `frontend/src/App.css` and `frontend/src/index.css`. Reuse these visual conventions across new components rather than introducing a new palette or component library without agreement.
+Use [Mantine](https://mantine.dev/) components and theme tokens for controls, typography, spacing, and surfaces. The shared theme in `frontend/src/theme.ts` defines the sage palette and control radii; `frontend/src/main.tsx` applies it in light mode. Keep custom CSS scoped to application layout or UI the library does not provide.
 
 ## Later Direction
 

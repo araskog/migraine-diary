@@ -1,186 +1,19 @@
-.app {
-  --color-text: #263b31;
-  --color-muted: #617067;
-  --color-white: #fff;
-  --color-action: #315c46;
-  --color-button: #e1ecdf;
-  --color-button-text: #294c38;
-  --color-border: #e0e7e1;
-  --color-input-border: #a7b7ab;
-  --color-card-border: #d4dfd5;
-  --color-sage: #edf2ed;
-  --color-eyebrow: #54735e;
-  --color-error: #8b2e24;
-  --color-error-border: #b95443;
-  --color-focus: #ac732b;
-  --radius-control: 7px;
-  --radius-card: 12px;
-
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 28px 24px 60px;
-  color: var(--color-text);
+.app .app-header {
+  padding-bottom: var(--mantine-spacing-lg);
+  border-bottom: 1px solid var(--mantine-color-gray-3);
 }
 
-.app header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--color-border);
+.app .page {
+  max-width: 440px;
+  margin: calc(var(--mantine-spacing-xl) * 2) auto 0;
 }
 
-.app .brand {
-  font-weight: 700;
-  font-size: 1.15rem;
-  margin: 0;
-}
-
-.app .local,
-.app .footnote {
-  color: var(--color-muted);
-  font-size: 0.82rem;
-}
-
-.app section {
-  max-width: 460px;
-  margin: 64px auto 0;
-}
-
-.app h1 {
-  font-size: clamp(2rem, 7vw, 2.6rem);
-  letter-spacing: -0.04em;
-  line-height: 1.15;
-  margin: 12px 0;
-}
-
-.app h2 {
-  font-size: 1.15rem;
-}
-
-.app p {
-  line-height: 1.6;
-}
-
-.app .eyebrow {
-  font-size: 0.85rem;
-  color: var(--color-eyebrow);
-}
-
-.app .intro {
-  color: var(--color-muted);
-  margin-bottom: 28px;
-}
-
-.app .switch {
-  display: flex;
-  gap: 6px;
-  padding: 5px;
-  border-radius: 10px;
-  background: var(--color-sage);
-  margin-bottom: 28px;
-}
-
-.app button {
-  padding: 12px 18px;
-  border: 0;
-  border-radius: var(--radius-control);
-  color: var(--color-button-text);
-  background: var(--color-button);
-  cursor: pointer;
-  font: inherit;
-  font-weight: 600;
-}
-
-.app .switch button {
-  flex: 1;
-  background: transparent;
-}
-
-.app .switch button[aria-pressed='true'],
-.app .primary {
-  color: var(--color-white);
-  background: var(--color-action);
-}
-
-.app form {
-  display: flex;
-  flex-direction: column;
-}
-
-.app label {
-  margin: 0 0 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.app input {
-  width: 100%;
-  border: 1px solid var(--color-input-border);
-  border-radius: var(--radius-control);
-  background: var(--color-white);
-  padding: 13px;
-  margin-bottom: 22px;
-  color: var(--color-text);
-  font: inherit;
-}
-
-.app .help {
-  font-size: 0.85rem;
-  color: var(--color-muted);
-  margin: -10px 0 22px;
-}
-
-.app button:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
-.app button:focus-visible,
-.app input:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 3px;
-}
-
-.app .errors {
-  color: var(--color-error);
-  border-left: 3px solid var(--color-error-border);
-  padding-left: 12px;
-  margin-bottom: 20px;
-}
-
-.app .errors p {
-  margin: 5px 0;
-}
-
-.app .footnote {
-  margin-top: 24px;
-}
-
-.app .placeholder {
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-card);
-  padding: 20px 24px;
-  margin: 28px 0;
-}
-
-.app strong {
+.app .identity {
   overflow-wrap: anywhere;
 }
 
 @media (max-width: 540px) {
-  .app {
-    padding: 22px 22px 40px;
-  }
-
-  .app header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .app section {
-    margin-top: 38px;
+  .app .page {
+    margin-top: var(--mantine-spacing-xl);
   }
 }
