@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react'
 import { Button, Group, Stack, Text } from '@mantine/core'
 import DiaryDetailsFields from './DiaryDetailsFields'
 import ErrorMessages from './ErrorMessages'
-import { emptyDetails, localDate, saveEntry } from './diary'
+import { localDate, saveEntry } from './diary'
 import type { DiaryDetails, DiaryEntry } from './diary'
 import { getSession } from './session'
 import type { Session } from './session'
 
 type DiaryEntryFormProps = {
   date: string
-  entry?: DiaryEntry
+  entry: DiaryEntry
   csrfToken: string
   disabled: boolean
   onSaved: (entry: DiaryEntry) => void
@@ -19,8 +19,7 @@ type DiaryEntryFormProps = {
   onSessionRefreshed: (session: Session) => void
 }
 
-function detailsOf(entry?: DiaryEntry): DiaryDetails {
-  if (!entry) return emptyDetails()
+function detailsOf(entry: DiaryEntry): DiaryDetails {
   const {
     medication_taken,
     medication_name,
@@ -48,7 +47,7 @@ export default function DiaryEntryForm({
   onSignedOut,
   onSessionRefreshed,
 }: DiaryEntryFormProps) {
-  const status = entry?.status
+  const status = entry.status
   const [details, setDetails] = useState(() => detailsOf(entry))
   const [savedDetails, setSavedDetails] = useState(() => detailsOf(entry))
   const [saving, setSaving] = useState(false)
@@ -103,52 +102,46 @@ export default function DiaryEntryForm({
 
   return (
     <Stack gap="xl">
-      {status ? (
-        <Stack
-          component="form"
-          gap="xl"
-          onSubmit={(event) => {
-            event.preventDefault()
-            void save()
+      <Stack
+        component="form"
+        gap="xl"
+        onSubmit={(event) => {
+          event.preventDefault()
+          void save()
+        }}
+      >
+        <DiaryDetailsFields
+          status={status}
+          value={details}
+          disabled={saving || disabled}
+          onChange={(value) => {
+            setDetails(value)
+            setNotice('')
           }}
-        >
-          <DiaryDetailsFields
-            status={status}
-            value={details}
-            disabled={saving || disabled}
-            onChange={(value) => {
-              setDetails(value)
-              setNotice('')
-            }}
-          />
-          <Group>
+        />
+        <Group>
+          <Button
+            type="submit"
+            disabled={!dirty || saving || disabled}
+            loading={saving}
+          >
+            Save details
+          </Button>
+          {dirty && (
             <Button
-              type="submit"
-              disabled={!dirty || saving || disabled}
-              loading={saving}
+              variant="subtle"
+              disabled={saving || disabled}
+              onClick={() => {
+                setDetails(savedDetails)
+                setNotice('')
+                setErrors([])
+              }}
             >
-              Save details
+              Discard changes
             </Button>
-            {dirty && (
-              <Button
-                variant="subtle"
-                disabled={saving || disabled}
-                onClick={() => {
-                  setDetails(savedDetails)
-                  setNotice('')
-                  setErrors([])
-                }}
-              >
-                Discard changes
-              </Button>
-            )}
-          </Group>
-        </Stack>
-      ) : (
-        <Text size="sm" c="dimmed">
-          Select this date in the calendar to record Migraine or Migraine-free.
-        </Text>
-      )}
+          )}
+        </Group>
+      </Stack>
       <ErrorMessages messages={errors} />
       {errors.length > 0 && status && (
         <Button

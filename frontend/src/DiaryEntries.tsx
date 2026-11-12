@@ -212,39 +212,41 @@ export default function DiaryEntries({
           </Text>
         </Group>
       </Box>
-      <Paper
-        component="section"
-        withBorder
-        p="xl"
-        radius="lg"
-        aria-label={`Details for ${dateLabel(date)}`}
-      >
-        <Stack gap="lg">
-          <Title order={2} size="h3">
-            Daily details
-          </Title>
-          <Text c="dimmed" size="sm">
-            {dateLabel(date)}
-          </Text>
-          <DiaryEntryForm
-            key={`${date}-${current?.status ?? ''}-${revision}`}
-            date={date}
-            entry={current}
-            csrfToken={csrfToken}
-            disabled={disabled}
-            onSaved={(saved) =>
-              setEntries((previous) => [
-                ...previous.filter((entry) => entry.date !== saved.date),
-                saved,
-              ])
-            }
-            onDirtyChange={onDirtyChange}
-            onSavingChange={onSavingChange}
-            onSignedOut={onSignedOut}
-            onSessionRefreshed={onSessionRefreshed}
-          />
-        </Stack>
-      </Paper>
+      {current && (
+        <Paper
+          component="section"
+          withBorder
+          p="xl"
+          radius="lg"
+          aria-label={`Details for ${dateLabel(date)}`}
+        >
+          <Stack gap="lg">
+            <Title order={2} size="h3">
+              Daily details
+            </Title>
+            <Text c="dimmed" size="sm">
+              {dateLabel(date)}
+            </Text>
+            <DiaryEntryForm
+              key={`${date}-${current?.status ?? ''}-${revision}`}
+              date={date}
+              entry={current}
+              csrfToken={csrfToken}
+              disabled={disabled}
+              onSaved={(saved) =>
+                setEntries((previous) => [
+                  ...previous.filter((entry) => entry.date !== saved.date),
+                  saved,
+                ])
+              }
+              onDirtyChange={onDirtyChange}
+              onSavingChange={onSavingChange}
+              onSignedOut={onSignedOut}
+              onSessionRefreshed={onSessionRefreshed}
+            />
+          </Stack>
+        </Paper>
+      )}
     </Box>
   )
 }
