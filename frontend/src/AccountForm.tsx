@@ -84,9 +84,13 @@ export default function AccountForm({
   return (
     <Stack component="section" gap="lg" className="page">
       <Stack gap="xs">
-        <Text size="sm" c="dimmed">
-          A little space for you
+        <Text fw={600}>Get to know your migraine patterns.</Text>
+        <Text c="dimmed">
+          Track migraine days over time and build a clearer picture of your
+          experience.
         </Text>
+      </Stack>
+      <Stack gap="xs">
         <Title order={1}>
           {mode === 'register' ? 'Create your account' : 'Welcome back'}
         </Title>
