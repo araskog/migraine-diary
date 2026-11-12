@@ -106,6 +106,8 @@ export default function DiaryEntries({
           weekendDays={[]}
           getDayProps={(day) => ({
             disabled: disabled || day > today,
+            className:
+              disabled && day <= today ? 'calendar-day-busy' : undefined,
             'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
           })}
           renderDay={(day) => {
@@ -145,6 +147,12 @@ export default function DiaryEntries({
                     entry={current}
                     csrfToken={csrfToken}
                     disabled={disabled}
+                    onCleared={() => {
+                      setSelectionOpened(false)
+                      setEntries((previous) =>
+                        previous.filter((entry) => entry.date !== date),
+                      )
+                    }}
                     onSaved={(saved) => {
                       setSelectionOpened(false)
                       setEntries((previous) => [

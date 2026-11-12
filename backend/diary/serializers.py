@@ -6,9 +6,8 @@ from rest_framework import serializers
 from .models import DiaryEntry
 
 
-class DiaryEntryInput(serializers.Serializer):
+class DiaryDateInput(serializers.Serializer):
     date = serializers.DateField()
-    status = serializers.ChoiceField(choices=DiaryEntry.Status.choices)
     timezone = serializers.CharField(max_length=255)
 
     def validate_timezone(self, value):
@@ -22,6 +21,10 @@ class DiaryEntryInput(serializers.Serializer):
         if attrs["date"] > today:
             raise serializers.ValidationError({"date": "Future dates cannot be saved."})
         return attrs
+
+
+class DiaryEntryInput(DiaryDateInput):
+    status = serializers.ChoiceField(choices=DiaryEntry.Status.choices)
 
 
 class DiaryEntryOutput(serializers.ModelSerializer):

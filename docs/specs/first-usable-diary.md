@@ -17,6 +17,7 @@ Include sign-out, password recovery, and correcting entries. Entries record migr
 | D5 | Another user cannot read or change these records, including through direct API requests. |
 | D6 | Invalid dates and dates later than today are rejected without creating or changing a record. Today follows the device's local timezone, including when travelling. Stored diary dates remain calendar dates and do not shift when the timezone changes. Validation is enforced by the backend using the supplied timezone. |
 | D7 | A missing entry has no calendar status icon or legend entry, never implying a confirmed migraine-free day. Its accessible date label identifies it as unrecorded. |
+| D8 | A user can clear a recorded migraine or migraine-free day. Clearing removes their entry and returns the date to unrecorded, without a status icon. The change persists after reopening; failed clears retain the saved calendar status and allow retrying. |
 | D9 | Registration, sign-in, recovery, recording, and correction work on mobile-sized screens and can be demonstrated locally with synthetic accounts and records. |
 
 ## Delivery and Verification
