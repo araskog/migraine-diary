@@ -215,6 +215,7 @@ export default function DiaryEntries({
       {current && (
         <Paper
           component="section"
+          bg="var(--app-intro-background)"
           withBorder
           p="xl"
           radius="lg"
