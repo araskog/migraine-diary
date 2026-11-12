@@ -8,7 +8,7 @@ import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
 from .settings import *  # noqa: F403
-from .settings import MIDDLEWARE, TEMPLATES
+from .settings import MIDDLEWARE, REST_FRAMEWORK, TEMPLATES
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 if (
@@ -72,3 +72,10 @@ STORAGES = {
     },
 }
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+REST_FRAMEWORK = {**REST_FRAMEWORK, "NUM_PROXIES": 1}
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+ANYMAIL = {"BREVO_API_KEY": os.environ.get("BREVO_API_KEY", ""), "REQUESTS_TIMEOUT": 10}
+DEFAULT_FROM_EMAIL = os.environ.get("PASSWORD_RESET_FROM_EMAIL", "")
+PASSWORD_RESET_ENABLED = bool(ANYMAIL["BREVO_API_KEY"] and DEFAULT_FROM_EMAIL)
+PASSWORD_RESET_ORIGIN = f"https://{ALLOWED_HOSTS[0]}"

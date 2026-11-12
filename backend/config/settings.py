@@ -79,3 +79,8 @@ TEMPLATES = [
     },
 ]
 STATIC_URL = "/static/"
+
+EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
+PASSWORD_RESET_ENABLED = False
+PASSWORD_RESET_TIMEOUT = 3600
+PASSWORD_RESET_ORIGIN = "http://127.0.0.1:5177/static/app"
