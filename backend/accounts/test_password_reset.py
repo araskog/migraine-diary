@@ -1,16 +1,21 @@
 import json
 import re
+from concurrent.futures import Future
 from datetime import datetime, timedelta
+from threading import Event
 from unittest.mock import patch
 
 import requests
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.core.cache import cache
-from django.test import Client, TestCase, override_settings
+from django.db import connection
+from django.test import Client, TestCase, TransactionTestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
+from . import password_reset_delivery as delivery
 from .models import User
 from .test_helpers import generated_password
 
@@ -32,6 +37,16 @@ class PasswordResetTests(TestCase):
         cache.clear()
         self.client = Client(enforce_csrf_checks=True)
         self.csrf = self.client.get("/api/session/").json()["csrfToken"]
+
+        def inline_delivery(email):
+            delivery.deliver_reset(email)
+            return True
+
+        self.dispatch = patch(
+            "accounts.password_reset.queue_reset", side_effect=inline_delivery
+        )
+        self.dispatch.start()
+        self.addCleanup(self.dispatch.stop)
 
     def request_reset(self, email="jane@example.test", **headers):
         return self.client.post(
@@ -168,16 +183,20 @@ class PasswordResetTests(TestCase):
 
     def test_delivery_failure_does_not_expose_email_or_token(self):
         with patch(
-            "accounts.password_reset.send_mail",
+            "accounts.password_reset_delivery.send_mail",
             side_effect=RuntimeError("sensitive provider detail"),
         ):
-            with self.assertLogs("accounts.password_reset", level="ERROR") as logs:
+            with self.assertLogs(
+                "accounts.password_reset_delivery", level="ERROR"
+            ) as logs:
                 failed = self.request_reset()
         unknown = self.request_reset("unknown@example.test")
         self.assertEqual(failed.json(), unknown.json())
         self.assertEqual(
             logs.output,
-            ["ERROR:accounts.password_reset:Password-reset email delivery failed."],
+            [
+                "ERROR:accounts.password_reset_delivery:Password-reset email delivery failed."
+            ],
         )
 
     def test_request_throttle_does_not_block_confirmation(self):
@@ -202,3 +221,76 @@ class PasswordResetTests(TestCase):
         body = json.loads(request.body)
         self.assertEqual(body["to"], [{"email": self.member.email}])
         self.assertIn("#reset-password/", body["textContent"])
+
+
+@override_settings(PASSWORD_RESET_ENABLED=True)
+class BackgroundResetTests(TransactionTestCase):
+    def setUp(self):
+        cache.clear()
+        User.objects.create_user("async@example.test", generated_password())
+        self.client = Client(enforce_csrf_checks=True)
+        self.csrf = self.client.get("/api/session/").json()["csrfToken"]
+
+    def test_request_does_not_lookup_account_or_wait_for_slow_delivery(self):
+        entered = Event()
+        release = Event()
+        futures = []
+
+        def blocked_mail(*args, **kwargs):
+            entered.set()
+            if not release.wait(timeout=5):
+                raise RuntimeError("Test delivery timed out")
+
+        def dispatch(email):
+            future = delivery.queue_reset(email)
+            futures.append(future)
+            return future
+
+        try:
+            with patch(
+                "accounts.password_reset_delivery.send_mail", side_effect=blocked_mail
+            ):
+                with patch("accounts.password_reset.queue_reset", side_effect=dispatch):
+                    with CaptureQueriesContext(connection) as queries:
+                        response = self.client.post(
+                            "/api/password-reset/",
+                            {"email": "async@example.test"},
+                            content_type="application/json",
+                            HTTP_X_CSRFTOKEN=self.csrf,
+                        )
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(len(queries), 0)
+                    self.assertTrue(entered.wait(timeout=3))
+                    self.assertFalse(release.is_set())
+                    unknown = self.client.post(
+                        "/api/password-reset/",
+                        {"email": "unknown@example.test"},
+                        content_type="application/json",
+                        HTTP_X_CSRFTOKEN=self.csrf,
+                    )
+                    self.assertEqual(response.json(), unknown.json())
+                    release.set()
+                    for future in futures:
+                        future.result(timeout=5)
+        finally:
+            release.set()
+            for future in futures:
+                if future is not None:
+                    future.result(timeout=5)
+
+    def test_background_capacity_is_bounded_and_released(self):
+        futures = []
+
+        def submit(*args):
+            future = Future()
+            futures.append(future)
+            return future
+
+        try:
+            with patch.object(delivery._executor, "submit", side_effect=submit):
+                for _ in range(4):
+                    self.assertIsNotNone(delivery.queue_reset("unknown@example.test"))
+                self.assertIsNone(delivery.queue_reset("unknown@example.test"))
+        finally:
+            for future in futures:
+                future.set_result(None)

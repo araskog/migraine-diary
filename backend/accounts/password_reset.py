@@ -1,14 +1,9 @@
-import logging
-
 from django.conf import settings
-from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
 from django.db import transaction
 from django.middleware.csrf import get_token
-from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.cache import never_cache
 from rest_framework import serializers
 from rest_framework.authentication import SessionAuthentication
@@ -18,8 +13,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from .models import User
-
-logger = logging.getLogger(__name__)
+from .password_reset_delivery import queue_reset
 
 
 class ResetEmail(serializers.Serializer):
@@ -55,24 +49,11 @@ def request_reset(request):
         return Response(
             {"detail": "Password recovery is temporarily unavailable."}, status=503
         )
-    form = PasswordResetForm({"email": data.validated_data["email"]})
-    form.is_valid()
-    for user in form.get_users(form.cleaned_data["email"]):
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
-        reset_url = f"{settings.PASSWORD_RESET_ORIGIN}/#reset-password/{uid}/{token}"
-        message = render_to_string(
-            "accounts/password_reset_email.txt", {"reset_url": reset_url}
+    if not queue_reset(data.validated_data["email"]):
+        return Response(
+            {"detail": "Password recovery is busy. Please try again shortly."},
+            status=503,
         )
-        try:
-            send_mail(
-                "Reset your Migraine Diary password",
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-            )
-        except Exception:
-            logger.error("Password-reset email delivery failed.")
     return Response(
         {
             "detail": "If an account exists for that email, we will send a password-reset link."
