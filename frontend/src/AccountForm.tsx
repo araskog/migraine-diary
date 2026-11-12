@@ -14,7 +14,6 @@ import type { Session } from './session'
 
 type AccountFormProps = {
   csrfToken: string
-  notice: string
   onAuthenticated: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
 }
@@ -40,14 +39,12 @@ function responseErrors(body: unknown, status: number): string[] {
 
 export default function AccountForm({
   csrfToken,
-  notice,
   onAuthenticated,
   onSessionRefreshed,
 }: AccountFormProps) {
   const [mode, setMode] = useState<'sign-in' | 'register'>('sign-in')
   const [busy, setBusy] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
-  const [showNotice, setShowNotice] = useState(true)
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -56,7 +53,6 @@ export default function AccountForm({
     const values = new FormData(form)
     setBusy(true)
     setErrors([])
-    setShowNotice(false)
     try {
       const response = await fetch(`/api/${mode}/`, {
         method: 'POST',
@@ -115,14 +111,8 @@ export default function AccountForm({
           if (value !== 'sign-in' && value !== 'register') return
           setMode(value)
           setErrors([])
-          setShowNotice(false)
         }}
       />
-      {showNotice && notice && (
-        <Text role="status" c="var(--app-color-positive)">
-          {notice}
-        </Text>
-      )}
       <form
         onSubmit={(event) => {
           void submit(event)
