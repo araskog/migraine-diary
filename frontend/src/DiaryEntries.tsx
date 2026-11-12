@@ -4,9 +4,14 @@ import { DatePicker } from '@mantine/dates'
 import DiaryEntryForm from './DiaryEntryForm'
 import ErrorMessages from './ErrorMessages'
 import { dateLabel, loadEntries, localDate, statusLabel } from './diary'
-import type { DiaryEntry } from './diary'
+import type { DiaryEntry, DiaryStatus } from './diary'
 import type { Session } from './session'
 import './DiaryEntries.css'
+
+const statusIcons: Record<DiaryStatus, string> = {
+  migraine: '●',
+  migraine_free: '○',
+}
 
 type DiaryEntriesProps = {
   csrfToken: string
@@ -91,21 +96,20 @@ export default function DiaryEntries({
             disabled: disabled || day > today,
             'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
           })}
-          renderDay={(day) => (
-            <span className="calendar-day">
-              <span>{Number(day.slice(-2))}</span>
-              <span
-                className={`calendar-marker ${day > today ? 'future' : (statuses.get(day) ?? 'unrecorded')}`}
-                aria-hidden="true"
-              >
-                {statuses.get(day) === 'migraine'
-                  ? '●'
-                  : statuses.get(day) === 'migraine_free'
-                    ? '○'
-                    : '–'}
+          renderDay={(day) => {
+            const status = statuses.get(day)
+            return (
+              <span className="calendar-day">
+                <span>{Number(day.slice(-2))}</span>
+                <span
+                  className={`calendar-marker ${day > today ? 'future' : (status ?? 'unrecorded')}`}
+                  aria-hidden="true"
+                >
+                  {status ? statusIcons[status] : null}
+                </span>
               </span>
-            </span>
-          )}
+            )
+          }}
         />
         <Group gap="md" mt="md" wrap="wrap">
           <Text size="xs">
@@ -119,9 +123,6 @@ export default function DiaryEntries({
               ○{' '}
             </span>
             Migraine-free
-          </Text>
-          <Text size="xs">
-            <span aria-hidden="true">– </span>Unrecorded
           </Text>
         </Group>
       </Box>
