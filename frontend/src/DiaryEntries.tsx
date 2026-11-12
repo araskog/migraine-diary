@@ -189,7 +189,7 @@ export default function DiaryEntries({
                   aria-label={`Status for ${dateLabel(date)}`}
                 >
                   <DiaryStatusPicker
-                    key={`${date}-${current?.status ?? ''}`}
+                    key={date}
                     date={date}
                     entry={current}
                     csrfToken={csrfToken}
