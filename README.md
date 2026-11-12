@@ -49,6 +49,13 @@ npm run typecheck
 npm run build
 ```
 
+For diary popup regression checks, start the frontend dev server, open
+[the browser checks](http://127.0.0.1:5173/static/app/tests/diary-interactions.html),
+and select **Run regression checks**. These exercise pending saves, repeated
+activation, focus, calendar DOM continuity, and clear/retry with synthetic API
+responses. Run at desktop and mobile viewport sizes; these checks are separate
+from `npm test` and do not exercise backend persistence.
+
 From `backend/`, with PostgreSQL running:
 
 ```sh

@@ -32,18 +32,16 @@ export default function DiaryEntryForm({
   const [status, setStatus] = useState<DiaryStatus | ''>(entry?.status ?? '')
   // Keep this popup's actions stable through the save and closing transition.
   const [canClear] = useState(entry !== undefined)
-  const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
 
   async function save(nextStatus: DiaryStatus | '') {
-    if (saving || disabled) return
+    if (disabled) return
     setStatus(nextStatus)
     setErrors([])
     if (date > localDate()) {
       setErrors(['Choose today or a past date.'])
       return
     }
-    setSaving(true)
     onSavingChange(true)
     try {
       if (nextStatus === '') {
@@ -63,13 +61,12 @@ export default function DiaryEntryForm({
         // Preserve the selection for retry when the connection returns.
       }
     } finally {
-      setSaving(false)
       onSavingChange(false)
     }
   }
 
   return (
-    <Stack gap="xs">
+    <Stack gap="xs" aria-busy={disabled}>
       <Stack gap={2}>
         <Button
           variant="subtle"
@@ -80,7 +77,7 @@ export default function DiaryEntryForm({
             </span>
           }
           aria-pressed={status === 'migraine'}
-          disabled={saving || disabled}
+          aria-disabled={disabled}
           onClick={() => void save('migraine')}
         >
           Migraine
@@ -90,7 +87,7 @@ export default function DiaryEntryForm({
           justify="flex-start"
           leftSection={<span aria-hidden="true">○</span>}
           aria-pressed={status === 'migraine_free'}
-          disabled={saving || disabled}
+          aria-disabled={disabled}
           onClick={() => void save('migraine_free')}
         >
           Migraine-free
@@ -113,7 +110,7 @@ export default function DiaryEntryForm({
                 <path d="m6 6 12 12M6 18 18 6" />
               </svg>
             }
-            disabled={saving || disabled}
+            aria-disabled={disabled}
             onClick={() => void save('')}
           >
             Clear day
@@ -124,7 +121,7 @@ export default function DiaryEntryForm({
       {errors.length > 0 && (
         <Button
           size="md"
-          disabled={saving || disabled}
+          aria-disabled={disabled}
           onClick={() => {
             void save(status)
           }}
