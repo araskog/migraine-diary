@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.core.exceptions import ValidationError
 
-from .models import User
+from .models import PasswordRecoveryRequest, User
 
 
 class AccountCreationForm(UserCreationForm):
@@ -60,3 +60,24 @@ class AccountAdmin(UserAdmin):
     add_fieldsets = (
         (None, {"classes": ("wide",), "fields": ("email", "password1", "password2")}),
     )
+
+
+@admin.register(PasswordRecoveryRequest)
+class PasswordRecoveryRequestAdmin(admin.ModelAdmin):
+    list_display = ("email", "requested_at", "handled")
+    list_filter = ("handled",)
+    list_editable = ("handled",)
+    search_fields = ("email",)
+    readonly_fields = ("email", "requested_at")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("email", "requested_at", "handled"),
+                "description": "Confirm account ownership before changing a password; submitting a request is not proof of ownership.",
+            },
+        ),
+    )
+
+    def has_add_permission(self, request):
+        return False

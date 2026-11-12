@@ -11,7 +11,7 @@ Include sign-out, password recovery, and correcting or removing entries. Entries
 | ID | Observable outcome |
 |---|---|
 | D1 | A user can register, sign in, and sign out. Signing out prevents further access to protected diary data until they sign in again. |
-| D2 | A user who forgets their password can recover access through a secure password-reset flow. Expired or already-used reset links cannot reset a password. |
+| D2 | A user can request manual password-recovery help using their email address. Requests are visible only to authorized administrators and do not reveal whether an account exists or change credentials. Self-service reset links are deferred. |
 | D3 | A user can record either migraine or migraine-free status for today or a past date. Each user/date has one current status; changing it updates that record. Success and failed saves are visibly distinguishable. |
 | D4 | Saved entries and corrections remain after closing/reopening the app and signing in again. Verification exercises backend persistence, not only browser state. |
 | D5 | Another user cannot read or change these records, including through direct API requests. |

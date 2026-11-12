@@ -8,7 +8,7 @@ import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
 from .settings import *  # noqa: F403
-from .settings import MIDDLEWARE, TEMPLATES
+from .settings import MIDDLEWARE, REST_FRAMEWORK, TEMPLATES
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 if (
@@ -72,3 +72,5 @@ STORAGES = {
     },
 }
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+REST_FRAMEWORK = {**REST_FRAMEWORK, "NUM_PROXIES": 1}

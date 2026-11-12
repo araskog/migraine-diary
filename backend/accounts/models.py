@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.db.models.functions import Lower
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -40,3 +41,15 @@ class User(AbstractBaseUser, PermissionsMixin):
                 Lower("email"), name="accounts_user_email_ci_unique"
             )
         ]
+
+
+class PasswordRecoveryRequest(models.Model):
+    email = models.EmailField(unique=True)
+    requested_at = models.DateTimeField(default=timezone.now)
+    handled = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-requested_at"]
+
+    def __str__(self):
+        return self.email
