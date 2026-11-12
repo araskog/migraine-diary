@@ -47,8 +47,16 @@ async function postReset(
     for (const value of Object.values(body)) {
       if (typeof value === 'string') messages.push(value)
       else if (Array.isArray(value)) {
-        for (const item of value)
+        for (const item of value) {
           if (typeof item === 'string') messages.push(item)
+          else if (
+            typeof item === 'object' &&
+            item !== null &&
+            'message' in item &&
+            typeof item.message === 'string'
+          )
+            messages.push(item.message)
+        }
       }
     }
   }

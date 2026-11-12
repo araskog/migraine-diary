@@ -62,7 +62,14 @@ test('confirmation sends reset credentials and matching password fields in the b
 test('invalid-link and password validation errors remain visible', async () => {
   for (const body of [
     { detail: 'This reset link is invalid or expired.' },
-    { new_password2: ['This password is too common.'] },
+    {
+      new_password2: [
+        {
+          message: 'This password is too common.',
+          code: 'password_too_common',
+        },
+      ],
+    },
   ]) {
     mock.method(globalThis, 'fetch', async () =>
       Response.json(body, { status: 400 }),
