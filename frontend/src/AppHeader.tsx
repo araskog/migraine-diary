@@ -50,7 +50,8 @@ export default function AppHeader({ children }: AppHeaderProps) {
       <Group gap="xs" wrap="nowrap">
         <Tooltip label={themeLabel}>
           <ActionIcon
-            variant="default"
+            variant="subtle"
+            className="theme-toggle"
             color="var(--app-color-positive)"
             size={44}
             radius="xl"

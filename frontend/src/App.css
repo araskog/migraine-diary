@@ -29,3 +29,8 @@
   font-size: clamp(1.1rem, 3.8vw, 1.65rem);
   line-height: 1.2;
 }
+
+.app .theme-toggle,
+.app .account-toggle {
+  border: 1px solid var(--mantine-color-default-border);
+}

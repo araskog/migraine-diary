@@ -31,7 +31,11 @@ export const theme = createTheme({
 })
 
 export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
-  variables: {},
+  variables: {
+    '--app-migraine': '#e85d65',
+    '--app-calendar-selected': theme.colors.sage[9],
+    '--app-calendar-selected-hover': '#182f25',
+  },
   light: {
     '--app-brand-text': theme.black,
     '--mantine-color-dimmed': theme.colors.gray[7],

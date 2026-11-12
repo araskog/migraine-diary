@@ -11,7 +11,7 @@
 }
 
 .diary-entries .migraine {
-  color: light-dark(var(--mantine-color-red-8), var(--mantine-color-red-4));
+  color: var(--app-migraine);
 }
 
 .diary-entries .migraine_free {
@@ -31,5 +31,14 @@
 }
 
 .diary-entries [data-selected] .calendar-marker.migraine {
-  color: var(--mantine-color-red-2);
+  color: var(--app-migraine);
+}
+
+.diary-entries [data-selected] {
+  background-color: var(--app-calendar-selected);
+}
+
+.diary-entries [data-selected]:hover,
+.diary-entries [data-selected]:active {
+  background-color: var(--app-calendar-selected-hover);
 }
