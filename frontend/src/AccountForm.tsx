@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import {
+  Anchor,
+  Box,
   Button,
   SegmentedControl,
   Stack,
@@ -9,6 +11,7 @@ import {
 } from '@mantine/core'
 import type { FormEvent } from 'react'
 import ErrorMessages from './ErrorMessages'
+import PasswordRecoveryForm from './PasswordRecoveryForm'
 import { getSession, isSession } from './session'
 import type { Session } from './session'
 
@@ -46,6 +49,7 @@ export default function AccountForm({
 }: AccountFormProps) {
   const [mode, setMode] = useState<'sign-in' | 'register'>('sign-in')
   const [busy, setBusy] = useState(false)
+  const [recovering, setRecovering] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
   const [showNotice, setShowNotice] = useState(true)
 
@@ -84,6 +88,15 @@ export default function AccountForm({
       setBusy(false)
     }
   }
+
+  if (recovering)
+    return (
+      <PasswordRecoveryForm
+        csrfToken={csrfToken}
+        onBack={() => setRecovering(false)}
+        onSessionRefreshed={onSessionRefreshed}
+      />
+    )
 
   return (
     <Stack component="section" gap="lg" className="page">
@@ -158,16 +171,27 @@ export default function AccountForm({
                 mode === 'register' ? 'password-help' : undefined
               }
             />
-            <Text
-              id="password-help"
-              size="xs"
-              c="dimmed"
-              aria-hidden={mode !== 'register'}
-              style={{ visibility: mode === 'register' ? 'visible' : 'hidden' }}
-            >
-              Use at least 8 characters. Avoid common passwords, only numbers,
-              or a password similar to your email.
-            </Text>
+            <Box mih="2.5rem">
+              {mode === 'register' ? (
+                <Text id="password-help" size="xs" c="dimmed">
+                  Use at least 8 characters. Avoid common passwords, only
+                  numbers, or a password similar to your email.
+                </Text>
+              ) : (
+                <Anchor
+                  component="button"
+                  type="button"
+                  size="xs"
+                  c="dimmed"
+                  fs="italic"
+                  ta="left"
+                  disabled={busy}
+                  onClick={() => setRecovering(true)}
+                >
+                  Forgot your password?
+                </Anchor>
+              )}
+            </Box>
           </Stack>
           <ErrorMessages messages={errors} />
           <Button size="md" disabled={busy} type="submit">
@@ -179,9 +203,6 @@ export default function AccountForm({
           </Button>
         </Stack>
       </form>
-      <Text size="sm" c="dimmed">
-        Password recovery is not available yet.
-      </Text>
     </Stack>
   )
 }

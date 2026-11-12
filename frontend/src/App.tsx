@@ -3,6 +3,8 @@ import { Button, Container, Stack, Text, Title } from '@mantine/core'
 import AccountForm from './AccountForm'
 import AppHeader from './AppHeader'
 import DiaryPage from './DiaryPage'
+import PasswordResetForm from './PasswordResetForm'
+import { readResetLink } from './passwordReset'
 import { getSession } from './session'
 import type { Session } from './session'
 import './App.css'
@@ -13,7 +15,32 @@ function App() {
     'loading' | 'account' | 'diary' | 'unavailable'
   >('loading')
   const [notice, setNotice] = useState('')
+  const [resetLink, setResetLink] = useState(() =>
+    readResetLink(window.location.hash),
+  )
   const [attempt, setAttempt] = useState(0)
+
+  useEffect(() => {
+    function receiveResetLink() {
+      const link = readResetLink(window.location.hash)
+      if (link !== undefined) {
+        setResetLink(link)
+        window.history.replaceState(
+          null,
+          '',
+          window.location.pathname + window.location.search,
+        )
+      }
+    }
+    if (resetLink !== undefined)
+      window.history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search,
+      )
+    window.addEventListener('hashchange', receiveResetLink)
+    return () => window.removeEventListener('hashchange', receiveResetLink)
+  }, [resetLink])
 
   useEffect(() => {
     let active = true
@@ -47,7 +74,7 @@ function App() {
 
   return (
     <Container component="main" size={960} px="lg" py="xl" className="app">
-      {page !== 'diary' && <AppHeader />}
+      {(page !== 'diary' || resetLink !== undefined) && <AppHeader />}
       {page === 'loading' && (
         <Text role="status" mt="xl">
           Checking your session…
@@ -69,7 +96,7 @@ function App() {
           </Button>
         </Stack>
       )}
-      {page === 'account' && session && (
+      {resetLink === undefined && page === 'account' && session && (
         <AccountForm
           csrfToken={session.csrfToken}
           notice={notice}
@@ -77,7 +104,7 @@ function App() {
           onSessionRefreshed={setSession}
         />
       )}
-      {page === 'diary' && session?.user && (
+      {resetLink === undefined && page === 'diary' && session?.user && (
         <DiaryPage
           email={session.user.email}
           csrfToken={session.csrfToken}
@@ -85,6 +112,26 @@ function App() {
           onSessionRefreshed={setSession}
         />
       )}
+      {resetLink !== undefined &&
+        session &&
+        page !== 'loading' &&
+        page !== 'unavailable' && (
+          <PasswordResetForm
+            key={
+              resetLink
+                ? `${resetLink.uid}:${resetLink.token}`
+                : 'invalid-reset-link'
+            }
+            link={resetLink}
+            csrfToken={session.csrfToken}
+            onSessionRefreshed={setSession}
+            onBack={() => {
+              setResetLink(undefined)
+              setPage('account')
+              setNotice('')
+            }}
+          />
+        )}
       {import.meta.env.DEV && (
         <Text c="dimmed" size="xs" mt="xl" ta="center">
           Local preview · synthetic data only
