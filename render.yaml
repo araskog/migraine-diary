@@ -7,7 +7,7 @@ services:
     branch: main
     autoDeployTrigger: checksPass
     buildCommand: python -m pip install uv==0.13.7 && sh scripts/render-build.sh
-    startCommand: cd backend && .venv/bin/python manage.py migrate --noinput && exec .venv/bin/gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 1
+    startCommand: cd backend && DATABASE_URL="$DATABASE_URL_UNPOOLED" .venv/bin/python manage.py migrate --noinput && exec .venv/bin/gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 1
     healthCheckPath: /api/health/
     envVars:
       - key: PYTHON_VERSION
@@ -21,4 +21,6 @@ services:
       - key: DJANGO_ALLOWED_HOSTS
         sync: false
       - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_URL_UNPOOLED
         sync: false

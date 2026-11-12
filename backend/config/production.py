@@ -1,6 +1,7 @@
 """Select with DJANGO_SETTINGS_MODULE=config.production."""
 
 import os
+import ssl
 from pathlib import Path
 
 import dj_database_url
@@ -50,7 +51,9 @@ if database.get("ENGINE") != "django.db.backends.postgresql" or not all(
         "Set DATABASE_URL to a complete PostgreSQL connection URL."
     )
 database.setdefault("OPTIONS", {}).update(
-    sslmode="verify-full", sslrootcert="system", connect_timeout=10
+    sslmode="verify-full",
+    sslrootcert=ssl.get_default_verify_paths().cafile or "system",
+    connect_timeout=10,
 )
 DATABASES = {"default": database}
 

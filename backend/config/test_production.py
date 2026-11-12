@@ -1,5 +1,6 @@
 import importlib.util
 import os
+import ssl
 from pathlib import Path
 from secrets import token_urlsafe
 from unittest.mock import patch
@@ -131,7 +132,9 @@ class ProductionSettingsTests(SimpleTestCase):
         )
         options = production.DATABASES["default"]["OPTIONS"]
         self.assertEqual(options["sslmode"], "verify-full")
-        self.assertEqual(options["sslrootcert"], "system")
+        self.assertEqual(
+            options["sslrootcert"], ssl.get_default_verify_paths().cafile or "system"
+        )
 
     def test_forwarded_https_does_not_redirect(self):
         production = load_production(**self.environment)
