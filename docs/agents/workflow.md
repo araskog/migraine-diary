@@ -28,7 +28,7 @@ Implements approved changes, writes and updates tests, follows repository conven
 
 ### Reviewers
 
-The [review-pr skill](../../.agents/skills/review-pr/SKILL.md) defines the Code Reviewer Agent and Quality Reviewer Agent responsibilities and review procedure. Reviewers check affected documentation against the final diff and report stale, contradictory, or unsupported claims as findings.
+The [review-pr skill](../../.agents/skills/review-pr/SKILL.md) defines the Code Reviewer Agent and Quality Reviewer Agent responsibilities and review procedure.
 
 ## Attribution
 
