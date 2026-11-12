@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Box, Button, Group, Stack, Text } from '@mantine/core'
+import { Button, Group, Stack, Text } from '@mantine/core'
 import DiaryDetailsFields from './DiaryDetailsFields'
-import ConfirmDialog from './ConfirmDialog'
 import ErrorMessages from './ErrorMessages'
 import { emptyDetails, localDate, saveEntry } from './diary'
-import type { DiaryDetails, DiaryEntry, DiaryStatus } from './diary'
+import type { DiaryDetails, DiaryEntry } from './diary'
 import { getSession } from './session'
 import type { Session } from './session'
 
@@ -22,8 +21,20 @@ type DiaryEntryFormProps = {
 
 function detailsOf(entry?: DiaryEntry): DiaryDetails {
   if (!entry) return emptyDetails()
-  const { medication_taken, medication_name, sleep, pain_severity } = entry
-  return { medication_taken, medication_name, sleep, pain_severity }
+  const {
+    medication_taken,
+    medication_name,
+    sleep,
+    sleep_duration,
+    pain_severity,
+  } = entry
+  return {
+    medication_taken,
+    medication_name,
+    sleep,
+    sleep_duration,
+    pain_severity,
+  }
 }
 
 export default function DiaryEntryForm({
@@ -37,14 +48,12 @@ export default function DiaryEntryForm({
   onSignedOut,
   onSessionRefreshed,
 }: DiaryEntryFormProps) {
-  const [status, setStatus] = useState<DiaryStatus | ''>(entry?.status ?? '')
+  const status = entry?.status
   const [details, setDetails] = useState(() => detailsOf(entry))
   const [savedDetails, setSavedDetails] = useState(() => detailsOf(entry))
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
   const [notice, setNotice] = useState('')
-  const [retryDetails, setRetryDetails] = useState(false)
-  const [confirmFree, setConfirmFree] = useState(false)
   const dirty = JSON.stringify(details) !== JSON.stringify(savedDetails)
 
   useEffect(() => {
@@ -59,12 +68,10 @@ export default function DiaryEntryForm({
     }
   }, [dirty, onDirtyChange])
 
-  async function save(nextStatus: DiaryStatus, includeDetails = false) {
-    if (saving || disabled) return
-    setStatus(nextStatus)
+  async function save() {
+    if (saving || disabled || !status) return
     setErrors([])
     setNotice('')
-    setRetryDetails(includeDetails)
     if (date > localDate()) {
       setErrors(['Choose today or a past date.'])
       return
@@ -72,24 +79,10 @@ export default function DiaryEntryForm({
     setSaving(true)
     onSavingChange(true)
     try {
-      const nextDetails =
-        nextStatus === 'migraine_free'
-          ? { ...details, pain_severity: null }
-          : details
-      const saved = await saveEntry(
-        date,
-        nextStatus,
-        csrfToken,
-        includeDetails ? nextDetails : undefined,
-      )
-      if (includeDetails) {
-        setDetails(detailsOf(saved))
-        setSavedDetails(detailsOf(saved))
-      } else if (nextStatus === 'migraine_free') {
-        setDetails(nextDetails)
-        setSavedDetails((previous) => ({ ...previous, pain_severity: null }))
-      }
-      setNotice(includeDetails ? 'Details saved' : 'Day saved')
+      const saved = await saveEntry(date, status, csrfToken, details)
+      setDetails(detailsOf(saved))
+      setSavedDetails(detailsOf(saved))
+      setNotice('Details saved')
       onSaved(saved)
     } catch {
       setErrors([
@@ -110,57 +103,15 @@ export default function DiaryEntryForm({
 
   return (
     <Stack gap="xl">
-      <ConfirmDialog
-        opened={confirmFree}
-        title="Change to migraine-free?"
-        message="This will remove the pain rating for this day. Your other answers will stay."
-        confirmLabel="Change to migraine-free"
-        onClose={() => setConfirmFree(false)}
-        onConfirm={() => {
-          setConfirmFree(false)
-          void save('migraine_free')
-        }}
-      />
-      <Box className="diary-status">
-        <Button
-          variant={status === 'migraine' ? 'light' : 'subtle'}
-          leftSection={
-            <span aria-hidden="true" style={{ color: 'var(--app-migraine)' }}>
-              ●
-            </span>
-          }
-          aria-pressed={status === 'migraine'}
-          disabled={saving || disabled}
-          onClick={() => void save('migraine')}
-        >
-          Migraine
-        </Button>
-        <Button
-          variant={status === 'migraine_free' ? 'light' : 'subtle'}
-          leftSection={<span aria-hidden="true">○</span>}
-          aria-pressed={status === 'migraine_free'}
-          disabled={saving || disabled}
-          onClick={() => {
-            if (details.pain_severity !== null) setConfirmFree(true)
-            else void save('migraine_free')
-          }}
-        >
-          Migraine-free
-        </Button>
-      </Box>
       {status ? (
         <Stack
           component="form"
           gap="xl"
           onSubmit={(event) => {
             event.preventDefault()
-            void save(status, true)
+            void save()
           }}
         >
-          <Text size="sm" c="dimmed">
-            A little more about your day, if you like. Everything below is
-            optional.
-          </Text>
           <DiaryDetailsFields
             status={status}
             value={details}
@@ -174,7 +125,7 @@ export default function DiaryEntryForm({
             <Button
               type="submit"
               disabled={!dirty || saving || disabled}
-              loading={saving && retryDetails}
+              loading={saving}
             >
               Save details
             </Button>
@@ -195,8 +146,7 @@ export default function DiaryEntryForm({
         </Stack>
       ) : (
         <Text size="sm" c="dimmed">
-          Choose Migraine or Migraine-free to record this day. Details are
-          optional.
+          Select this date in the calendar to record Migraine or Migraine-free.
         </Text>
       )}
       <ErrorMessages messages={errors} />
@@ -204,7 +154,7 @@ export default function DiaryEntryForm({
         <Button
           variant="light"
           disabled={saving || disabled}
-          onClick={() => void save(status, retryDetails)}
+          onClick={() => void save()}
         >
           Try again
         </Button>

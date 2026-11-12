@@ -60,15 +60,3 @@
 .diary-entries [data-selected]:active {
   background-color: var(--app-calendar-selected-hover);
 }
-
-.diary-entries .diary-status {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--mantine-spacing-xs);
-}
-
-@media (max-width: 400px) {
-  .diary-entries .diary-status {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}

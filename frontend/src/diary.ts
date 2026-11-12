@@ -3,6 +3,7 @@ export type DiaryDetails = {
   medication_taken: boolean | null
   medication_name: string
   sleep: '' | 'poor' | 'okay' | 'good'
+  sleep_duration: '' | 'less' | 'usual' | 'more'
   pain_severity: number | null
 }
 export type DiaryEntry = { date: string; status: DiaryStatus } & DiaryDetails
@@ -12,6 +13,7 @@ export function emptyDetails(): DiaryDetails {
     medication_taken: null,
     medication_name: '',
     sleep: '',
+    sleep_duration: '',
     pain_severity: null,
   }
 }
@@ -59,6 +61,9 @@ function isEntry(value: unknown): value is DiaryEntry {
     'sleep' in value &&
     typeof value.sleep === 'string' &&
     ['', 'poor', 'okay', 'good'].includes(value.sleep) &&
+    'sleep_duration' in value &&
+    typeof value.sleep_duration === 'string' &&
+    ['', 'less', 'usual', 'more'].includes(value.sleep_duration) &&
     'pain_severity' in value &&
     (value.pain_severity === null ||
       (typeof value.pain_severity === 'number' &&

@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Box, Button, Group, Paper, Stack, Text, Title } from '@mantine/core'
+import {
+  Box,
+  Button,
+  Group,
+  Paper,
+  Popover,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import DiaryEntryForm from './DiaryEntryForm'
+import DiaryStatusPicker from './DiaryStatusPicker'
 import ConfirmDialog from './ConfirmDialog'
 import ErrorMessages from './ErrorMessages'
 import { dateLabel, loadEntries, localDate, statusLabel } from './diary'
@@ -35,6 +45,8 @@ export default function DiaryEntries({
 }: DiaryEntriesProps) {
   const [entries, setEntries] = useState<DiaryEntry[]>([])
   const [date, setDate] = useState(localDate)
+  const [selectionOpened, setSelectionOpened] = useState(false)
+  const [revision, setRevision] = useState(0)
   const [pendingDate, setPendingDate] = useState<string | null>(null)
   const [visibleMonth, setVisibleMonth] = useState(localDate)
   const [loading, setLoading] = useState(true)
@@ -91,6 +103,8 @@ export default function DiaryEntries({
         onClose={() => setPendingDate(null)}
         onConfirm={() => {
           if (pendingDate) setDate(pendingDate)
+          setRevision((value) => value + 1)
+          setSelectionOpened(true)
           setPendingDate(null)
         }}
       />
@@ -102,15 +116,17 @@ export default function DiaryEntries({
           onDateChange={(month) => {
             if (!disabled) {
               setVisibleMonth(month)
+              setSelectionOpened(false)
             }
           }}
           onChange={(value) => {
             if (value && value <= localDate()) {
-              if (value !== date && dirty) {
+              if (dirty) {
                 setPendingDate(value)
                 return
               }
               setDate(value)
+              setSelectionOpened(true)
             }
           }}
           firstDayOfWeek={1}
@@ -139,7 +155,46 @@ export default function DiaryEntries({
                 </span>
               </span>
             )
-            return content
+            if (day !== date) return content
+            return (
+              <Popover
+                opened={selectionOpened}
+                onChange={(opened) => {
+                  if (!disabled) setSelectionOpened(opened)
+                }}
+                position="bottom"
+                width={190}
+                shadow="sm"
+                trapFocus
+                returnFocus
+              >
+                <Popover.Target>{content}</Popover.Target>
+                <Popover.Dropdown
+                  p="xs"
+                  aria-label={`Status for ${dateLabel(date)}`}
+                >
+                  <DiaryStatusPicker
+                    key={`${date}-${current?.status ?? ''}`}
+                    date={date}
+                    entry={current}
+                    csrfToken={csrfToken}
+                    disabled={disabled}
+                    onSaved={(saved) => {
+                      setSelectionOpened(false)
+                      setEntries((previous) => [
+                        ...previous.filter(
+                          (entry) => entry.date !== saved.date,
+                        ),
+                        saved,
+                      ])
+                    }}
+                    onSavingChange={onSavingChange}
+                    onSignedOut={onSignedOut}
+                    onSessionRefreshed={onSessionRefreshed}
+                  />
+                </Popover.Dropdown>
+              </Popover>
+            )
           }}
         />
         <Group gap="md" mt="md" wrap="wrap">
@@ -166,10 +221,13 @@ export default function DiaryEntries({
       >
         <Stack gap="lg">
           <Title order={2} size="h3">
-            {dateLabel(date)}
+            Daily details
           </Title>
+          <Text c="dimmed" size="sm">
+            {dateLabel(date)}
+          </Text>
           <DiaryEntryForm
-            key={date}
+            key={`${date}-${current?.status ?? ''}-${revision}`}
             date={date}
             entry={current}
             csrfToken={csrfToken}

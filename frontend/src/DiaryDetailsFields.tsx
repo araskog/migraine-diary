@@ -83,8 +83,8 @@ export default function DiaryDetailsFields({
         )}
       </Stack>
       <Select
-        label="How was your sleep last night?"
-        placeholder="Choose if you like"
+        label="How was your sleep quality?"
+        placeholder="Select quality"
         data={[
           { value: 'poor', label: 'Poor' },
           { value: 'okay', label: 'Okay' },
@@ -102,6 +102,28 @@ export default function DiaryDetailsFields({
             sleep === 'good'
           )
             onChange({ ...value, sleep: sleep ?? '' })
+        }}
+      />
+      <Select
+        label="How long did you sleep?"
+        placeholder="Select duration"
+        data={[
+          { value: 'less', label: 'Less than usual' },
+          { value: 'usual', label: 'Usual' },
+          { value: 'more', label: 'More than usual' },
+        ]}
+        value={value.sleep_duration || null}
+        clearable
+        clearButtonProps={{ 'aria-label': 'Clear sleep duration answer' }}
+        disabled={disabled}
+        onChange={(duration) => {
+          if (
+            duration === null ||
+            duration === 'less' ||
+            duration === 'usual' ||
+            duration === 'more'
+          )
+            onChange({ ...value, sleep_duration: duration ?? '' })
         }}
       />
       {status === 'migraine' && (

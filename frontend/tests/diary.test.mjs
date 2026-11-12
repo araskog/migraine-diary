@@ -107,12 +107,14 @@ test('saving optional details retains explicit no and zero and sends clearing va
       medication_taken: false,
       medication_name: '',
       sleep: 'okay',
+      sleep_duration: 'usual',
       pain_severity: 0,
     },
     {
       medication_taken: true,
       medication_name: 'Synthetic medication',
       sleep: 'poor',
+      sleep_duration: 'less',
       pain_severity: 10,
     },
     emptyDetails(),
@@ -139,6 +141,8 @@ test('malformed optional details never become a successful load', async () => {
     { medication_name: null },
     { sleep: 'bad' },
     { sleep: null },
+    { sleep_duration: 'unknown' },
+    { sleep_duration: null },
   ]) {
     mock.method(globalThis, 'fetch', async () =>
       Response.json([

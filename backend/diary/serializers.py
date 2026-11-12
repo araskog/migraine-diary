@@ -17,6 +17,9 @@ class DiaryEntryInput(serializers.Serializer):
     sleep = serializers.ChoiceField(
         choices=DiaryEntry.Sleep.choices, required=False, allow_blank=True
     )
+    sleep_duration = serializers.ChoiceField(
+        choices=DiaryEntry.SleepDuration.choices, required=False, allow_blank=True
+    )
     pain_severity = serializers.IntegerField(
         required=False, allow_null=True, min_value=0, max_value=10
     )
@@ -54,5 +57,6 @@ class DiaryEntryOutput(serializers.ModelSerializer):
             "medication_taken",
             "medication_name",
             "sleep",
+            "sleep_duration",
             "pain_severity",
         ]

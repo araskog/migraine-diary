@@ -15,6 +15,7 @@ class DiaryEntryAdmin(admin.ModelAdmin):
         "medication_taken",
         "medication_name",
         "sleep",
+        "sleep_duration",
         "pain_severity",
     )
     ordering = ("-date",)

@@ -17,6 +17,7 @@ def entry_output(day, status, **details):
         "medication_taken": None,
         "medication_name": "",
         "sleep": "",
+        "sleep_duration": "",
         "pain_severity": None,
         **details,
     }
@@ -213,6 +214,7 @@ class DiaryEntryTests(TestCase):
             "medication_taken": True,
             "medication_name": "Synthetic medication",
             "sleep": "poor",
+            "sleep_duration": "less",
             "pain_severity": 7,
         }
         response = self.save(**details)
@@ -232,6 +234,7 @@ class DiaryEntryTests(TestCase):
             ),
         )
         self.assertEqual(self.save().json()["sleep"], "poor")
+        self.assertEqual(self.save().json()["sleep_duration"], "less")
         self.assertIsNone(self.save().json()["pain_severity"])
 
     def test_answers_can_be_cleared_without_treating_no_or_zero_as_unanswered(self):
@@ -255,6 +258,8 @@ class DiaryEntryTests(TestCase):
             {"pain_severity": 2.5},
             {"sleep": "unknown"},
             {"sleep": None},
+            {"sleep_duration": "invalid"},
+            {"sleep_duration": None},
             {"medication_taken": "sometimes"},
             {"medication_name": "x" * 201, "medication_taken": True},
             {"medication_name": "Synthetic medication"},
@@ -289,3 +294,14 @@ class DiaryEntryTests(TestCase):
         )
         self.assertEqual(response.status_code, 403)
         self.assertEqual(DiaryEntry.objects.get(user=self.other).sleep, "good")
+
+    def test_sleep_duration_choices_and_clearing_on_either_status(self):
+        for status in ["migraine", "migraine_free"]:
+            for duration in ["less", "usual", "more", ""]:
+                with self.subTest(status=status, duration=duration):
+                    response = self.save(status=status, sleep_duration=duration)
+                    self.assertIn(response.status_code, [200, 201])
+                    self.assertEqual(response.json()["sleep_duration"], duration)
+                    self.assertEqual(
+                        DiaryEntry.objects.get(user=self.user).sleep_duration, duration
+                    )

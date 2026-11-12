@@ -1,0 +1,136 @@
+import { useState } from 'react'
+import { Button, Stack, Text } from '@mantine/core'
+import ErrorMessages from './ErrorMessages'
+import { localDate, saveEntry } from './diary'
+import type { DiaryEntry, DiaryStatus } from './diary'
+import { getSession } from './session'
+import type { Session } from './session'
+
+type DiaryStatusPickerProps = {
+  date: string
+  entry?: DiaryEntry
+  csrfToken: string
+  disabled: boolean
+  onSaved: (entry: DiaryEntry) => void
+  onSavingChange: (saving: boolean) => void
+  onSignedOut: (session: Session) => void
+  onSessionRefreshed: (session: Session) => void
+}
+
+export default function DiaryStatusPicker({
+  date,
+  entry,
+  csrfToken,
+  disabled,
+  onSaved,
+  onSavingChange,
+  onSignedOut,
+  onSessionRefreshed,
+}: DiaryStatusPickerProps) {
+  const [status, setStatus] = useState<DiaryStatus | ''>(entry?.status ?? '')
+  const [saving, setSaving] = useState(false)
+  const [errors, setErrors] = useState<string[]>([])
+  const [confirmFree, setConfirmFree] = useState(false)
+
+  async function save(nextStatus: DiaryStatus) {
+    if (saving || disabled) return
+    setStatus(nextStatus)
+    setErrors([])
+    if (date > localDate()) {
+      setErrors(['Choose today or a past date.'])
+      return
+    }
+    setSaving(true)
+    onSavingChange(true)
+    try {
+      const saved = await saveEntry(date, nextStatus, csrfToken)
+      onSaved(saved)
+    } catch {
+      setErrors([
+        'Unable to confirm this save. Your selection is kept; please try again.',
+      ])
+      try {
+        const session = await getSession()
+        if (session.user === null) onSignedOut(session)
+        else onSessionRefreshed(session)
+      } catch {
+        // Preserve the selection for retry when the connection returns.
+      }
+    } finally {
+      setSaving(false)
+      onSavingChange(false)
+    }
+  }
+
+  if (confirmFree)
+    return (
+      <Stack gap="sm">
+        <Text size="sm">
+          Changing to migraine-free removes this day’s pain rating. Your other
+          answers stay.
+        </Text>
+        <Button variant="default" onClick={() => setConfirmFree(false)}>
+          Keep migraine
+        </Button>
+        <Button
+          disabled={saving || disabled}
+          onClick={() => {
+            setConfirmFree(false)
+            void save('migraine_free')
+          }}
+        >
+          Mark migraine-free
+        </Button>
+      </Stack>
+    )
+
+  return (
+    <Stack gap="xs">
+      <Stack gap={2}>
+        <Button
+          variant="subtle"
+          justify="flex-start"
+          leftSection={
+            <span aria-hidden="true" style={{ color: 'var(--app-migraine)' }}>
+              ●
+            </span>
+          }
+          aria-pressed={status === 'migraine'}
+          disabled={saving || disabled}
+          onClick={() => void save('migraine')}
+        >
+          Migraine
+        </Button>
+        <Button
+          variant="subtle"
+          justify="flex-start"
+          leftSection={<span aria-hidden="true">○</span>}
+          aria-pressed={status === 'migraine_free'}
+          disabled={saving || disabled}
+          onClick={() => {
+            if (
+              entry?.pain_severity !== null &&
+              entry?.pain_severity !== undefined
+            )
+              setConfirmFree(true)
+            else void save('migraine_free')
+          }}
+        >
+          Migraine-free
+        </Button>
+      </Stack>
+      <ErrorMessages messages={errors} />
+      {errors.length > 0 && status && (
+        <Button
+          size="md"
+          disabled={saving || disabled}
+          onClick={() => {
+            void save(status)
+          }}
+        >
+          Try again
+        </Button>
+      )}
+    </Stack>
+  )
+}
