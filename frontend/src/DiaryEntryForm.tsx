@@ -30,6 +30,8 @@ export default function DiaryEntryForm({
   onSessionRefreshed,
 }: DiaryEntryFormProps) {
   const [status, setStatus] = useState<DiaryStatus | ''>(entry?.status ?? '')
+  // Keep this popup's actions stable through the save and closing transition.
+  const [canClear] = useState(entry !== undefined)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
 
@@ -93,7 +95,7 @@ export default function DiaryEntryForm({
         >
           Migraine-free
         </Button>
-        {entry && (
+        {canClear && (
           <Button
             variant="subtle"
             justify="flex-start"
