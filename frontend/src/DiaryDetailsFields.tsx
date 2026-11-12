@@ -14,7 +14,7 @@ type DiaryDetailsFieldsProps = {
   status: DiaryStatus
   value: DiaryDetails
   disabled: boolean
-  onChange: (value: DiaryDetails) => void
+  onChange: (value: DiaryDetails, save?: boolean) => void
 }
 
 export default function DiaryDetailsFields({
@@ -53,8 +53,12 @@ export default function DiaryDetailsFields({
             maxLength={200}
             value={value.medication_name}
             disabled={disabled}
+            onBlur={() => onChange(value)}
             onChange={(event) =>
-              onChange({ ...value, medication_name: event.currentTarget.value })
+              onChange(
+                { ...value, medication_name: event.currentTarget.value },
+                false,
+              )
             }
           />
         )}
@@ -128,8 +132,11 @@ export default function DiaryDetailsFields({
               }
               marks={[{ value: 0 }, { value: 10 }]}
               disabled={disabled}
-              onChange={(pain_severity) =>
+              onChangeEnd={(pain_severity) =>
                 onChange({ ...value, pain_severity })
+              }
+              onChange={(pain_severity) =>
+                onChange({ ...value, pain_severity }, false)
               }
             />
             <Group justify="space-between" wrap="nowrap">

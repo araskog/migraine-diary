@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Button, Group, Stack, Text } from '@mantine/core'
+import { useEffect, useRef, useState } from 'react'
+import { Button, Stack, Text } from '@mantine/core'
 import DiaryDetailsFields from './DiaryDetailsFields'
 import ErrorMessages from './ErrorMessages'
 import { localDate, saveEntry } from './diary'
@@ -51,9 +51,15 @@ export default function DiaryEntryForm({
   const [details, setDetails] = useState(() => detailsOf(entry))
   const [savedDetails, setSavedDetails] = useState(() => detailsOf(entry))
   const [saving, setSaving] = useState(false)
+  const latest = useRef(details)
+  const pending = useRef<DiaryDetails | null>(null)
+  const savingRef = useRef(false)
   const [errors, setErrors] = useState<string[]>([])
   const [notice, setNotice] = useState('')
-  const dirty = JSON.stringify(details) !== JSON.stringify(savedDetails)
+  const dirty =
+    saving ||
+    errors.length > 0 ||
+    JSON.stringify(details) !== JSON.stringify(savedDetails)
 
   useEffect(() => {
     onDirtyChange(dirty)
@@ -67,25 +73,36 @@ export default function DiaryEntryForm({
     }
   }, [dirty, onDirtyChange])
 
-  async function save() {
-    if (saving || disabled || !status) return
-    setErrors([])
-    setNotice('')
+  async function save(value = latest.current) {
+    if (disabled) return
+    pending.current = value
+    if (savingRef.current) return
     if (date > localDate()) {
       setErrors(['Choose today or a past date.'])
       return
     }
+    savingRef.current = true
     setSaving(true)
     onSavingChange(true)
+    setErrors([])
+    setNotice('')
     try {
-      const saved = await saveEntry(date, status, csrfToken, details)
-      setDetails(detailsOf(saved))
-      setSavedDetails(detailsOf(saved))
-      setNotice('Details saved')
-      onSaved(saved)
+      while (pending.current) {
+        const submitted = pending.current
+        pending.current = null
+        const saved = await saveEntry(date, status, csrfToken, submitted)
+        const confirmed = detailsOf(saved)
+        setSavedDetails(confirmed)
+        if (latest.current === submitted) {
+          latest.current = confirmed
+          setDetails(confirmed)
+        }
+        onSaved(saved)
+      }
+      setNotice('Saved')
     } catch {
       setErrors([
-        'Unable to confirm this save. Your answers are kept; please try again.',
+        'Unable to save your changes. Your answers are kept; please try again.',
       ])
       try {
         const session = await getSession()
@@ -95,6 +112,8 @@ export default function DiaryEntryForm({
         // Keep answers available for retry when the connection returns.
       }
     } finally {
+      pending.current = null
+      savingRef.current = false
       setSaving(false)
       onSavingChange(false)
     }
@@ -102,46 +121,17 @@ export default function DiaryEntryForm({
 
   return (
     <Stack gap="sm">
-      <Stack
-        component="form"
-        gap="md"
-        onSubmit={(event) => {
-          event.preventDefault()
-          void save()
+      <DiaryDetailsFields
+        status={status}
+        value={details}
+        disabled={disabled}
+        onChange={(value, commit = true) => {
+          latest.current = value
+          setDetails(value)
+          setNotice('')
+          if (commit) void save(value)
         }}
-      >
-        <DiaryDetailsFields
-          status={status}
-          value={details}
-          disabled={saving || disabled}
-          onChange={(value) => {
-            setDetails(value)
-            setNotice('')
-          }}
-        />
-        <Group>
-          <Button
-            type="submit"
-            disabled={!dirty || saving || disabled}
-            loading={saving}
-          >
-            Save details
-          </Button>
-          {dirty && (
-            <Button
-              variant="subtle"
-              disabled={saving || disabled}
-              onClick={() => {
-                setDetails(savedDetails)
-                setNotice('')
-                setErrors([])
-              }}
-            >
-              Discard changes
-            </Button>
-          )}
-        </Group>
-      </Stack>
+      />
       <ErrorMessages messages={errors} />
       {errors.length > 0 && status && (
         <Button
@@ -153,7 +143,7 @@ export default function DiaryEntryForm({
         </Button>
       )}
       <Text role="status" size="sm" c="dimmed" mih="1.5em">
-        {notice || (dirty ? 'Unsaved details' : '')}
+        {saving ? 'Saving…' : dirty ? 'Unsaved changes' : notice}
       </Text>
     </Stack>
   )

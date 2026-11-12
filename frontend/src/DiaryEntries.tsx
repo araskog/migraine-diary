@@ -27,6 +27,7 @@ const statusIcons: Record<DiaryStatus, string> = {
 type DiaryEntriesProps = {
   csrfToken: string
   disabled: boolean
+  saving: boolean
   dirty: boolean
   onDirtyChange: (dirty: boolean) => void
   onSavingChange: (saving: boolean) => void
@@ -37,6 +38,7 @@ type DiaryEntriesProps = {
 export default function DiaryEntries({
   csrfToken,
   disabled,
+  saving,
   dirty,
   onDirtyChange,
   onSavingChange,
@@ -145,7 +147,7 @@ export default function DiaryEntries({
           withCellSpacing={false}
           weekendDays={[]}
           getDayProps={(day) => ({
-            disabled: disabled || day > today,
+            disabled: disabled || saving || day > today,
             'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
           })}
           renderDay={(day) => {
@@ -184,7 +186,7 @@ export default function DiaryEntries({
                     date={date}
                     entry={current}
                     csrfToken={csrfToken}
-                    disabled={disabled}
+                    disabled={disabled || saving}
                     onSaved={(saved) => {
                       setSelectionOpened(false)
                       setEntries((previous) => [

@@ -121,7 +121,8 @@ export default function DiaryPage({
       <Stack component="section" gap="lg" className="page diary-page">
         <DiaryEntries
           csrfToken={csrfToken}
-          disabled={busy || saving}
+          disabled={busy}
+          saving={saving}
           dirty={dirty}
           onDirtyChange={setDirty}
           onSavingChange={setSaving}
