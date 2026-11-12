@@ -39,7 +39,9 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--app-color-positive': theme.colors.sage[8],
   },
   dark: {
-    '--app-brand-text': theme.colors.sage[0],
+    '--app-brand-text': theme.colors.sage[1],
+    '--mantine-color-text': theme.colors.gray[0],
+    '--mantine-color-dimmed': theme.colors.gray[3],
     '--app-control-background': theme.colors.dark[6],
     '--app-color-positive': theme.colors.sage[3],
   },

@@ -51,7 +51,7 @@ export default function AppHeader({ children }: AppHeaderProps) {
         <Tooltip label={themeLabel}>
           <ActionIcon
             variant="subtle"
-            color="var(--mantine-color-text)"
+            color="var(--app-color-positive)"
             size={44}
             radius="xl"
             aria-label={themeLabel}
