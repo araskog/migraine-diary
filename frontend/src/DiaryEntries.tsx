@@ -30,6 +30,7 @@ export default function DiaryEntries({
 }: DiaryEntriesProps) {
   const [entries, setEntries] = useState<DiaryEntry[]>([])
   const [date, setDate] = useState(localDate)
+  const [visibleMonth, setVisibleMonth] = useState(localDate)
   const [selectionOpened, setSelectionOpened] = useState(false)
   const [loading, setLoading] = useState(true)
   const [failed, setFailed] = useState(false)
@@ -81,6 +82,13 @@ export default function DiaryEntries({
         <DatePicker
           aria-label="Diary calendar"
           value={date}
+          date={visibleMonth}
+          onDateChange={(month) => {
+            if (!disabled) {
+              setVisibleMonth(month)
+              setSelectionOpened(false)
+            }
+          }}
           onChange={(value) => {
             if (value && value <= localDate()) {
               setDate(value)
