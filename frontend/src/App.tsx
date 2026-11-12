@@ -117,6 +117,11 @@ function App() {
         page !== 'loading' &&
         page !== 'unavailable' && (
           <PasswordResetForm
+            key={
+              resetLink
+                ? `${resetLink.uid}:${resetLink.token}`
+                : 'invalid-reset-link'
+            }
             link={resetLink}
             csrfToken={session.csrfToken}
             onSessionRefreshed={setSession}
