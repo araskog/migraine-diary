@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button, Radio, Stack, Title } from '@mantine/core'
+import { Button, Stack } from '@mantine/core'
 import ErrorMessages from './ErrorMessages'
-import { dateLabel, localDate, saveEntry } from './diary'
+import { localDate, saveEntry } from './diary'
 import type { DiaryEntry, DiaryStatus } from './diary'
 import { getSession } from './session'
 import type { Session } from './session'
@@ -62,32 +62,33 @@ export default function DiaryEntryForm({
   }
 
   return (
-    <Stack gap="md">
-      <Title order={2} size="h4">
-        {dateLabel(date)}
-      </Title>
-      <Radio.Group
-        name="diary-status"
-        label="How was this day?"
-        value={status}
-        onChange={(value) => {
-          if (value !== 'migraine' && value !== 'migraine_free') return
-          void save(value)
-        }}
-      >
-        <Stack gap="sm" mt="sm">
-          <Radio
-            value="migraine"
-            label="Migraine"
-            disabled={saving || disabled}
-          />
-          <Radio
-            value="migraine_free"
-            label="Migraine-free"
-            disabled={saving || disabled}
-          />
-        </Stack>
-      </Radio.Group>
+    <Stack gap="xs">
+      <Stack gap={2}>
+        <Button
+          variant="subtle"
+          justify="flex-start"
+          leftSection={
+            <span aria-hidden="true" style={{ color: 'var(--app-migraine)' }}>
+              ●
+            </span>
+          }
+          aria-pressed={status === 'migraine'}
+          disabled={saving || disabled}
+          onClick={() => void save('migraine')}
+        >
+          Migraine
+        </Button>
+        <Button
+          variant="subtle"
+          justify="flex-start"
+          leftSection={<span aria-hidden="true">○</span>}
+          aria-pressed={status === 'migraine_free'}
+          disabled={saving || disabled}
+          onClick={() => void save('migraine_free')}
+        >
+          Migraine-free
+        </Button>
+      </Stack>
       <ErrorMessages messages={errors} />
       {errors.length > 0 && status && (
         <Button
