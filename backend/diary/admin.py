@@ -8,7 +8,15 @@ class DiaryEntryAdmin(admin.ModelAdmin):
     list_display = ("user", "date", "status")
     search_fields = ("user__email",)
     list_filter = ("status",)
-    readonly_fields = ("user", "date", "status")
+    readonly_fields = (
+        "user",
+        "date",
+        "status",
+        "medication_taken",
+        "medication_name",
+        "sleep",
+        "pain_severity",
+    )
     ordering = ("-date",)
 
     def has_add_permission(self, request):

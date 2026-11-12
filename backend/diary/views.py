@@ -16,9 +16,16 @@ def entries(request):
     serializer = DiaryEntryInput(data=request.data)
     serializer.is_valid(raise_exception=True)
     data = serializer.validated_data
+    defaults = {
+        key: value for key, value in data.items() if key not in {"date", "timezone"}
+    }
+    if defaults.get("medication_taken") is not True and "medication_taken" in defaults:
+        defaults["medication_name"] = ""
+    if data["status"] == DiaryEntry.Status.MIGRAINE_FREE:
+        defaults["pain_severity"] = None
     entry, created = DiaryEntry.objects.update_or_create(
         user=request.user,
         date=data["date"],
-        defaults={"status": data["status"]},
+        defaults=defaults,
     )
     return Response(DiaryEntryOutput(entry).data, status=201 if created else 200)

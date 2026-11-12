@@ -19,7 +19,13 @@ class DiaryEntryAdminTests(TestCase):
             "member@example.test", generated_password()
         )
         cls.entry = DiaryEntry.objects.create(
-            user=cls.member, date="2026-01-01", status="migraine"
+            user=cls.member,
+            date="2026-01-01",
+            status="migraine",
+            medication_taken=True,
+            medication_name="Synthetic medication",
+            sleep="poor",
+            pain_severity=7,
         )
 
     def test_owner_can_inspect_and_search_entries(self):
@@ -34,6 +40,8 @@ class DiaryEntryAdminTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Migraine day")
+        self.assertContains(response, "Synthetic medication")
+        self.assertContains(response, "Poor")
         self.assertNotContains(response, 'name="_save"')
 
     def test_anonymous_and_nonstaff_cannot_inspect_entries(self):
