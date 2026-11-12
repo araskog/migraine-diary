@@ -180,7 +180,7 @@ export default function AccountForm({
         </Stack>
       </form>
       <Text size="sm" c="dimmed">
-        Password recovery is not available in this local preview yet.
+        Password recovery is not available yet.
       </Text>
     </Stack>
   )

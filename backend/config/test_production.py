@@ -47,6 +47,7 @@ class ProductionSettingsTests(SimpleTestCase):
         self.environment = {
             "DJANGO_SECRET_KEY": token_urlsafe(64),
             "DJANGO_ALLOWED_HOSTS": "diary.example.test",
+            "DATABASE_URL": f"postgresql://diary:{token_urlsafe(24)}@database.example.test/diary",
         }
 
     def test_missing_or_weak_secret_is_rejected(self):
@@ -82,7 +83,11 @@ class ProductionSettingsTests(SimpleTestCase):
 
     def test_https_host_and_cookie_protection(self):
         production = load_production(**self.environment)
-        values = production_overrides(production)
+        values = {
+            key: value
+            for key, value in production_overrides(production).items()
+            if key != "DATABASES"
+        }
         values.update(
             ROOT_URLCONF=__name__,
             SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies",
@@ -103,9 +108,48 @@ class ProductionSettingsTests(SimpleTestCase):
 
     def test_deployment_checks_report_only_deferred_hsts_policies(self):
         production = load_production(**self.environment)
-        values = production_overrides(production)
+        values = {
+            key: value
+            for key, value in production_overrides(production).items()
+            if key != "DATABASES"
+        }
         with override_settings(**values):
             checks = run_checks(tags=[Tags.security], include_deployment_checks=True)
             self.assertEqual(
                 {check.id for check in checks}, {"security.W005", "security.W021"}
             )
+
+    def test_database_is_required_and_tls_cannot_be_disabled(self):
+        for url in ("", "sqlite:///local.db", "postgresql://localhost/diary"):
+            with self.subTest(url=url), self.assertRaises(ImproperlyConfigured):
+                load_production(**{**self.environment, "DATABASE_URL": url})
+        production = load_production(
+            **{
+                **self.environment,
+                "DATABASE_URL": self.environment["DATABASE_URL"] + "?sslmode=disable",
+            }
+        )
+        options = production.DATABASES["default"]["OPTIONS"]
+        self.assertEqual(options["sslmode"], "verify-full")
+        self.assertEqual(options["sslrootcert"], "system")
+
+    def test_forwarded_https_does_not_redirect(self):
+        production = load_production(**self.environment)
+        values = {
+            key: value
+            for key, value in production_overrides(production).items()
+            if key != "DATABASES"
+        }
+        values.update(
+            ROOT_URLCONF=__name__,
+            SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies",
+        )
+        with override_settings(**values):
+            response = Client().get(
+                "/", HTTP_HOST="diary.example.test", HTTP_X_FORWARDED_PROTO="https"
+            )
+            self.assertEqual(response.status_code, 200)
+            response = Client().get(
+                "/", HTTP_HOST="diary.example.test", HTTP_X_FORWARDED_PROTO="http"
+            )
+            self.assertEqual(response.status_code, 301)

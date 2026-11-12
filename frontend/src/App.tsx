@@ -56,9 +56,7 @@ function App() {
       {page === 'unavailable' && (
         <Stack component="section" gap="lg" className="page">
           <Title order={1}>Unable to connect</Title>
-          <Text c="dimmed">
-            Check that the local service is running, then try again.
-          </Text>
+          <Text c="dimmed">Please try again in a moment.</Text>
           <Button
             size="md"
             variant="light"
@@ -87,9 +85,11 @@ function App() {
           onSessionRefreshed={setSession}
         />
       )}
-      <Text c="dimmed" size="xs" mt="xl" ta="center">
-        Local preview · synthetic data only
-      </Text>
+      {import.meta.env.DEV && (
+        <Text c="dimmed" size="xs" mt="xl" ta="center">
+          Local preview · synthetic data only
+        </Text>
+      )}
     </Container>
   )
 }
