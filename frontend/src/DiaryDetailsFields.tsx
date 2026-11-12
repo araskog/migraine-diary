@@ -1,8 +1,7 @@
 import {
   Anchor,
-  Box,
   Group,
-  Radio,
+  Checkbox,
   Select,
   Slider,
   Stack,
@@ -26,49 +25,27 @@ export default function DiaryDetailsFields({
 }: DiaryDetailsFieldsProps) {
   return (
     <Stack gap="md">
-      <Stack gap="xs">
-        <Radio.Group
-          label="Did you take migraine medication?"
-          value={
-            value.medication_taken === null
-              ? ''
-              : value.medication_taken
-                ? 'yes'
-                : 'no'
-          }
-          onChange={(answer) =>
+      <Stack
+        gap="xs"
+        role="group"
+        aria-label="Did you take migraine medication?"
+      >
+        <Text size="sm" fw={500}>
+          Did you take migraine medication?
+        </Text>
+        <Checkbox
+          label="Yes"
+          checked={value.medication_taken === true}
+          disabled={disabled}
+          onChange={(event) => {
+            const checked = event.currentTarget.checked
             onChange({
               ...value,
-              medication_taken: answer === 'yes',
-              medication_name: answer === 'yes' ? value.medication_name : '',
+              medication_taken: checked,
+              medication_name: checked ? value.medication_name : '',
             })
-          }
-        >
-          <Group mt="xs" gap="xl">
-            <Radio value="yes" label="Yes" disabled={disabled} />
-            <Radio value="no" label="No" disabled={disabled} />
-          </Group>
-        </Radio.Group>
-        {value.medication_taken !== null && (
-          <Anchor
-            component="button"
-            ta="left"
-            style={{ alignSelf: 'flex-start' }}
-            type="button"
-            size="xs"
-            c="dimmed"
-            disabled={disabled}
-            onClick={() =>
-              onChange({
-                ...value,
-                medication_taken: null,
-                medication_name: '',
-              })
-            }
-          >
-            Clear medication answer
-          </Anchor>
-        )}
+          }}
+        />
         {value.medication_taken === true && (
           <TextInput
             label="Which medication?"
@@ -136,7 +113,7 @@ export default function DiaryDetailsFields({
               ? 'Not answered'
               : `${value.pain_severity} out of 10`}
           </Text>
-          <Box px="xs" pb="lg">
+          <Stack gap={4}>
             <Slider
               min={0}
               max={10}
@@ -149,16 +126,21 @@ export default function DiaryDetailsFields({
                   ? 'Not answered'
                   : `${value.pain_severity} out of 10`
               }
-              marks={[
-                { value: 0, label: '0 · No pain' },
-                { value: 10, label: '10 · Worst' },
-              ]}
+              marks={[{ value: 0 }, { value: 10 }]}
               disabled={disabled}
               onChange={(pain_severity) =>
                 onChange({ ...value, pain_severity })
               }
             />
-          </Box>
+            <Group justify="space-between" wrap="nowrap">
+              <Text size="xs" c="dimmed">
+                0 · No pain
+              </Text>
+              <Text size="xs" c="dimmed">
+                10 · Worst
+              </Text>
+            </Group>
+          </Stack>
           {value.pain_severity !== null && (
             <Anchor
               component="button"

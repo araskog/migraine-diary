@@ -246,6 +246,10 @@ class DiaryEntryTests(TestCase):
             medication_name="Synthetic medication",
             pain_severity=10,
         )
+        response = self.save(medication_taken=False)
+        self.assertIs(response.json()["medication_taken"], False)
+        self.assertEqual(response.json()["medication_name"], "")
+        self.assertEqual(DiaryEntry.objects.get(user=self.user).medication_name, "")
         response = self.save(medication_taken=None, sleep="", pain_severity=None)
         self.assertEqual(response.json(), entry_output("2026-01-01", "migraine"))
         self.assertEqual(DiaryEntry.objects.count(), 1)
