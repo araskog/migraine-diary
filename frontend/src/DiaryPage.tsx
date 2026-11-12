@@ -58,7 +58,9 @@ export default function DiaryPage({
         <Menu position="bottom-end" width={260} shadow="md">
           <Menu.Target>
             <ActionIcon
-              variant="default"
+              variant="subtle"
+              className="account-toggle"
+              color="var(--app-color-positive)"
               size={44}
               radius="xl"
               aria-label="Account menu"

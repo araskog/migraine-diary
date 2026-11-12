@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button, Radio, Stack, Text, Title } from '@mantine/core'
+import { Button, Radio, Stack, Title } from '@mantine/core'
 import ErrorMessages from './ErrorMessages'
-import { dateLabel, localDate, saveEntry, statusLabel } from './diary'
+import { dateLabel, localDate, saveEntry } from './diary'
 import type { DiaryEntry, DiaryStatus } from './diary'
 import { getSession } from './session'
 import type { Session } from './session'
@@ -30,13 +30,11 @@ export default function DiaryEntryForm({
   const [status, setStatus] = useState<DiaryStatus | ''>(entry?.status ?? '')
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
-  const [notice, setNotice] = useState('')
 
   async function save(nextStatus: DiaryStatus) {
     if (saving || disabled) return
     setStatus(nextStatus)
     setErrors([])
-    setNotice('')
     if (date > localDate()) {
       setErrors(['Choose today or a past date.'])
       return
@@ -46,7 +44,6 @@ export default function DiaryEntryForm({
     try {
       const saved = await saveEntry(date, nextStatus, csrfToken)
       onSaved(saved)
-      setNotice(`Saved: ${statusLabel(saved.status)}.`)
     } catch {
       setErrors([
         'Unable to confirm this save. Your selection is kept; please try again.',
@@ -69,11 +66,6 @@ export default function DiaryEntryForm({
       <Title order={2} size="h4">
         {dateLabel(date)}
       </Title>
-      <Text size="sm" c="dimmed">
-        {entry
-          ? `Recorded: ${statusLabel(entry.status)}. You can update this day.`
-          : 'This day is unrecorded.'}
-      </Text>
       <Radio.Group
         name="diary-status"
         label="How was this day?"
@@ -107,16 +99,6 @@ export default function DiaryEntryForm({
         >
           Try again
         </Button>
-      )}
-      {saving && (
-        <Text role="status" size="sm">
-          Saving…
-        </Text>
-      )}
-      {notice && (
-        <Text role="status" size="sm">
-          {notice}
-        </Text>
       )}
     </Stack>
   )

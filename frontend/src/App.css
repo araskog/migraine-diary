@@ -13,3 +13,24 @@
     margin-top: var(--mantine-spacing-xl);
   }
 }
+
+.app .app-brand {
+  min-width: 0;
+}
+.app .app-brand-icon {
+  width: clamp(36px, 8vw, 56px);
+  height: clamp(36px, 8vw, 56px);
+  flex-shrink: 0;
+  color: var(--app-color-positive);
+}
+.app .app-brand-name {
+  color: var(--app-brand-text);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.1rem, 3.8vw, 1.65rem);
+  line-height: 1.2;
+}
+
+.app .theme-toggle,
+.app .account-toggle {
+  border: 1px solid var(--mantine-color-default-border);
+}
