@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Box, Button, Group, Stack, Text } from '@mantine/core'
+import { Box, Button, Group, Modal, Stack, Text } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import DiaryEntryForm from './DiaryEntryForm'
 import ErrorMessages from './ErrorMessages'
@@ -30,6 +30,7 @@ export default function DiaryEntries({
 }: DiaryEntriesProps) {
   const [entries, setEntries] = useState<DiaryEntry[]>([])
   const [date, setDate] = useState(localDate)
+  const [selectionOpened, setSelectionOpened] = useState(false)
   const [loading, setLoading] = useState(true)
   const [failed, setFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
@@ -81,7 +82,10 @@ export default function DiaryEntries({
           aria-label="Diary calendar"
           value={date}
           onChange={(value) => {
-            if (value && value <= localDate()) setDate(value)
+            if (value && value <= localDate()) {
+              setDate(value)
+              setSelectionOpened(true)
+            }
           }}
           firstDayOfWeek={1}
           fullWidth
@@ -126,22 +130,33 @@ export default function DiaryEntries({
           </Text>
         </Group>
       </Box>
-      <DiaryEntryForm
-        key={date}
-        date={date}
-        entry={current}
-        csrfToken={csrfToken}
-        disabled={disabled}
-        onSaved={(saved) =>
-          setEntries((previous) => [
-            ...previous.filter((entry) => entry.date !== saved.date),
-            saved,
-          ])
-        }
-        onSavingChange={onSavingChange}
-        onSignedOut={onSignedOut}
-        onSessionRefreshed={onSessionRefreshed}
-      />
+      <Modal
+        opened={selectionOpened}
+        onClose={() => {
+          if (!disabled) setSelectionOpened(false)
+        }}
+        title={dateLabel(date)}
+        centered
+        closeButtonProps={{ 'aria-label': 'Close day selection' }}
+      >
+        <DiaryEntryForm
+          key={date}
+          date={date}
+          entry={current}
+          csrfToken={csrfToken}
+          disabled={disabled}
+          onSaved={(saved) => {
+            setSelectionOpened(false)
+            setEntries((previous) => [
+              ...previous.filter((entry) => entry.date !== saved.date),
+              saved,
+            ])
+          }}
+          onSavingChange={onSavingChange}
+          onSignedOut={onSignedOut}
+          onSessionRefreshed={onSessionRefreshed}
+        />
+      </Modal>
     </Stack>
   )
 }
