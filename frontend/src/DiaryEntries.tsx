@@ -131,9 +131,15 @@ export default function DiaryEntries({
           }}
           firstDayOfWeek={1}
           fullWidth
-          maxLevel="month"
-          previousLabel="Previous month"
-          nextLabel="Next month"
+          maxLevel="year"
+          onLevelChange={() => setSelectionOpened(false)}
+          ariaLabels={{
+            monthLevelControl: 'Choose month',
+            previousMonth: 'Previous month',
+            nextMonth: 'Next month',
+            previousYear: 'Previous year',
+            nextYear: 'Next year',
+          }}
           maxDate={today}
           size="lg"
           withCellSpacing={false}
@@ -217,11 +223,11 @@ export default function DiaryEntries({
           component="section"
           bg="var(--app-intro-background)"
           withBorder
-          p="xl"
+          p="lg"
           radius="lg"
           aria-label={`Details for ${dateLabel(date)}`}
         >
-          <Stack gap="lg">
+          <Stack gap="xs">
             <Title order={2} size="h3">
               Daily details
             </Title>

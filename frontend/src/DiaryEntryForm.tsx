@@ -101,10 +101,10 @@ export default function DiaryEntryForm({
   }
 
   return (
-    <Stack gap="xl">
+    <Stack gap="sm">
       <Stack
         component="form"
-        gap="xl"
+        gap="md"
         onSubmit={(event) => {
           event.preventDefault()
           void save()

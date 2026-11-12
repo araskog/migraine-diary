@@ -25,7 +25,7 @@ export default function DiaryDetailsFields({
   onChange,
 }: DiaryDetailsFieldsProps) {
   return (
-    <Stack gap="xl">
+    <Stack gap="md">
       <Stack gap="xs">
         <Radio.Group
           label="Did you take migraine medication?"
