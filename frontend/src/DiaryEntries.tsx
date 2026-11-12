@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Box, Button, Group, Modal, Stack, Text } from '@mantine/core'
+import { Box, Button, Group, Popover, Stack, Text } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import DiaryEntryForm from './DiaryEntryForm'
 import ErrorMessages from './ErrorMessages'
@@ -102,7 +102,7 @@ export default function DiaryEntries({
           })}
           renderDay={(day) => {
             const status = statuses.get(day)
-            return (
+            const content = (
               <span className="calendar-day">
                 <span>{Number(day.slice(-2))}</span>
                 <span
@@ -112,6 +112,46 @@ export default function DiaryEntries({
                   {status ? statusIcons[status] : null}
                 </span>
               </span>
+            )
+            if (day !== date) return content
+            return (
+              <Popover
+                opened={selectionOpened}
+                onChange={(opened) => {
+                  if (!disabled) setSelectionOpened(opened)
+                }}
+                position="bottom"
+                width={190}
+                shadow="sm"
+                trapFocus
+                returnFocus
+              >
+                <Popover.Target>{content}</Popover.Target>
+                <Popover.Dropdown
+                  p="xs"
+                  aria-label={`Status for ${dateLabel(date)}`}
+                >
+                  <DiaryEntryForm
+                    key={date}
+                    date={date}
+                    entry={current}
+                    csrfToken={csrfToken}
+                    disabled={disabled}
+                    onSaved={(saved) => {
+                      setSelectionOpened(false)
+                      setEntries((previous) => [
+                        ...previous.filter(
+                          (entry) => entry.date !== saved.date,
+                        ),
+                        saved,
+                      ])
+                    }}
+                    onSavingChange={onSavingChange}
+                    onSignedOut={onSignedOut}
+                    onSessionRefreshed={onSessionRefreshed}
+                  />
+                </Popover.Dropdown>
+              </Popover>
             )
           }}
         />
@@ -130,33 +170,6 @@ export default function DiaryEntries({
           </Text>
         </Group>
       </Box>
-      <Modal
-        opened={selectionOpened}
-        onClose={() => {
-          if (!disabled) setSelectionOpened(false)
-        }}
-        title={dateLabel(date)}
-        centered
-        closeButtonProps={{ 'aria-label': 'Close day selection' }}
-      >
-        <DiaryEntryForm
-          key={date}
-          date={date}
-          entry={current}
-          csrfToken={csrfToken}
-          disabled={disabled}
-          onSaved={(saved) => {
-            setSelectionOpened(false)
-            setEntries((previous) => [
-              ...previous.filter((entry) => entry.date !== saved.date),
-              saved,
-            ])
-          }}
-          onSavingChange={onSavingChange}
-          onSignedOut={onSignedOut}
-          onSessionRefreshed={onSessionRefreshed}
-        />
-      </Modal>
     </Stack>
   )
 }

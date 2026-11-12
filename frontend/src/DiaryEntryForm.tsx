@@ -62,17 +62,27 @@ export default function DiaryEntryForm({
   }
 
   return (
-    <Stack gap="md">
-      <Stack gap="sm">
+    <Stack gap="xs">
+      <Stack gap={2}>
         <Button
-          variant={status === 'migraine' ? 'filled' : 'default'}
+          variant="subtle"
+          justify="flex-start"
+          leftSection={
+            <span aria-hidden="true" style={{ color: 'var(--app-migraine)' }}>
+              ●
+            </span>
+          }
+          aria-pressed={status === 'migraine'}
           disabled={saving || disabled}
           onClick={() => void save('migraine')}
         >
           Migraine
         </Button>
         <Button
-          variant={status === 'migraine_free' ? 'filled' : 'default'}
+          variant="subtle"
+          justify="flex-start"
+          leftSection={<span aria-hidden="true">○</span>}
+          aria-pressed={status === 'migraine_free'}
           disabled={saving || disabled}
           onClick={() => void save('migraine_free')}
         >
