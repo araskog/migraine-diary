@@ -30,13 +30,11 @@ export default function DiaryEntryForm({
   const [status, setStatus] = useState<DiaryStatus | ''>(entry?.status ?? '')
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
-  const [notice, setNotice] = useState('')
 
   async function save(nextStatus: DiaryStatus) {
     if (saving || disabled) return
     setStatus(nextStatus)
     setErrors([])
-    setNotice('')
     if (date > localDate()) {
       setErrors(['Choose today or a past date.'])
       return
@@ -46,7 +44,6 @@ export default function DiaryEntryForm({
     try {
       const saved = await saveEntry(date, nextStatus, csrfToken)
       onSaved(saved)
-      setNotice(`Saved: ${statusLabel(saved.status)}.`)
     } catch {
       setErrors([
         'Unable to confirm this save. Your selection is kept; please try again.',
@@ -111,11 +108,6 @@ export default function DiaryEntryForm({
       {saving && (
         <Text role="status" size="sm">
           Saving…
-        </Text>
-      )}
-      {notice && (
-        <Text role="status" size="sm">
-          {notice}
         </Text>
       )}
     </Stack>
