@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { afterEach, mock, test } from 'node:test'
 import {
+  emptyDetails,
   isDiaryDate,
   loadEntries,
   localDate,
@@ -17,8 +18,8 @@ test('calendar date follows local time rather than UTC', () => {
 
 test('loading accepts both statuses and passes cancellation and no-cache options', async () => {
   const entries = [
-    { date: '2026-11-10', status: 'migraine_free' },
-    { date: '2026-11-09', status: 'migraine' },
+    { date: '2026-11-10', status: 'migraine_free', ...emptyDetails() },
+    { date: '2026-11-09', status: 'migraine', ...emptyDetails() },
   ]
   const signal = new AbortController().signal
   mock.method(globalThis, 'fetch', async (url, options) => {
@@ -43,13 +44,14 @@ test('malformed or unauthorized loads do not become an empty diary', async () =>
 })
 
 test('saving sends CSRF, device timezone and a calendar date without a user ID', async () => {
-  const entry = { date: '2026-11-10', status: 'migraine' }
+  const entry = { date: '2026-11-10', status: 'migraine', ...emptyDetails() }
   mock.method(globalThis, 'fetch', async (url, options) => {
     assert.equal(url, '/api/diary/entries/')
     assert.equal(options.method, 'POST')
     assert.equal(options.headers['X-CSRFToken'], 'synthetic-csrf')
     assert.deepEqual(JSON.parse(options.body), {
-      ...entry,
+      date: entry.date,
+      status: entry.status,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     })
     return Response.json(entry, { status: 201 })
@@ -97,4 +99,58 @@ test('unrecorded dates are distinct from explicit migraine-free dates', () => {
   assert.equal(statusLabel(), 'Unrecorded')
   assert.equal(statusLabel('migraine'), 'Migraine')
   assert.equal(statusLabel('migraine_free'), 'Migraine-free')
+})
+
+test('saving optional details retains explicit no and zero and sends clearing values', async () => {
+  for (const details of [
+    {
+      medication_taken: false,
+      medication_name: '',
+      sleep: 'okay',
+      pain_severity: 0,
+    },
+    {
+      medication_taken: true,
+      medication_name: 'Synthetic medication',
+      sleep: 'poor',
+      pain_severity: 10,
+    },
+    emptyDetails(),
+  ]) {
+    mock.method(globalThis, 'fetch', async (_url, options) => {
+      const body = JSON.parse(options.body)
+      for (const [key, value] of Object.entries(details))
+        assert.deepEqual(body[key], value)
+      return Response.json({ date: body.date, status: body.status, ...details })
+    })
+    assert.deepEqual(
+      await saveEntry('2026-11-10', 'migraine', 'synthetic-csrf', details),
+      { date: '2026-11-10', status: 'migraine', ...details },
+    )
+    mock.restoreAll()
+  }
+})
+
+test('malformed optional details never become a successful load', async () => {
+  for (const invalid of [
+    { pain_severity: 11 },
+    { pain_severity: 1.5 },
+    { medication_taken: 'no' },
+    { medication_name: null },
+    { sleep: 'bad' },
+    { sleep: null },
+  ]) {
+    mock.method(globalThis, 'fetch', async () =>
+      Response.json([
+        {
+          date: '2026-11-10',
+          status: 'migraine',
+          ...emptyDetails(),
+          ...invalid,
+        },
+      ]),
+    )
+    await assert.rejects(loadEntries(new AbortController().signal))
+    mock.restoreAll()
+  }
 })

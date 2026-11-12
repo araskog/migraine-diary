@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Box, Button, Group, Popover, Stack, Text } from '@mantine/core'
+import { Box, Button, Group, Paper, Stack, Text, Title } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import DiaryEntryForm from './DiaryEntryForm'
+import ConfirmDialog from './ConfirmDialog'
 import ErrorMessages from './ErrorMessages'
 import { dateLabel, loadEntries, localDate, statusLabel } from './diary'
 import type { DiaryEntry, DiaryStatus } from './diary'
@@ -16,6 +17,8 @@ const statusIcons: Record<DiaryStatus, string> = {
 type DiaryEntriesProps = {
   csrfToken: string
   disabled: boolean
+  dirty: boolean
+  onDirtyChange: (dirty: boolean) => void
   onSavingChange: (saving: boolean) => void
   onSignedOut: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
@@ -24,14 +27,16 @@ type DiaryEntriesProps = {
 export default function DiaryEntries({
   csrfToken,
   disabled,
+  dirty,
+  onDirtyChange,
   onSavingChange,
   onSignedOut,
   onSessionRefreshed,
 }: DiaryEntriesProps) {
   const [entries, setEntries] = useState<DiaryEntry[]>([])
   const [date, setDate] = useState(localDate)
+  const [pendingDate, setPendingDate] = useState<string | null>(null)
   const [visibleMonth, setVisibleMonth] = useState(localDate)
-  const [selectionOpened, setSelectionOpened] = useState(false)
   const [loading, setLoading] = useState(true)
   const [failed, setFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
@@ -77,7 +82,18 @@ export default function DiaryEntries({
     )
 
   return (
-    <Stack gap="xl" className="diary-entries">
+    <Box className="diary-entries">
+      <ConfirmDialog
+        opened={pendingDate !== null}
+        title="Unsaved details"
+        message="Discard your unfinished details and choose another day?"
+        confirmLabel="Discard and continue"
+        onClose={() => setPendingDate(null)}
+        onConfirm={() => {
+          if (pendingDate) setDate(pendingDate)
+          setPendingDate(null)
+        }}
+      />
       <Box>
         <DatePicker
           aria-label="Diary calendar"
@@ -86,13 +102,15 @@ export default function DiaryEntries({
           onDateChange={(month) => {
             if (!disabled) {
               setVisibleMonth(month)
-              setSelectionOpened(false)
             }
           }}
           onChange={(value) => {
             if (value && value <= localDate()) {
+              if (value !== date && dirty) {
+                setPendingDate(value)
+                return
+              }
               setDate(value)
-              setSelectionOpened(true)
             }
           }}
           firstDayOfWeek={1}
@@ -121,46 +139,7 @@ export default function DiaryEntries({
                 </span>
               </span>
             )
-            if (day !== date) return content
-            return (
-              <Popover
-                opened={selectionOpened}
-                onChange={(opened) => {
-                  if (!disabled) setSelectionOpened(opened)
-                }}
-                position="bottom"
-                width={190}
-                shadow="sm"
-                trapFocus
-                returnFocus
-              >
-                <Popover.Target>{content}</Popover.Target>
-                <Popover.Dropdown
-                  p="xs"
-                  aria-label={`Status for ${dateLabel(date)}`}
-                >
-                  <DiaryEntryForm
-                    key={date}
-                    date={date}
-                    entry={current}
-                    csrfToken={csrfToken}
-                    disabled={disabled}
-                    onSaved={(saved) => {
-                      setSelectionOpened(false)
-                      setEntries((previous) => [
-                        ...previous.filter(
-                          (entry) => entry.date !== saved.date,
-                        ),
-                        saved,
-                      ])
-                    }}
-                    onSavingChange={onSavingChange}
-                    onSignedOut={onSignedOut}
-                    onSessionRefreshed={onSessionRefreshed}
-                  />
-                </Popover.Dropdown>
-              </Popover>
-            )
+            return content
           }}
         />
         <Group gap="md" mt="md" wrap="wrap">
@@ -178,6 +157,36 @@ export default function DiaryEntries({
           </Text>
         </Group>
       </Box>
-    </Stack>
+      <Paper
+        component="section"
+        withBorder
+        p="xl"
+        radius="lg"
+        aria-label={`Details for ${dateLabel(date)}`}
+      >
+        <Stack gap="lg">
+          <Title order={2} size="h3">
+            {dateLabel(date)}
+          </Title>
+          <DiaryEntryForm
+            key={date}
+            date={date}
+            entry={current}
+            csrfToken={csrfToken}
+            disabled={disabled}
+            onSaved={(saved) =>
+              setEntries((previous) => [
+                ...previous.filter((entry) => entry.date !== saved.date),
+                saved,
+              ])
+            }
+            onDirtyChange={onDirtyChange}
+            onSavingChange={onSavingChange}
+            onSignedOut={onSignedOut}
+            onSessionRefreshed={onSessionRefreshed}
+          />
+        </Stack>
+      </Paper>
+    </Box>
   )
 }

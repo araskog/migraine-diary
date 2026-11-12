@@ -3,6 +3,7 @@ import { ActionIcon, Menu, Stack, Text } from '@mantine/core'
 import AppHeader from './AppHeader'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
+import ConfirmDialog from './ConfirmDialog'
 import { getSession, isSession } from './session'
 import type { Session } from './session'
 
@@ -21,6 +22,8 @@ export default function DiaryPage({
 }: DiaryPageProps) {
   const [busy, setBusy] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [dirty, setDirty] = useState(false)
+  const [confirmSignOut, setConfirmSignOut] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
 
   async function signOut() {
@@ -54,6 +57,17 @@ export default function DiaryPage({
 
   return (
     <>
+      <ConfirmDialog
+        opened={confirmSignOut}
+        title="Unsaved details"
+        message="Discard your unfinished details and sign out?"
+        confirmLabel="Discard and sign out"
+        onClose={() => setConfirmSignOut(false)}
+        onConfirm={() => {
+          setConfirmSignOut(false)
+          void signOut()
+        }}
+      />
       <AppHeader>
         <Menu position="bottom-end" width={260} shadow="md">
           <Menu.Target>
@@ -95,7 +109,8 @@ export default function DiaryPage({
             <Menu.Item
               disabled={busy || saving}
               onClick={() => {
-                void signOut()
+                if (dirty) setConfirmSignOut(true)
+                else void signOut()
               }}
             >
               {busy ? 'Signing out…' : 'Sign out'}
@@ -103,10 +118,12 @@ export default function DiaryPage({
           </Menu.Dropdown>
         </Menu>
       </AppHeader>
-      <Stack component="section" gap="lg" className="page">
+      <Stack component="section" gap="lg" className="page diary-page">
         <DiaryEntries
           csrfToken={csrfToken}
           disabled={busy || saving}
+          dirty={dirty}
+          onDirtyChange={setDirty}
           onSavingChange={setSaving}
           onSignedOut={onSignedOut}
           onSessionRefreshed={onSessionRefreshed}
