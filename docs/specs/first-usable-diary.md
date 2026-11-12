@@ -16,7 +16,7 @@ Include sign-out, password recovery, and correcting or removing entries. Entries
 | D4 | Saved entries and corrections remain after closing/reopening the app and signing in again. Verification exercises backend persistence, not only browser state. |
 | D5 | Another user cannot read or change these records, including through direct API requests. |
 | D6 | Invalid dates and dates later than today are rejected without creating or changing a record. Today follows the device's local timezone, including when travelling. Stored diary dates remain calendar dates and do not shift when the timezone changes. Validation is enforced by the backend using the supplied timezone. |
-| D7 | A missing entry is displayed as unrecorded, never as a confirmed migraine-free day. |
+| D7 | A missing entry has no calendar status icon or legend entry, never implying a confirmed migraine-free day. Its accessible date label identifies it as unrecorded. |
 | D8 | Removing an entry requires confirmation. Cancelling leaves it unchanged; confirming removes it persistently. A failed removal is reported and is not shown as successful. |
 | D9 | Registration, sign-in, recovery, recording, correction, and removal work on mobile-sized screens and can be demonstrated locally with synthetic accounts and records. |
 

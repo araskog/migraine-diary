@@ -102,7 +102,7 @@ export default function DiaryEntries({
                   ? '●'
                   : statuses.get(day) === 'migraine_free'
                     ? '○'
-                    : '–'}
+                    : null}
               </span>
             </span>
           )}
@@ -119,9 +119,6 @@ export default function DiaryEntries({
               ○{' '}
             </span>
             Migraine-free
-          </Text>
-          <Text size="xs">
-            <span aria-hidden="true">– </span>Unrecorded
           </Text>
         </Group>
       </Box>
