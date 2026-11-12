@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ActionIcon, Menu, Stack, Text, Title } from '@mantine/core'
+import { ActionIcon, Menu, Stack, Text } from '@mantine/core'
 import AppHeader from './AppHeader'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
@@ -104,7 +104,6 @@ export default function DiaryPage({
         </Menu>
       </AppHeader>
       <Stack component="section" gap="lg" className="page">
-        <Title order={1}>Your diary</Title>
         <DiaryEntries
           csrfToken={csrfToken}
           disabled={busy || saving}
