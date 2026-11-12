@@ -48,6 +48,19 @@
   opacity: 1;
 }
 
+.diary-entries .calendar-day-busy {
+  color: var(--mantine-color-text);
+  opacity: 1;
+}
+
+.diary-entries .calendar-day-busy[data-outside] {
+  color: var(--mantine-color-dimmed);
+}
+
+.diary-entries .calendar-day-busy[data-selected] {
+  color: var(--mantine-primary-color-contrast);
+}
+
 .diary-entries [data-selected] .calendar-marker.migraine {
   color: var(--app-migraine);
 }

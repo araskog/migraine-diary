@@ -6,10 +6,24 @@ from rest_framework import serializers
 from .models import DiaryEntry
 
 
-class DiaryEntryInput(serializers.Serializer):
+class DiaryDateInput(serializers.Serializer):
     date = serializers.DateField()
-    status = serializers.ChoiceField(choices=DiaryEntry.Status.choices)
     timezone = serializers.CharField(max_length=255)
+    def validate_timezone(self, value):
+        try:
+            return ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError):
+            raise serializers.ValidationError("Supply a valid IANA timezone.")
+
+    def validate(self, attrs):
+        today = timezone.localdate(timezone.now(), attrs["timezone"])
+        if attrs["date"] > today:
+            raise serializers.ValidationError({"date": "Future dates cannot be saved."})
+        return attrs
+
+
+class DiaryEntryInput(DiaryDateInput):
+    status = serializers.ChoiceField(choices=DiaryEntry.Status.choices)
     medication_taken = serializers.BooleanField(required=False, allow_null=True)
     medication_name = serializers.CharField(
         required=False, allow_blank=True, max_length=200
@@ -24,16 +38,8 @@ class DiaryEntryInput(serializers.Serializer):
         required=False, allow_null=True, min_value=0, max_value=10
     )
 
-    def validate_timezone(self, value):
-        try:
-            return ZoneInfo(value)
-        except (ZoneInfoNotFoundError, ValueError):
-            raise serializers.ValidationError("Supply a valid IANA timezone.")
-
     def validate(self, attrs):
-        today = timezone.localdate(timezone.now(), attrs["timezone"])
-        if attrs["date"] > today:
-            raise serializers.ValidationError({"date": "Future dates cannot be saved."})
+        attrs = super().validate(attrs)
         if attrs.get("medication_name") and attrs.get("medication_taken") is not True:
             raise serializers.ValidationError(
                 {"medication_name": "Choose Yes before naming medication."}

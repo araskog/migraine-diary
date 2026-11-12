@@ -194,6 +194,10 @@ export default function DiaryEntries({
                     entry={current}
                     csrfToken={csrfToken}
                     disabled={disabled || saving}
+                    onCleared={() => {
+                      setSelectionOpened(false)
+                      setEntries((previous) => previous.filter((entry) => entry.date !== date))
+                    }}
                     onSaved={(saved) => {
                       setSelectionOpened(false)
                       setEntries((previous) => [

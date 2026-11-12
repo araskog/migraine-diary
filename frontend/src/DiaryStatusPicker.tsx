@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Stack, Text } from '@mantine/core'
 import ErrorMessages from './ErrorMessages'
-import { localDate, saveEntry } from './diary'
+import { clearEntry, localDate, saveEntry } from './diary'
 import type { DiaryEntry, DiaryStatus } from './diary'
 import { getSession } from './session'
 import type { Session } from './session'
@@ -12,6 +12,7 @@ type DiaryStatusPickerProps = {
   csrfToken: string
   disabled: boolean
   onSaved: (entry: DiaryEntry) => void
+  onCleared: () => void
   onSavingChange: (saving: boolean) => void
   onSignedOut: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
@@ -23,6 +24,7 @@ export default function DiaryStatusPicker({
   csrfToken,
   disabled,
   onSaved,
+  onCleared,
   onSavingChange,
   onSignedOut,
   onSessionRefreshed,
@@ -32,7 +34,7 @@ export default function DiaryStatusPicker({
   const [errors, setErrors] = useState<string[]>([])
   const [confirmFree, setConfirmFree] = useState(false)
 
-  async function save(nextStatus: DiaryStatus) {
+  async function save(nextStatus: DiaryStatus | '') {
     if (saving || disabled) return
     setStatus(nextStatus)
     setErrors([])
@@ -43,8 +45,13 @@ export default function DiaryStatusPicker({
     setSaving(true)
     onSavingChange(true)
     try {
-      const saved = await saveEntry(date, nextStatus, csrfToken)
-      onSaved(saved)
+      if (nextStatus === '') {
+        await clearEntry(date, csrfToken)
+        onCleared()
+      } else {
+        const saved = await saveEntry(date, nextStatus, csrfToken)
+        onSaved(saved)
+      }
     } catch {
       setErrors([
         'Unable to confirm this save. Your selection is kept; please try again.',
@@ -118,9 +125,10 @@ export default function DiaryStatusPicker({
         >
           Migraine-free
         </Button>
+        {entry && <Button variant="subtle" justify="flex-start" disabled={saving || disabled} onClick={() => void save('')}>Clear day</Button>}
       </Stack>
       <ErrorMessages messages={errors} />
-      {errors.length > 0 && status && (
+      {errors.length > 0 && (
         <Button
           size="md"
           disabled={saving || disabled}
