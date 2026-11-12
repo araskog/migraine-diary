@@ -23,6 +23,8 @@ Use [Mantine](https://mantine.dev/) components and theme tokens for controls, ty
 
 ## Later Direction
 
+Keep diary capabilities API-first. The browser, a planned public MCP service, and the future in-app assistant must use the same backend validation and ownership rules. The MCP service will adapt diary operations for AI clients. See [First MCP Integration](specs/first-mcp-integration.md) for scope, authorization, and acceptance criteria.
+
 AI summaries follow the usable diary; reports follow summaries. No LLM framework is selected. The deployment configuration targets one Render web service in Frankfurt with Neon PostgreSQL. Django serves the built React app and static assets on the same origin. `render.yaml` defines the free service and deployment commands; credentials are supplied through the hosting dashboard.
 
 ## References
