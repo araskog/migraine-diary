@@ -37,12 +37,15 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--app-calendar-selected-hover': '#182f25',
   },
   light: {
+    '--app-intro-background': theme.colors.sage[1],
     '--app-brand-text': theme.black,
     '--mantine-color-dimmed': theme.colors.gray[7],
     '--app-control-background': theme.colors.sage[0],
     '--app-color-positive': theme.colors.sage[8],
   },
   dark: {
+    '--app-intro-background':
+      'color-mix(in srgb, var(--mantine-color-body), #a8c3a5 8%)',
     '--app-brand-text': theme.colors.sage[1],
     '--mantine-color-text': theme.colors.gray[0],
     '--mantine-color-dimmed': theme.colors.gray[3],
