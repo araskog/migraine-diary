@@ -31,6 +31,7 @@ type DiaryEntriesProps = {
   dirty: boolean
   onDirtyChange: (dirty: boolean) => void
   onSavingChange: (saving: boolean) => void
+  onStatusSavingChange: (saving: boolean) => void
   onSignedOut: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
 }
@@ -42,6 +43,7 @@ export default function DiaryEntries({
   dirty,
   onDirtyChange,
   onSavingChange,
+  onStatusSavingChange,
   onSignedOut,
   onSessionRefreshed,
 }: DiaryEntriesProps) {
@@ -196,7 +198,7 @@ export default function DiaryEntries({
                         saved,
                       ])
                     }}
-                    onSavingChange={onSavingChange}
+                    onSavingChange={onStatusSavingChange}
                     onSignedOut={onSignedOut}
                     onSessionRefreshed={onSessionRefreshed}
                   />

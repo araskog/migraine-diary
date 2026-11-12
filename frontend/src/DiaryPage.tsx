@@ -22,6 +22,7 @@ export default function DiaryPage({
 }: DiaryPageProps) {
   const [busy, setBusy] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [statusSaving, setStatusSaving] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [confirmSignOut, setConfirmSignOut] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
@@ -107,7 +108,7 @@ export default function DiaryPage({
             </Menu.Label>
             <Menu.Divider />
             <Menu.Item
-              disabled={busy || saving}
+              disabled={busy || saving || statusSaving}
               onClick={() => {
                 if (dirty) setConfirmSignOut(true)
                 else void signOut()
@@ -121,8 +122,9 @@ export default function DiaryPage({
       <Stack component="section" gap="lg" className="page diary-page">
         <DiaryEntries
           csrfToken={csrfToken}
-          disabled={busy}
-          saving={saving}
+          disabled={busy || statusSaving}
+          saving={saving || statusSaving}
+          onStatusSavingChange={setStatusSaving}
           dirty={dirty}
           onDirtyChange={setDirty}
           onSavingChange={setSaving}
