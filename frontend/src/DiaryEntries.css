@@ -29,3 +29,7 @@
 .diary-entries [data-outside]:not([data-disabled]):not(:disabled) {
   opacity: 1;
 }
+
+.diary-entries [data-selected] .calendar-marker.migraine {
+  color: var(--mantine-color-red-2);
+}
