@@ -12,6 +12,8 @@ The first increment exposes listing and saving diary entries. Saving supports bo
 
 Keep diary operations available through the backend API. MCP tools use those operations and their backend validation and ownership rules. Share domain behavior rather than duplicating it in MCP handlers. Derive the diary owner from authenticated identity, never a tool argument.
 
+Define one shared set of diary tools for the public MCP service and the future in-app AI chat, including names, descriptions, input/output schemas, and execution handlers. Both surfaces must use that set with the authenticated user's context. Framework and transport adapters may translate representations while preserving the shared contract and behavior. Evaluate Strands Agents as a candidate for the in-app agent runtime and MCP tool integration during implementation planning.
+
 Tools accept explicit calendar dates. Saving also requires an IANA timezone so the backend can validate today and reject future dates consistently with the app. An AI client must obtain the user's intended date and timezone before calling the tool. Stored dates remain calendar dates. Missing entries remain unrecorded.
 
 Saving the same user/date/status again leaves one current entry. Return structured results only after persistence succeeds, and return distinguishable validation, authorization, and operational errors without leaking internal details.
@@ -33,6 +35,7 @@ Select the authorization implementation and an initial compatible AI client duri
 | M5 | Invalid dates, future dates, invalid timezones, and unsupported statuses are rejected without changing saved entries, using the same backend rules as the API. Include timezone boundary cases. |
 | M6 | Unauthenticated requests and invalid, expired, revoked, wrong-audience, or insufficient-permission credentials cannot perform protected operations. A client cannot read or change another user's diary by supplying identifiers. |
 | M7 | Failed saves return an error rather than success. A retry after a lost response leaves one entry with the requested status. |
+| M8 | MCP exposes the shared tool definitions and handlers intended for the in-app AI chat. Contract checks verify consistent schemas, results, validation, and ownership through the MCP adapter and direct invocation of the shared tools. When in-app chat is added, it uses this same set. |
 
 ## Delivery and Verification
 
@@ -44,5 +47,6 @@ Automated checks cover tool schemas, backend persistence, validation, retry beha
 
 - [MCP server concepts](https://modelcontextprotocol.io/docs/learn/server-concepts)
 - [MCP authorization](https://modelcontextprotocol.io/specification/latest/basic/authorization)
+- [Strands Agents](https://strandsagents.com/)
 - [Architecture](../architecture.md)
 - [Domain glossary](../../GLOSSARY.md)
