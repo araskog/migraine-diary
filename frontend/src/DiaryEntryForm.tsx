@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button, Radio, Stack, Text, Title } from '@mantine/core'
+import { Button, Radio, Stack, Title } from '@mantine/core'
 import ErrorMessages from './ErrorMessages'
-import { dateLabel, localDate, saveEntry, statusLabel } from './diary'
+import { dateLabel, localDate, saveEntry } from './diary'
 import type { DiaryEntry, DiaryStatus } from './diary'
 import { getSession } from './session'
 import type { Session } from './session'
@@ -66,11 +66,6 @@ export default function DiaryEntryForm({
       <Title order={2} size="h4">
         {dateLabel(date)}
       </Title>
-      <Text size="sm" c="dimmed">
-        {entry
-          ? `Recorded: ${statusLabel(entry.status)}. You can update this day.`
-          : 'This day is unrecorded.'}
-      </Text>
       <Radio.Group
         name="diary-status"
         label="How was this day?"
@@ -104,11 +99,6 @@ export default function DiaryEntryForm({
         >
           Try again
         </Button>
-      )}
-      {saving && (
-        <Text role="status" size="sm">
-          Saving…
-        </Text>
       )}
     </Stack>
   )
