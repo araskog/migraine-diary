@@ -21,11 +21,15 @@ Use the approved clear, approachable direction: neutral surfaces and sage accent
 
 Use [Mantine](https://mantine.dev/) components and theme tokens for controls, typography, spacing, and surfaces. The shared theme in `frontend/src/theme.ts` defines the sage palette and control radii; `frontend/src/main.tsx` applies it with dark mode as the default and a browser-persisted light/dark choice. Keep custom CSS scoped to application layout or UI the library does not provide.
 
+## Deployment
+
+The implemented deployment configuration uses one Render web service in Frankfurt with Neon PostgreSQL. Django serves the built React app and static assets on the same origin. `render.yaml` defines the free service and deployment commands; credentials are supplied through the hosting dashboard.
+
 ## Later Direction
 
 Keep diary capabilities API-first. The browser, a planned public MCP service, and the in-app assistant must use the same backend validation and ownership rules. The MCP service and in-app AI chat will share one set of tool definitions and execution handlers backed by diary operations. Strands Agents is a candidate for the agent runtime and MCP integration. See [AI Chat and MCP Diary Tools](specs/first-mcp-integration.md) for scope, authorization, and acceptance criteria.
 
-AI summaries follow the usable diary; reports follow summaries. No LLM framework is selected. The deployment configuration targets one Render web service in Frankfurt with Neon PostgreSQL. Django serves the built React app and static assets on the same origin. `render.yaml` defines the free service and deployment commands; credentials are supplied through the hosting dashboard.
+AI summaries follow the usable diary; reports follow summaries. No LLM framework is selected.
 
 ## References
 
