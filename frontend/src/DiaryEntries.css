@@ -51,6 +51,7 @@
 .diary-entries .calendar-day-busy {
   color: var(--mantine-color-text);
   opacity: 1;
+  cursor: default;
 }
 
 .diary-entries .calendar-day-busy[data-outside] {
