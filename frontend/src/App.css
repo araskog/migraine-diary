@@ -34,3 +34,51 @@
 .app .account-toggle {
   border: 1px solid var(--mantine-color-default-border);
 }
+
+.app .account-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-lg);
+  background: var(--mantine-color-body);
+  max-width: 840px;
+  margin: 48px auto 0;
+}
+
+.app .account-intro {
+  padding: 32px;
+  justify-content: center;
+  background: var(--app-intro-background);
+  color: var(--app-brand-text);
+}
+
+.app .account-intro h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.app .account-form {
+  min-width: 0;
+  padding: 32px;
+}
+
+@media (max-width: 700px) {
+  .app .account-page {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 440px;
+    margin-top: 24px;
+  }
+
+  .app .account-intro,
+  .app .account-form {
+    padding: 24px;
+  }
+
+  .app .account-intro h2 {
+    font-size: 1.65rem;
+  }
+}

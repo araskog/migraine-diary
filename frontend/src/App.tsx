@@ -12,7 +12,6 @@ function App() {
   const [page, setPage] = useState<
     'loading' | 'account' | 'diary' | 'unavailable'
   >('loading')
-  const [notice, setNotice] = useState('')
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
@@ -42,7 +41,6 @@ function App() {
   function finishSignOut(next: Session) {
     setSession(next)
     setPage('account')
-    setNotice('You have signed out.')
   }
 
   return (
@@ -72,7 +70,6 @@ function App() {
       {page === 'account' && session && (
         <AccountForm
           csrfToken={session.csrfToken}
-          notice={notice}
           onAuthenticated={openDiary}
           onSessionRefreshed={setSession}
         />
