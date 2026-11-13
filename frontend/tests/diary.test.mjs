@@ -3,6 +3,7 @@ import { afterEach, mock, test } from 'node:test'
 import {
   emptyDetails,
   isDiaryDate,
+  clearEntry,
   loadEntries,
   localDate,
   saveEntry,
@@ -10,6 +11,32 @@ import {
 } from '../src/diary.ts'
 
 afterEach(() => mock.restoreAll())
+
+test('clearing sends a protected date-specific request and accepts an empty response', async () => {
+  mock.method(globalThis, 'fetch', async (url, options) => {
+    assert.equal(url, '/api/diary/entries/')
+    assert.equal(options.method, 'DELETE')
+    assert.equal(options.headers['X-CSRFToken'], 'synthetic-csrf')
+    assert.deepEqual(JSON.parse(options.body), {
+      date: '2026-11-10',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    })
+    return new Response(null, { status: 204 })
+  })
+  await clearEntry('2026-11-10', 'synthetic-csrf')
+})
+
+test('clearing rejects failures and unexpected success responses', async () => {
+  for (const status of [200, 400, 403, 500]) {
+    mock.method(globalThis, 'fetch', async () => Response.json({}, { status }))
+    await assert.rejects(clearEntry('2026-11-10', 'synthetic-csrf'))
+    mock.restoreAll()
+  }
+  mock.method(globalThis, 'fetch', async () => {
+    throw new TypeError('offline')
+  })
+  await assert.rejects(clearEntry('2026-11-10', 'synthetic-csrf'))
+})
 
 test('calendar date follows local time rather than UTC', () => {
   assert.equal(localDate(new Date(2026, 0, 2, 0, 5)), '2026-01-02')

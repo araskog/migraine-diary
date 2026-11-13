@@ -163,7 +163,7 @@ class DiaryEntryTests(TestCase):
 
     def test_anonymous_and_signed_out_sessions_cannot_access_entries(self):
         anonymous = Client(enforce_csrf_checks=True)
-        for method in [anonymous.get, anonymous.post]:
+        for method in [anonymous.get, anonymous.post, anonymous.delete]:
             response = method(self.path)
             self.assertEqual(response.status_code, 403)
             self.assertIn("no-store", response["Cache-Control"])
@@ -192,8 +192,77 @@ class DiaryEntryTests(TestCase):
         self.assertFalse(DiaryEntry.objects.exists())
         self.assertEqual(self.save().status_code, 201)
         self.assertEqual(
-            self.client.delete(self.path, HTTP_X_CSRFTOKEN=self.token).status_code, 405
+            self.client.delete(self.path, HTTP_X_CSRFTOKEN=self.token).status_code, 400
         )
+
+    def clear(self, **overrides):
+        data = {"date": "2026-01-01", "timezone": "UTC"}
+        data.update(overrides)
+        return self.client.delete(
+            self.path,
+            data,
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.token,
+        )
+
+    def test_clear_both_statuses_persists_and_is_safe_to_retry(self):
+        for status in ["migraine", "migraine_free"]:
+            with self.subTest(status=status):
+                self.save(status=status)
+                response = self.clear()
+                self.assertEqual(response.status_code, 204)
+                self.assertEqual(response.content, b"")
+                self.assertIn("no-store", response["Cache-Control"])
+                self.assertFalse(DiaryEntry.objects.filter(user=self.user).exists())
+                self.assertEqual(self.clear().status_code, 204)
+                self.client.post("/api/sign-out/", HTTP_X_CSRFTOKEN=self.token)
+                self.client = Client(enforce_csrf_checks=True)
+                self.sign_in()
+                self.assertEqual(self.client.get(self.path).json(), [])
+
+    def test_clear_only_removes_own_entry_for_requested_date(self):
+        self.save()
+        self.save(date="2025-12-31")
+        other = DiaryEntry.objects.create(
+            user=self.other, date="2026-01-01", status="migraine_free"
+        )
+        self.assertEqual(self.clear(user=self.other.pk).status_code, 204)
+        self.assertTrue(DiaryEntry.objects.filter(pk=other.pk).exists())
+        self.assertEqual(
+            self.client.get(self.path).json(),
+            [entry_output("2025-12-31", "migraine")],
+        )
+
+    def test_invalid_or_unprotected_clear_preserves_entry(self):
+        self.save()
+        for overrides in [
+            {"date": "2026-02-30"},
+            {"date": "2026-01-03"},
+            {"date": None},
+            {"timezone": "Invalid/Zone"},
+            {"timezone": None},
+            {"date": "2026-01-02", "timezone": "America/Los_Angeles"},
+        ]:
+            with self.subTest(overrides=overrides):
+                self.assertEqual(self.clear(**overrides).status_code, 400)
+        for headers in [
+            {},
+            {"HTTP_X_CSRFTOKEN": "x" * 64},
+            {
+                "HTTP_X_CSRFTOKEN": self.token,
+                "HTTP_ORIGIN": "https://untrusted.example",
+            },
+        ]:
+            response = self.client.delete(
+                self.path,
+                {"date": "2026-01-01", "timezone": "UTC"},
+                content_type="application/json",
+                **headers,
+            )
+            self.assertEqual(response.status_code, 403)
+        self.assertEqual(DiaryEntry.objects.get(user=self.user).status, "migraine")
+        self.client.post("/api/sign-out/", HTTP_X_CSRFTOKEN=self.token)
+        self.assertEqual(self.clear().status_code, 403)
 
     def test_database_enforces_one_status_per_user_date_and_valid_status(self):
         DiaryEntry.objects.create(user=self.user, date="2026-01-01", status="migraine")

@@ -48,6 +48,10 @@
   opacity: 1;
 }
 
+.diary-entries .calendar-day-busy {
+  cursor: default;
+}
+
 .diary-entries [data-selected] .calendar-marker.migraine {
   color: var(--app-migraine);
 }
@@ -61,6 +65,12 @@
   background-color: var(--app-calendar-selected-hover);
 }
 
-.diary-entries .calendar-day-busy {
-  cursor: default;
+.diary-entries .calendar-day-busy:not([data-selected]):hover,
+.diary-entries .calendar-day-busy:not([data-selected]):active {
+  background-color: transparent;
+}
+
+.diary-entries .calendar-day-busy[data-selected]:hover,
+.diary-entries .calendar-day-busy[data-selected]:active {
+  background-color: var(--app-calendar-selected);
 }

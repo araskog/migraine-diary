@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Stack, Text } from '@mantine/core'
 import ErrorMessages from './ErrorMessages'
-import { localDate, saveEntry } from './diary'
+import { clearEntry, localDate, saveEntry } from './diary'
 import type { DiaryEntry, DiaryStatus } from './diary'
 import { getSession } from './session'
 import type { Session } from './session'
@@ -12,6 +12,7 @@ type DiaryStatusPickerProps = {
   csrfToken: string
   disabled: boolean
   onSaved: (entry: DiaryEntry) => void
+  onCleared: () => void
   onSavingChange: (saving: boolean) => void
   onSignedOut: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
@@ -23,29 +24,36 @@ export default function DiaryStatusPicker({
   csrfToken,
   disabled,
   onSaved,
+  onCleared,
   onSavingChange,
   onSignedOut,
   onSessionRefreshed,
 }: DiaryStatusPickerProps) {
   const [status, setStatus] = useState<DiaryStatus | ''>(entry?.status ?? '')
-  const [saving, setSaving] = useState(false)
+  const [canClear] = useState(entry !== undefined)
   const [errors, setErrors] = useState<string[]>([])
+  const [canRetry, setCanRetry] = useState(false)
   const [confirmFree, setConfirmFree] = useState(false)
 
-  async function save(nextStatus: DiaryStatus) {
-    if (saving || disabled) return
+  async function save(nextStatus: DiaryStatus | '') {
+    if (disabled) return
     setStatus(nextStatus)
     setErrors([])
     if (date > localDate()) {
       setErrors(['Choose today or a past date.'])
       return
     }
-    setSaving(true)
     onSavingChange(true)
     try {
-      const saved = await saveEntry(date, nextStatus, csrfToken)
-      onSaved(saved)
+      if (nextStatus === '') {
+        await clearEntry(date, csrfToken)
+        onCleared()
+      } else {
+        const saved = await saveEntry(date, nextStatus, csrfToken)
+        onSaved(saved)
+      }
     } catch {
+      setCanRetry(true)
       setErrors([
         'Unable to confirm this save. Your selection is kept; please try again.',
       ])
@@ -57,35 +65,55 @@ export default function DiaryStatusPicker({
         // Preserve the selection for retry when the connection returns.
       }
     } finally {
-      setSaving(false)
       onSavingChange(false)
     }
   }
 
+  const retryAction = canRetry && (
+    <Button
+      size="md"
+      aria-disabled={disabled}
+      onClick={() => {
+        void save(status)
+      }}
+    >
+      Try again
+    </Button>
+  )
+
   if (confirmFree)
     return (
-      <Stack gap="sm">
+      <Stack gap="sm" aria-busy={disabled}>
         <Text size="sm">
           Changing to migraine-free removes this day’s pain rating. Your other
           answers stay.
         </Text>
-        <Button variant="default" onClick={() => setConfirmFree(false)}>
+        <Button
+          variant="default"
+          aria-disabled={disabled}
+          onClick={() => {
+            if (disabled) return
+            setStatus(entry?.status ?? '')
+            setErrors([])
+            setCanRetry(false)
+            setConfirmFree(false)
+          }}
+        >
           Keep migraine
         </Button>
         <Button
-          disabled={saving || disabled}
-          onClick={() => {
-            setConfirmFree(false)
-            void save('migraine_free')
-          }}
+          aria-disabled={disabled}
+          onClick={() => void save('migraine_free')}
         >
           Mark migraine-free
         </Button>
+        <ErrorMessages messages={errors} />
+        {retryAction}
       </Stack>
     )
 
   return (
-    <Stack gap="xs">
+    <Stack gap="xs" aria-busy={disabled}>
       <Stack gap={2}>
         <Button
           variant="subtle"
@@ -96,7 +124,7 @@ export default function DiaryStatusPicker({
             </span>
           }
           aria-pressed={status === 'migraine'}
-          disabled={saving || disabled}
+          aria-disabled={disabled}
           onClick={() => void save('migraine')}
         >
           Migraine
@@ -106,8 +134,9 @@ export default function DiaryStatusPicker({
           justify="flex-start"
           leftSection={<span aria-hidden="true">○</span>}
           aria-pressed={status === 'migraine_free'}
-          disabled={saving || disabled}
+          aria-disabled={disabled}
           onClick={() => {
+            if (disabled) return
             if (
               entry?.pain_severity !== null &&
               entry?.pain_severity !== undefined
@@ -118,19 +147,33 @@ export default function DiaryStatusPicker({
         >
           Migraine-free
         </Button>
+        {canClear && (
+          <Button
+            variant="subtle"
+            justify="flex-start"
+            aria-disabled={disabled}
+            leftSection={
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="m6 6 12 12M6 18 18 6" />
+              </svg>
+            }
+            onClick={() => void save('')}
+          >
+            Clear day
+          </Button>
+        )}
       </Stack>
       <ErrorMessages messages={errors} />
-      {errors.length > 0 && status && (
-        <Button
-          size="md"
-          disabled={saving || disabled}
-          onClick={() => {
-            void save(status)
-          }}
-        >
-          Try again
-        </Button>
-      )}
+      {retryAction}
     </Stack>
   )
 }

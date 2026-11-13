@@ -3,15 +3,23 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import DiaryEntry
-from .serializers import DiaryEntryInput, DiaryEntryOutput
+from .serializers import DiaryDateInput, DiaryEntryInput, DiaryEntryOutput
 
 
 @never_cache
-@api_view(["GET", "POST"])
+@api_view(["GET", "POST", "DELETE"])
 def entries(request):
     if request.method == "GET":
         entries = DiaryEntry.objects.filter(user=request.user).order_by("-date")
         return Response(DiaryEntryOutput(entries, many=True).data)
+
+    if request.method == "DELETE":
+        serializer = DiaryDateInput(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        DiaryEntry.objects.filter(
+            user=request.user, date=serializer.validated_data["date"]
+        ).delete()
+        return Response(status=204)
 
     serializer = DiaryEntryInput(data=request.data)
     serializer.is_valid(raise_exception=True)

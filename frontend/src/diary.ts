@@ -108,3 +108,21 @@ export async function saveEntry(
     throw new Error('Unable to save diary day.')
   return body
 }
+
+export async function clearEntry(
+  date: string,
+  csrfToken: string,
+): Promise<void> {
+  const response = await fetch('/api/diary/entries/', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    body: JSON.stringify({
+      date,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    }),
+  })
+  if (response.status !== 204) throw new Error('Unable to clear diary day.')
+}

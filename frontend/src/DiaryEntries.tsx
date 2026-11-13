@@ -189,11 +189,17 @@ export default function DiaryEntries({
                   aria-label={`Status for ${dateLabel(date)}`}
                 >
                   <DiaryStatusPicker
-                    key={`${date}-${current?.status ?? ''}`}
+                    key={date}
                     date={date}
                     entry={current}
                     csrfToken={csrfToken}
                     disabled={disabled || saving}
+                    onCleared={() => {
+                      setSelectionOpened(false)
+                      setEntries((previous) =>
+                        previous.filter((entry) => entry.date !== date),
+                      )
+                    }}
                     onSaved={(saved) => {
                       setSelectionOpened(false)
                       setEntries((previous) => [
