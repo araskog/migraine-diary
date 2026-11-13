@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ActionIcon, Menu, Stack, Text } from '@mantine/core'
+import LoadingIndicator from './LoadingIndicator'
 import AppHeader from './AppHeader'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
@@ -114,7 +115,7 @@ export default function DiaryPage({
                 else void signOut()
               }}
             >
-              {busy ? 'Signing out…' : 'Sign out'}
+              {busy ? <LoadingIndicator label="Signing out" /> : 'Sign out'}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>

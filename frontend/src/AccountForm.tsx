@@ -164,12 +164,8 @@ export default function AccountForm({
               </Text>
             </Stack>
             <ErrorMessages messages={errors} />
-            <Button size="md" disabled={busy} type="submit">
-              {busy
-                ? 'Please wait…'
-                : mode === 'register'
-                  ? 'Create account'
-                  : 'Sign in'}
+            <Button size="md" loading={busy} type="submit">
+              {mode === 'register' ? 'Create account' : 'Sign in'}
             </Button>
           </Stack>
         </form>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Container, Stack, Text, Title } from '@mantine/core'
+import LoadingIndicator from './LoadingIndicator'
 import AccountForm from './AccountForm'
 import AppHeader from './AppHeader'
 import DiaryPage from './DiaryPage'
@@ -46,11 +47,7 @@ function App() {
   return (
     <Container component="main" size={960} px="lg" py="xl" className="app">
       {page !== 'diary' && <AppHeader />}
-      {page === 'loading' && (
-        <Text role="status" mt="xl">
-          Getting your diary ready…
-        </Text>
-      )}
+      {page === 'loading' && <LoadingIndicator fullPage />}
       {page === 'unavailable' && (
         <Stack component="section" gap="lg" className="page">
           <Title order={1}>Unable to connect</Title>
