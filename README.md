@@ -49,12 +49,17 @@ npm run typecheck
 npm run build
 ```
 
-For diary popup regression checks, start the frontend dev server, open
-[the browser checks](http://127.0.0.1:5173/static/app/tests/diary-interactions.html),
-and select **Run regression checks**. These exercise pending saves, repeated
-activation, focus, calendar DOM continuity, and clear/retry with synthetic API
-responses. Run at desktop and mobile viewport sizes; these checks are separate
-from `npm test` and do not exercise backend persistence.
+GitHub Actions runs the checks on pushes and pull requests, including browser
+regressions at desktop and mobile sizes. To run those locally from `frontend/`:
+
+```sh
+npx playwright install chromium # First run only
+npm run test:browser
+```
+
+The browser command starts its own local server. It uses synthetic API responses
+and checks pending actions, focus, calendar continuity and clear/retry behavior;
+backend persistence is covered by the Django tests below.
 
 From `backend/`, with PostgreSQL running:
 

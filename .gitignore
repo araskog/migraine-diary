@@ -13,3 +13,5 @@ dist/
 
 backend/staticfiles/
 .neon
+
+frontend/test-results/
