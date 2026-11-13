@@ -176,10 +176,7 @@ document.getElementById('run').onclick = async (event) => {
     assert(day('migraine_free'), 'Failed clear removed the saved marker')
     pass('Failed clear retains the saved marker and exposes retry')
     const beforeRetry = writes
-    action('Try again').click()
-    await waitFor(
-      () => action('Clear day')?.getAttribute('aria-disabled') === 'true',
-    )
+    await start('Try again')
     action('Clear day').click()
     await delay(32)
     assert(writes === beforeRetry + 1, 'Retry allowed a competing write')
