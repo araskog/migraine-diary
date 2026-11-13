@@ -23,7 +23,11 @@ Use [Mantine](https://mantine.dev/) components and theme tokens for controls, ty
 
 ## Deployment
 
-The implemented deployment configuration uses one Render web service in Frankfurt with Neon PostgreSQL. Django serves the built React app and static assets on the same origin. `render.yaml` defines the free service and deployment commands; credentials are supplied through the hosting dashboard.
+The React frontend runs on Cloudflare Pages, the Django API runs on Vercel, and Neon PostgreSQL stores accounts, sessions, and diary records. The browser calls `/api/*` on the frontend origin; a Pages Function forwards those requests to Vercel, preserving session cookies, request origins, and CSRF headers. API responses are not cached.
+
+Vercel uses API-only Django settings with explicit allowed hosts and trusted frontend origins. Application traffic uses Neon's pooled connection; migrations use a separate direct connection. Django admin is accessed on the Vercel origin, with its own session cookies and static assets.
+
+See [Deployment](deployment.md) for hosting setup and cutover checks.
 
 ## Later Direction
 
