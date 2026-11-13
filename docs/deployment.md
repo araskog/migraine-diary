@@ -7,7 +7,7 @@ Set `DJANGO_SETTINGS_MODULE=config.vercel`, a strong `DJANGO_SECRET_KEY`,
 `DJANGO_ALLOWED_HOSTS` to the explicit Vercel API hostname, and `DATABASE_URL`
 to the existing Neon pooled connection URL. Set `DJANGO_CSRF_TRUSTED_ORIGINS`
 to the exact HTTPS Cloudflare frontend origin (comma-separated if necessary).
-Do not use wildcard preview origins. Set `PUBLIC_REGISTRATION_ENABLED` explicitly.
+Do not use wildcard preview origins.
 Vercel discovers the WSGI entrypoint and collects admin static assets.
 
 ## Cloudflare Pages
