@@ -27,8 +27,6 @@ The React frontend runs on Cloudflare Pages, the Django API runs on Vercel, and 
 
 Vercel uses API-only Django settings with explicit allowed hosts and trusted frontend origins. Application traffic uses Neon's pooled connection; migrations use a separate direct connection. Django admin is accessed on the Vercel origin, with its own session cookies and static assets.
 
-See [Deployment](deployment.md) for hosting setup and cutover checks.
-
 ## Later Direction
 
 Keep diary capabilities API-first. The browser, a planned public MCP service, and the in-app assistant must use the same backend validation and ownership rules. The MCP service and in-app AI chat will share one set of tool definitions and execution handlers backed by diary operations. Strands Agents is a candidate for the agent runtime and MCP integration. See [AI Chat and MCP Diary Tools](specs/first-mcp-integration.md) for scope, authorization, and acceptance criteria.
