@@ -33,6 +33,7 @@ export default function DiaryEntryForm({
   // Keep this popup's actions stable through the save and closing transition.
   const [canClear] = useState(entry !== undefined)
   const [errors, setErrors] = useState<string[]>([])
+  const [canRetry, setCanRetry] = useState(false)
 
   async function save(nextStatus: DiaryStatus | '') {
     if (disabled) return
@@ -52,6 +53,7 @@ export default function DiaryEntryForm({
         onSaved(saved)
       }
     } catch {
+      setCanRetry(true)
       setErrors(['Unable to confirm this change. Please try again.'])
       try {
         const session = await getSession()
@@ -118,7 +120,7 @@ export default function DiaryEntryForm({
         )}
       </Stack>
       <ErrorMessages messages={errors} />
-      {errors.length > 0 && (
+      {canRetry && (
         <Button
           size="md"
           aria-disabled={disabled}
