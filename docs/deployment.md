@@ -1,7 +1,5 @@
 # Vercel, Cloudflare Pages, and Neon
 
-Migration configuration is prepared locally; hosted verification and cutover are pending.
-
 ## Vercel API
 
 Import the repository with **backend** as Root Directory and Django as the framework.
@@ -18,9 +16,7 @@ Import the repository with **frontend** as Root Directory, build command
 `npm ci && npm run build`, and output directory **dist**. Use Node.js 24.
 Pages sets `CLOUDFLARE_PAGES`, selecting root-relative frontend assets.
 Set the runtime variable `API_ORIGIN` to the HTTPS Vercel API origin, with no path.
-The Pages Function forwards `/api/*`, preserving cookies and CSRF headers.
-Responses are not cached. Other paths use Pages static assets and SPA fallback.
-Use the Vercel hostname directly for Django admin; admin cookies are separate.
+Use the Vercel hostname directly for Django admin.
 
 ## Database and cutover
 
@@ -33,10 +29,8 @@ synthetic database and their own explicit frontend origin.
 Before cutover, verify health, registration policy, sign-in, sign-out, recording,
 clearing, reload persistence, CSRF rejection, and ownership with synthetic users.
 Verify admin assets on Vercel and desktop/mobile frontend assets on Pages.
-Keep Render available until hosted checks pass; do not send traffic to both
-versions during incompatible schema changes. No database schema change is needed
-for this hosting migration.
+Keep Render available until hosted checks pass.
 
-References checked: [Vercel Django](https://vercel.com/docs/frameworks/full-stack/django),
+References: [Vercel Django](https://vercel.com/docs/frameworks/full-stack/django),
 [Pages advanced mode](https://developers.cloudflare.com/pages/functions/advanced-mode/),
 [Neon pooling](https://neon.com/docs/connect/connection-pooling).
