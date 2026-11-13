@@ -10,6 +10,8 @@ Agree on important test boundaries per feature. Use a short plan for bounded tas
 
 ## Delivery
 
+Before completing an increment, check the documentation affected by the change and update it in the same PR. Keep architecture descriptions aligned with implemented structure, interfaces, and deployment; move delivered capabilities out of future-direction sections. Update specifications when agreed behavior or milestone status changes, and README setup/check commands when those change. Follow the source responsibilities in AGENTS.md and link to existing details instead of duplicating them. Verify claims against the implementation and available check evidence; distinguish implemented configuration from verified live behavior.
+
 1. Work on a task branch. Reuse the branch for its existing task.
 2. One implementation agent reads the coding standards before writing code, implements only the approved increment, runs required checks, reports results, and stops when that increment is complete.
 3. Prefer small, focused commits, each representing one coherent change, so reviewers can follow the work. Keep related code and tests together and avoid mixing unrelated changes. Use Conventional Commits, push, and open a PR. The PR description covers the problem, final behavior, scope, and requirements or spec link. Put test results and review follow-ups in commit messages and review comments.
