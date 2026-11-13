@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   Button,
+  Checkbox,
   SegmentedControl,
   Stack,
   Text,
@@ -9,6 +10,7 @@ import {
 } from '@mantine/core'
 import type { FormEvent } from 'react'
 import ErrorMessages from './ErrorMessages'
+import PrivacyNotice, { privacyVersion } from './PrivacyNotice'
 import { getSession, isSession } from './session'
 import type { Session } from './session'
 
@@ -63,6 +65,12 @@ export default function AccountForm({
         body: JSON.stringify({
           email: values.get('email'),
           password: values.get('password'),
+          ...(mode === 'register'
+            ? {
+                health_consent: values.get('health_consent') === 'on',
+                privacy_policy_version: privacyVersion,
+              }
+            : {}),
         }),
       })
       const body: unknown = await response.json()
@@ -163,6 +171,15 @@ export default function AccountForm({
                 or a password similar to your email.
               </Text>
             </Stack>
+            <PrivacyNotice />
+            {mode === 'register' && (
+              <Checkbox
+                name="health_consent"
+                required
+                disabled={busy}
+                label="I explicitly consent to Migraine Diary storing and using my health entries to provide my diary. I can withdraw consent by deleting my account."
+              />
+            )}
             <ErrorMessages messages={errors} />
             <Button size="md" disabled={busy} type="submit">
               {busy

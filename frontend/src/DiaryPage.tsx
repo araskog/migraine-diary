@@ -1,6 +1,15 @@
 import { useState } from 'react'
-import { ActionIcon, Menu, Stack, Text } from '@mantine/core'
+import {
+  ActionIcon,
+  Button,
+  Menu,
+  Modal,
+  PasswordInput,
+  Stack,
+  Text,
+} from '@mantine/core'
 import AppHeader from './AppHeader'
+import PrivacyNotice from './PrivacyNotice'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
 import ConfirmDialog from './ConfirmDialog'
@@ -20,6 +29,8 @@ export default function DiaryPage({
   onSignedOut,
   onSessionRefreshed,
 }: DiaryPageProps) {
+  const [deleting, setDeleting] = useState(false)
+  const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [saving, setSaving] = useState(false)
   const [statusSaving, setStatusSaving] = useState(false)
@@ -56,6 +67,32 @@ export default function DiaryPage({
     }
   }
 
+  async function deleteAccount() {
+    if (busy || saving) return
+    setBusy(true)
+    setErrors([])
+    try {
+      const response = await fetch('/api/account/delete/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({ password }),
+      })
+      const body: unknown = await response.json()
+      if (!response.ok || !isSession(body) || body.user !== null)
+        throw new Error('Deletion failed')
+      onSignedOut(body)
+    } catch {
+      setErrors([
+        'Unable to delete account. Check your password and try again.',
+      ])
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <>
       <ConfirmDialog
@@ -69,6 +106,42 @@ export default function DiaryPage({
           void signOut()
         }}
       />
+      <Modal
+        opened={deleting}
+        onClose={() => {
+          if (!busy) {
+            setDeleting(false)
+            setPassword('')
+          }
+        }}
+        title="Delete your account?"
+      >
+        <Stack>
+          <Text>
+            This withdraws consent and permanently deletes your account and
+            diary from the active database. Before continuing, you may request a
+            copy of your data through the privacy contact. Backup expiry is
+            awaiting confirmation in the draft privacy notice.
+          </Text>
+          <PasswordInput
+            label="Confirm your password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.currentTarget.value)}
+            disabled={busy}
+          />
+          <ErrorMessages messages={errors} />
+          <Button
+            color="red"
+            disabled={busy || saving || !password}
+            onClick={() => {
+              void deleteAccount()
+            }}
+          >
+            Withdraw consent and delete account
+          </Button>
+        </Stack>
+      </Modal>
       <AppHeader>
         <Menu position="bottom-end" width={260} shadow="md">
           <Menu.Target>
@@ -108,7 +181,14 @@ export default function DiaryPage({
             </Menu.Label>
             <Menu.Divider />
             <Menu.Item
-              disabled={busy || saving || statusSaving}
+              disabled={busy || saving}
+              onClick={() => setDeleting(true)}
+              color="red"
+            >
+              Withdraw consent and delete account
+            </Menu.Item>
+            <Menu.Item
+              disabled={busy || saving}
               onClick={() => {
                 if (dirty) setConfirmSignOut(true)
                 else void signOut()
@@ -131,6 +211,7 @@ export default function DiaryPage({
           onSignedOut={onSignedOut}
           onSessionRefreshed={onSessionRefreshed}
         />
+        <PrivacyNotice />
         <ErrorMessages messages={errors} />
       </Stack>
     </>

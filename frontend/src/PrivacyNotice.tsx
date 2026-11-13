@@ -1,0 +1,54 @@
+import { Button, Modal, Stack, Text } from '@mantine/core'
+import { useState } from 'react'
+
+export const privacyVersion = '2026-11-13'
+
+export default function PrivacyNotice() {
+  const [opened, setOpened] = useState(false)
+  return (
+    <>
+      <Button variant="subtle" onClick={() => setOpened(true)}>
+        Privacy
+      </Button>
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title="Your privacy"
+      >
+        <Stack>
+          <Text>
+            Migraine Diary stores your email, a securely hashed password,
+            login/session information and the dates you mark as migraine or
+            migraine-free to provide your account and saved diary.
+          </Text>
+          <Text>
+            We rely on consent under GDPR Article 6(1)(a), with explicit consent
+            under Article 9(2)(a) for health entries. You can correct entries in
+            your diary and withdraw consent by deleting your account from the
+            account menu. Withdrawal does not affect earlier lawful processing.
+          </Text>
+          <Text>
+            Before deletion, you may request a copy of your data through the
+            privacy contact. You can also complain to Sweden’s privacy
+            authority, IMY.
+          </Text>
+          <Text>
+            Migraine Diary is operated by Amanda Araskog. Contact:
+            amanda.araskog@gmail.com. Hosting providers are Neon (database),
+            Vercel (API) and Cloudflare (website). Hosting regions and
+            international transfer safeguards are awaiting verification.
+          </Text>
+          <Text>
+            We retain your account and diary until you delete your account or
+            withdraw consent. Deletion removes them from the active database.
+            Neon Free provides up to six hours of restore history, limited by
+            the volume of changes. This is not a guarantee that every backup
+            copy is erased within six hours: separate snapshots, branches and
+            provider backup deletion periods still need verification.
+          </Text>
+          <Text size="sm">Version {privacyVersion}</Text>
+        </Stack>
+      </Modal>
+    </>
+  )
+}
