@@ -81,8 +81,17 @@ export default function DiaryPage({
         body: JSON.stringify({ password }),
       })
       const body: unknown = await response.json()
-      if (!response.ok || !isSession(body) || body.user !== null)
+      if (!response.ok) {
+        const current = await getSession()
+        if (current.user === null) {
+          onSignedOut(current)
+          return
+        }
+        onSessionRefreshed(current)
         throw new Error('Deletion failed')
+      }
+      if (!isSession(body) || body.user !== null)
+        throw new Error('Unexpected response')
       onSignedOut(body)
     } catch {
       setErrors([
@@ -120,8 +129,7 @@ export default function DiaryPage({
           <Text>
             This withdraws consent and permanently deletes your account and
             diary from the active database. Before continuing, you may request a
-            copy of your data through the privacy contact. Backup expiry is
-            awaiting confirmation in the draft privacy notice.
+            copy of your data through the privacy contact.
           </Text>
           <PasswordInput
             label="Confirm your password"

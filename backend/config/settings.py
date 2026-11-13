@@ -79,6 +79,3 @@ TEMPLATES = [
     },
 ]
 STATIC_URL = "/static/"
-
-# Registration remains open unless the operator explicitly disables it.
-PUBLIC_REGISTRATION_ENABLED = os.environ.get("PUBLIC_REGISTRATION_ENABLED", "1") == "1"

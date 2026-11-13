@@ -17,9 +17,8 @@ export default function PrivacyNotice() {
       >
         <Stack>
           <Text>
-            Migraine Diary stores your email, a securely hashed password,
-            login/session information and the dates you mark as migraine or
-            migraine-free to provide your account and saved diary.
+            We use your account details and the health information you choose to
+            record to provide your saved diary.
           </Text>
           <Text>
             We rely on consent under GDPR Article 6(1)(a), with explicit consent
@@ -29,22 +28,20 @@ export default function PrivacyNotice() {
           </Text>
           <Text>
             Before deletion, you may request a copy of your data through the
-            privacy contact. You can also complain to Sweden’s privacy
-            authority, IMY.
+            privacy contact. You have the right to lodge a complaint with a data
+            protection supervisory authority.
           </Text>
           <Text>
             Migraine Diary is operated by Amanda Araskog. Contact:
             amanda.araskog@gmail.com. Hosting providers are Neon (database),
-            Vercel (API) and Cloudflare (website). Hosting regions and
-            international transfer safeguards are awaiting verification.
+            Vercel (API) and Cloudflare (website).
           </Text>
           <Text>
             We retain your account and diary until you delete your account or
             withdraw consent. Deletion removes them from the active database.
-            Neon Free provides up to six hours of restore history, limited by
-            the volume of changes. This is not a guarantee that every backup
-            copy is erased within six hours: separate snapshots, branches and
-            provider backup deletion periods still need verification.
+            Deleted data may remain temporarily in protected recovery copies.
+            Neon Free provides up to six hours of restore history; separate
+            snapshots or copies may have different retention.
           </Text>
           <Text size="sm">Version {privacyVersion}</Text>
         </Stack>

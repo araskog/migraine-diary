@@ -1,11 +1,10 @@
 from django.db import IntegrityError, transaction
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase
 
 from .models import User
 from .test_helpers import generated_password
 
 
-@override_settings(PUBLIC_REGISTRATION_ENABLED=True)
 class AccountTests(TestCase):
     def setUp(self):
         self.password = generated_password()
@@ -164,23 +163,6 @@ class AccountTests(TestCase):
                 )
 
 
-class ClosedRegistrationTests(TestCase):
-    @override_settings(PUBLIC_REGISTRATION_ENABLED=False)
-    def test_registration_is_closed_without_creating_user(self):
-        response = self.client.post(
-            "/api/register/", {}, content_type="application/json"
-        )
-        self.assertEqual(response.status_code, 403)
-        self.assertFalse(User.objects.exists())
-
-    @override_settings(PUBLIC_REGISTRATION_ENABLED=False)
-    def test_existing_account_keeps_access(self):
-        user = User.objects.create_user("existing@example.test", generated_password())
-        self.client.force_login(user)
-        self.assertEqual(self.client.get("/api/diary/").status_code, 200)
-
-
-@override_settings(PUBLIC_REGISTRATION_ENABLED=True)
 class PrivacyTests(AccountTests):
     def test_registration_requires_explicit_current_consent(self):
         for extra in [

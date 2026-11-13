@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -59,10 +58,6 @@ def session(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def register(request):
-    if not settings.PUBLIC_REGISTRATION_ENABLED:
-        return Response(
-            {"detail": "Account registration is currently closed."}, status=403
-        )
     SessionAuthentication().enforce_csrf(request)
     credentials = Credentials(data=request.data)
     credentials.is_valid(raise_exception=True)
