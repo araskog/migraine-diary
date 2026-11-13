@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   Title,
+  VisuallyHidden,
 } from '@mantine/core'
 import type { FormEvent } from 'react'
 import ErrorMessages from './ErrorMessages'
@@ -164,12 +165,15 @@ export default function AccountForm({
               </Text>
             </Stack>
             <ErrorMessages messages={errors} />
-            <Button size="md" disabled={busy} type="submit">
+            <VisuallyHidden role="status">
               {busy
-                ? 'Please wait…'
-                : mode === 'register'
-                  ? 'Create account'
-                  : 'Sign in'}
+                ? mode === 'register'
+                  ? 'Creating account'
+                  : 'Signing in'
+                : ''}
+            </VisuallyHidden>
+            <Button size="md" loading={busy} aria-busy={busy} type="submit">
+              {mode === 'register' ? 'Create account' : 'Sign in'}
             </Button>
           </Stack>
         </form>

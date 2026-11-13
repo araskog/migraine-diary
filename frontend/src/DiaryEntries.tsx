@@ -10,6 +10,7 @@ import {
   Title,
 } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
+import LoadingIndicator from './LoadingIndicator'
 import DiaryEntryForm from './DiaryEntryForm'
 import DiaryStatusPicker from './DiaryStatusPicker'
 import ConfirmDialog from './ConfirmDialog'
@@ -76,7 +77,7 @@ export default function DiaryEntries({
     return () => controller.abort()
   }, [attempt])
 
-  if (loading) return <Text role="status">Loading your diary…</Text>
+  if (loading) return <LoadingIndicator fullPage label="Loading diary" />
   if (failed)
     return (
       <Stack gap="md">

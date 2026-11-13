@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Button, Stack, Text } from '@mantine/core'
+import { Box, Button, Stack } from '@mantine/core'
+import LoadingIndicator from './LoadingIndicator'
 import DiaryDetailsFields from './DiaryDetailsFields'
 import ErrorMessages from './ErrorMessages'
 import { localDate, saveEntry } from './diary'
@@ -138,9 +139,9 @@ export default function DiaryEntryForm({
           Try again
         </Button>
       )}
-      <Text role="status" size="sm" c="dimmed" mih="1.5em">
-        {saving ? 'Saving…' : ''}
-      </Text>
+      <Box mih="1.5em">
+        {saving && <LoadingIndicator label="Saving details" />}
+      </Box>
     </Stack>
   )
 }

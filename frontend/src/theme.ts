@@ -1,4 +1,4 @@
-import { Button, createTheme, SegmentedControl } from '@mantine/core'
+import { Button, createTheme, Loader, SegmentedControl } from '@mantine/core'
 import type { CSSVariablesResolver } from '@mantine/core'
 
 export const theme = createTheme({
@@ -7,6 +7,9 @@ export const theme = createTheme({
   defaultRadius: 'md',
   black: '#263b31',
   components: {
+    Loader: Loader.extend({
+      defaultProps: { type: 'dots', color: 'var(--app-color-positive)' },
+    }),
     Button: Button.extend({
       defaultProps: { color: 'sage', autoContrast: true },
     }),

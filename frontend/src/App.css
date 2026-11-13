@@ -92,3 +92,9 @@
     font-size: 1.65rem;
   }
 }
+
+.app .page-loading {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
