@@ -9,6 +9,7 @@ from .models import DiaryEntry
 class DiaryDateInput(serializers.Serializer):
     date = serializers.DateField()
     timezone = serializers.CharField(max_length=255)
+
     def validate_timezone(self, value):
         try:
             return ZoneInfo(value)

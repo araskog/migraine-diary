@@ -230,7 +230,7 @@ class DiaryEntryTests(TestCase):
         self.assertTrue(DiaryEntry.objects.filter(pk=other.pk).exists())
         self.assertEqual(
             self.client.get(self.path).json(),
-            [{"date": "2025-12-31", "status": "migraine"}],
+            [entry_output("2025-12-31", "migraine")],
         )
 
     def test_invalid_or_unprotected_clear_preserves_entry(self):

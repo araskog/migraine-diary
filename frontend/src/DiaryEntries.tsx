@@ -196,7 +196,9 @@ export default function DiaryEntries({
                     disabled={disabled || saving}
                     onCleared={() => {
                       setSelectionOpened(false)
-                      setEntries((previous) => previous.filter((entry) => entry.date !== date))
+                      setEntries((previous) =>
+                        previous.filter((entry) => entry.date !== date),
+                      )
                     }}
                     onSaved={(saved) => {
                       setSelectionOpened(false)

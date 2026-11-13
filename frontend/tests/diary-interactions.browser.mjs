@@ -34,7 +34,11 @@ window.fetch = async (url, options) => {
           ? Response.json({}, { status: 500 })
           : options.method === 'DELETE'
             ? new Response(null, { status: 204 })
-            : Response.json({ ...emptyDetails(), date: body.date, status: body.status }),
+            : Response.json({
+                ...emptyDetails(),
+                date: body.date,
+                status: body.status,
+              }),
       )
     }
   })
