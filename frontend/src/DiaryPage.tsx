@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import {
   ActionIcon,
+  Anchor,
+  Group,
   Button,
   Menu,
   Modal,
@@ -191,13 +193,6 @@ export default function DiaryPage({
             <Menu.Divider />
             <Menu.Item
               disabled={busy || saving}
-              onClick={() => setDeleting(true)}
-              color="red"
-            >
-              Withdraw consent and delete account
-            </Menu.Item>
-            <Menu.Item
-              disabled={busy || saving}
               onClick={() => {
                 if (dirty) setConfirmSignOut(true)
                 else void signOut()
@@ -220,8 +215,20 @@ export default function DiaryPage({
           onSignedOut={onSignedOut}
           onSessionRefreshed={onSessionRefreshed}
         />
-        <PrivacyNotice />
         <ErrorMessages messages={errors} />
+        <Group component="footer" justify="flex-end" gap="md" mt="xl">
+          <PrivacyNotice />
+          <Anchor
+            component="button"
+            type="button"
+            size="xs"
+            c="dimmed"
+            disabled={busy || saving}
+            onClick={() => setDeleting(true)}
+          >
+            Delete account
+          </Anchor>
+        </Group>
       </Stack>
     </>
   )
