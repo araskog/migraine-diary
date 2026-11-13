@@ -24,6 +24,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    health_consent_at = models.DateTimeField(null=True, editable=False)
+    privacy_policy_version = models.CharField(max_length=32, blank=True, editable=False)
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

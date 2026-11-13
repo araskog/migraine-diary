@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/register/", views.register),
     path("api/sign-in/", views.sign_in),
     path("api/sign-out/", views.sign_out),
+    path("api/account/delete/", views.delete_account),
     path("api/diary/", views.diary),
     path("api/diary/entries/", entries),
 ]
