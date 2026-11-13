@@ -1,5 +1,22 @@
 export type DiaryStatus = 'migraine' | 'migraine_free'
-export type DiaryEntry = { date: string; status: DiaryStatus }
+export type DiaryDetails = {
+  medication_taken: boolean | null
+  medication_name: string
+  sleep: '' | 'poor' | 'okay' | 'good'
+  sleep_duration: '' | 'less' | 'usual' | 'more'
+  pain_severity: number | null
+}
+export type DiaryEntry = { date: string; status: DiaryStatus } & DiaryDetails
+
+export function emptyDetails(): DiaryDetails {
+  return {
+    medication_taken: null,
+    medication_name: '',
+    sleep: '',
+    sleep_duration: '',
+    pain_severity: null,
+  }
+}
 
 export function localDate(date = new Date()): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
@@ -35,7 +52,24 @@ function isEntry(value: unknown): value is DiaryEntry {
     'date' in value &&
     isDiaryDate(value.date) &&
     'status' in value &&
-    (value.status === 'migraine' || value.status === 'migraine_free')
+    (value.status === 'migraine' || value.status === 'migraine_free') &&
+    'medication_taken' in value &&
+    (value.medication_taken === null ||
+      typeof value.medication_taken === 'boolean') &&
+    'medication_name' in value &&
+    typeof value.medication_name === 'string' &&
+    'sleep' in value &&
+    typeof value.sleep === 'string' &&
+    ['', 'poor', 'okay', 'good'].includes(value.sleep) &&
+    'sleep_duration' in value &&
+    typeof value.sleep_duration === 'string' &&
+    ['', 'less', 'usual', 'more'].includes(value.sleep_duration) &&
+    'pain_severity' in value &&
+    (value.pain_severity === null ||
+      (typeof value.pain_severity === 'number' &&
+        Number.isInteger(value.pain_severity) &&
+        value.pain_severity >= 0 &&
+        value.pain_severity <= 10))
   )
 }
 
@@ -54,6 +88,7 @@ export async function saveEntry(
   date: string,
   status: DiaryStatus,
   csrfToken: string,
+  details?: DiaryDetails,
 ): Promise<DiaryEntry> {
   const response = await fetch('/api/diary/entries/', {
     method: 'POST',
@@ -64,6 +99,7 @@ export async function saveEntry(
     body: JSON.stringify({
       date,
       status,
+      ...details,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }),
   })

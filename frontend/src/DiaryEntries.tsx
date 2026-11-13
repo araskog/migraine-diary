@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react'
-import { Box, Button, Group, Popover, Stack, Text } from '@mantine/core'
+import {
+  Box,
+  Button,
+  Group,
+  Paper,
+  Popover,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import DiaryEntryForm from './DiaryEntryForm'
+import DiaryStatusPicker from './DiaryStatusPicker'
+import ConfirmDialog from './ConfirmDialog'
 import ErrorMessages from './ErrorMessages'
 import { dateLabel, loadEntries, localDate, statusLabel } from './diary'
 import type { DiaryEntry, DiaryStatus } from './diary'
@@ -16,7 +27,11 @@ const statusIcons: Record<DiaryStatus, string> = {
 type DiaryEntriesProps = {
   csrfToken: string
   disabled: boolean
+  saving: boolean
+  dirty: boolean
+  onDirtyChange: (dirty: boolean) => void
   onSavingChange: (saving: boolean) => void
+  onStatusSavingChange: (saving: boolean) => void
   onSignedOut: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
 }
@@ -24,14 +39,20 @@ type DiaryEntriesProps = {
 export default function DiaryEntries({
   csrfToken,
   disabled,
+  saving,
+  dirty,
+  onDirtyChange,
   onSavingChange,
+  onStatusSavingChange,
   onSignedOut,
   onSessionRefreshed,
 }: DiaryEntriesProps) {
   const [entries, setEntries] = useState<DiaryEntry[]>([])
   const [date, setDate] = useState(localDate)
-  const [visibleMonth, setVisibleMonth] = useState(localDate)
   const [selectionOpened, setSelectionOpened] = useState(false)
+  const [revision, setRevision] = useState(0)
+  const [pendingDate, setPendingDate] = useState<string | null>(null)
+  const [visibleMonth, setVisibleMonth] = useState(localDate)
   const [loading, setLoading] = useState(true)
   const [failed, setFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
@@ -77,35 +98,63 @@ export default function DiaryEntries({
     )
 
   return (
-    <Stack gap="xl" className="diary-entries">
+    <Box className="diary-entries">
+      <ConfirmDialog
+        opened={pendingDate !== null}
+        title="Unsaved details"
+        message="Discard your unfinished details and choose another day?"
+        confirmLabel="Discard and continue"
+        onClose={() => setPendingDate(null)}
+        onConfirm={() => {
+          if (pendingDate) setDate(pendingDate)
+          setRevision((value) => value + 1)
+          setSelectionOpened(true)
+          setPendingDate(null)
+        }}
+      />
       <Box>
         <DatePicker
           aria-label="Diary calendar"
           value={date}
           date={visibleMonth}
           onDateChange={(month) => {
-            if (!disabled) {
+            if (!disabled && !saving) {
               setVisibleMonth(month)
               setSelectionOpened(false)
             }
           }}
           onChange={(value) => {
-            if (value && value <= localDate()) {
+            if (!disabled && !saving && value && value <= localDate()) {
+              if (dirty) {
+                setPendingDate(value)
+                return
+              }
               setDate(value)
               setSelectionOpened(true)
             }
           }}
           firstDayOfWeek={1}
           fullWidth
-          maxLevel="month"
-          previousLabel="Previous month"
-          nextLabel="Next month"
+          maxLevel="year"
+          onLevelChange={() => setSelectionOpened(false)}
+          ariaLabels={{
+            monthLevelControl: 'Choose month',
+            previousMonth: 'Previous month',
+            nextMonth: 'Next month',
+            previousYear: 'Previous year',
+            nextYear: 'Next year',
+          }}
           maxDate={today}
           size="lg"
           withCellSpacing={false}
           weekendDays={[]}
           getDayProps={(day) => ({
-            disabled: disabled || day > today,
+            disabled: day > today,
+            'aria-disabled': disabled || saving || day > today,
+            className:
+              (disabled || saving) && day <= today
+                ? 'calendar-day-busy'
+                : undefined,
             'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
           })}
           renderDay={(day) => {
@@ -139,12 +188,12 @@ export default function DiaryEntries({
                   p="xs"
                   aria-label={`Status for ${dateLabel(date)}`}
                 >
-                  <DiaryEntryForm
-                    key={date}
+                  <DiaryStatusPicker
+                    key={`${date}-${current?.status ?? ''}`}
                     date={date}
                     entry={current}
                     csrfToken={csrfToken}
-                    disabled={disabled}
+                    disabled={disabled || saving}
                     onSaved={(saved) => {
                       setSelectionOpened(false)
                       setEntries((previous) => [
@@ -154,7 +203,7 @@ export default function DiaryEntries({
                         saved,
                       ])
                     }}
-                    onSavingChange={onSavingChange}
+                    onSavingChange={onStatusSavingChange}
                     onSignedOut={onSignedOut}
                     onSessionRefreshed={onSessionRefreshed}
                   />
@@ -178,6 +227,42 @@ export default function DiaryEntries({
           </Text>
         </Group>
       </Box>
-    </Stack>
+      {current?.status === 'migraine' && (
+        <Paper
+          component="section"
+          bg="var(--app-intro-background)"
+          withBorder
+          p="lg"
+          radius="lg"
+          aria-label={`Details for ${dateLabel(date)}`}
+        >
+          <Stack gap="xs">
+            <Title order={2} size="h3">
+              Daily details
+            </Title>
+            <Text c="dimmed" size="sm">
+              {dateLabel(date)}
+            </Text>
+            <DiaryEntryForm
+              key={`${date}-${current?.status ?? ''}-${revision}`}
+              date={date}
+              entry={current}
+              csrfToken={csrfToken}
+              disabled={disabled}
+              onSaved={(saved) =>
+                setEntries((previous) => [
+                  ...previous.filter((entry) => entry.date !== saved.date),
+                  saved,
+                ])
+              }
+              onDirtyChange={onDirtyChange}
+              onSavingChange={onSavingChange}
+              onSignedOut={onSignedOut}
+              onSessionRefreshed={onSessionRefreshed}
+            />
+          </Stack>
+        </Paper>
+      )}
+    </Box>
   )
 }

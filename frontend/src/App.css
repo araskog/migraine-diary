@@ -8,6 +8,16 @@
   margin: calc(var(--mantine-spacing-xl) * 2) auto 0;
 }
 
+.app .diary-page {
+  max-width: 940px;
+}
+
+@media (max-width: 760px) {
+  .app .diary-page {
+    max-width: 440px;
+  }
+}
+
 @media (max-width: 540px) {
   .app .page {
     margin-top: var(--mantine-spacing-xl);
