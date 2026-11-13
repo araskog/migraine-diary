@@ -90,7 +90,7 @@ export default function DiaryEntries({
             }
           }}
           onChange={(value) => {
-            if (value && value <= localDate()) {
+            if (!disabled && value && value <= localDate()) {
               setDate(value)
               setSelectionOpened(true)
             }
@@ -105,7 +105,8 @@ export default function DiaryEntries({
           withCellSpacing={false}
           weekendDays={[]}
           getDayProps={(day) => ({
-            disabled: disabled || day > today,
+            disabled: day > today,
+            'aria-disabled': disabled || day > today,
             className:
               disabled && day <= today ? 'calendar-day-busy' : undefined,
             'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
