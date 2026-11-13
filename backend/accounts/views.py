@@ -1,8 +1,10 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.middleware.csrf import get_token
+from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from rest_framework import serializers
 from rest_framework.authentication import SessionAuthentication
@@ -11,6 +13,20 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .models import User
+
+PRIVACY_POLICY_VERSION = "2026-11-13"
+
+
+class RegistrationConsent(serializers.Serializer):
+    health_consent = serializers.BooleanField()
+    privacy_policy_version = serializers.ChoiceField(choices=[PRIVACY_POLICY_VERSION])
+
+    def validate_health_consent(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                "Explicit health-data consent is required."
+            )
+        return value
 
 
 class Credentials(serializers.Serializer):
@@ -43,6 +59,10 @@ def session(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def register(request):
+    if not settings.PUBLIC_REGISTRATION_ENABLED:
+        return Response(
+            {"detail": "Account registration is currently closed."}, status=403
+        )
     SessionAuthentication().enforce_csrf(request)
     credentials = Credentials(data=request.data)
     credentials.is_valid(raise_exception=True)
@@ -52,9 +72,16 @@ def register(request):
         validate_password(password, user=User(email=email))
     except ValidationError as error:
         return Response({"password": error.messages}, status=400)
+    consent = RegistrationConsent(data=request.data)
+    consent.is_valid(raise_exception=True)
     try:
         with transaction.atomic():
-            user = User.objects.create_user(email, password)
+            user = User.objects.create_user(
+                email,
+                password,
+                health_consent_at=timezone.now(),
+                privacy_policy_version=PRIVACY_POLICY_VERSION,
+            )
     except IntegrityError:
         return Response(
             {"email": ["An account with this email already exists."]}, status=400
@@ -88,3 +115,16 @@ def sign_out(request):
 @api_view(["GET"])
 def diary(request):
     return Response({"title": "Your diary", "recordingAvailable": False})
+
+
+@never_cache
+@api_view(["POST"])
+def delete_account(request):
+    password = serializers.CharField(trim_whitespace=False, max_length=1024)
+    value = password.run_validation(request.data.get("password"))
+    if not request.user.check_password(value):
+        return Response({"detail": "Password is incorrect."}, status=400)
+    with transaction.atomic():
+        request.user.delete()
+        logout(request)
+    return Response(identity(request))

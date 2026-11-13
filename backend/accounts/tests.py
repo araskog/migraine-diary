@@ -1,10 +1,11 @@
 from django.db import IntegrityError, transaction
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 
 from .models import User
 from .test_helpers import generated_password
 
 
+@override_settings(PUBLIC_REGISTRATION_ENABLED=True)
 class AccountTests(TestCase):
     def setUp(self):
         self.password = generated_password()
@@ -21,7 +22,13 @@ class AccountTests(TestCase):
 
     def register(self, email="synthetic@example.test"):
         response = self.post(
-            "/api/register/", {"email": email, "password": self.password}
+            "/api/register/",
+            {
+                "email": email,
+                "password": self.password,
+                "health_consent": True,
+                "privacy_policy_version": "2026-11-13",
+            },
         )
         if response.status_code == 201:
             self.token = response.json()["csrfToken"]
@@ -155,3 +162,73 @@ class AccountTests(TestCase):
                 self.assertEqual(
                     response.json(), {"detail": "Email or password is incorrect."}
                 )
+
+
+class ClosedRegistrationTests(TestCase):
+    @override_settings(PUBLIC_REGISTRATION_ENABLED=False)
+    def test_registration_is_closed_without_creating_user(self):
+        response = self.client.post(
+            "/api/register/", {}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(User.objects.exists())
+
+    @override_settings(PUBLIC_REGISTRATION_ENABLED=False)
+    def test_existing_account_keeps_access(self):
+        user = User.objects.create_user("existing@example.test", generated_password())
+        self.client.force_login(user)
+        self.assertEqual(self.client.get("/api/diary/").status_code, 200)
+
+
+@override_settings(PUBLIC_REGISTRATION_ENABLED=True)
+class PrivacyTests(AccountTests):
+    def test_registration_requires_explicit_current_consent(self):
+        for extra in [
+            {},
+            {"health_consent": False},
+            {"health_consent": True, "privacy_policy_version": "old"},
+        ]:
+            response = self.post(
+                "/api/register/",
+                {"email": "consent@example.test", "password": self.password, **extra},
+            )
+            self.assertEqual(response.status_code, 400)
+        self.assertFalse(User.objects.exists())
+        self.assertEqual(self.register().status_code, 201)
+        user = User.objects.get()
+        self.assertIsNotNone(user.health_consent_at)
+        self.assertEqual(user.privacy_policy_version, "2026-11-13")
+
+    def test_deletion_requires_password_csrf_and_preserves_other_owner(self):
+        from diary.models import DiaryEntry
+
+        self.register()
+        user = User.objects.get()
+        other = User.objects.create_user("other@example.test", generated_password())
+        DiaryEntry.objects.create(user=user, date="2020-01-01", status="migraine")
+        DiaryEntry.objects.create(user=other, date="2020-01-01", status="migraine")
+        self.assertEqual(
+            self.client.post(
+                "/api/account/delete/", {"password": self.password}
+            ).status_code,
+            403,
+        )
+        self.assertEqual(
+            self.post("/api/account/delete/", {"password": "incorrect"}).status_code,
+            400,
+        )
+        self.assertTrue(User.objects.filter(pk=user.pk).exists())
+        response = self.post(
+            "/api/account/delete/", {"password": self.password, "user": other.pk}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.json()["user"])
+        self.assertFalse(User.objects.filter(pk=user.pk).exists())
+        self.assertEqual(
+            list(DiaryEntry.objects.values_list("user_id", flat=True)), [other.pk]
+        )
+        self.assertEqual(self.client.get("/api/diary/").status_code, 403)
+        self.assertEqual(
+            self.post("/api/account/delete/", {"password": self.password}).status_code,
+            403,
+        )

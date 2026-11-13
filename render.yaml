@@ -10,6 +10,8 @@ services:
     startCommand: cd backend && DATABASE_URL="$DATABASE_URL_UNPOOLED" .venv/bin/python manage.py migrate --noinput && exec .venv/bin/gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 1
     healthCheckPath: /api/health/
     envVars:
+      - key: PUBLIC_REGISTRATION_ENABLED
+        value: "1"
       - key: PYTHON_VERSION
         value: 3.13.18
       - key: NODE_VERSION
