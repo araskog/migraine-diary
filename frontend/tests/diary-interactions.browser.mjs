@@ -120,12 +120,32 @@ document.getElementById('run').onclick = async (event) => {
       button.focus()
       const before = appearance(button)
       const count = writes
+      const calendarBefore = days.map((node) => {
+        const style = getComputedStyle(node)
+        return JSON.stringify({
+          color: style.color,
+          background: style.backgroundColor,
+          opacity: style.opacity,
+        })
+      })
       button.click()
       await waitFor(
         () =>
           button.disabled || button.getAttribute('aria-disabled') === 'true',
       )
       assert(document.activeElement === button, 'Saving moved keyboard focus')
+      days.forEach((node, index) => {
+        const style = getComputedStyle(node)
+        const after = JSON.stringify({
+          color: style.color,
+          background: style.backgroundColor,
+          opacity: style.opacity,
+        })
+        assert(
+          after === calendarBefore[index],
+          `Calendar flashed: ${node.getAttribute('aria-label')} ${calendarBefore[index]} -> ${after}`,
+        )
+      })
       assert(
         appearance(button) === before,
         'Action appearance changed while saving',
@@ -141,7 +161,16 @@ document.getElementById('run').onclick = async (event) => {
         'Calendar uses a prohibited cursor while saving',
       )
       button.click()
+      const selectedDay = calendar.querySelector('button[data-selected]')
+      const otherDay = calendar.querySelector(
+        'button[aria-label$=", Unrecorded"]:not([data-selected]):not(:disabled)',
+      )
+      otherDay?.click()
       await delay(32)
+      assert(
+        calendar.querySelector('button[data-selected]') === selectedDay,
+        'Calendar selection changed while saving',
+      )
       assert(writes === count + 1, 'Repeated activation sent another write')
       pass(
         `${label}: stable appearance/focus/calendar; repeat activation blocked`,
