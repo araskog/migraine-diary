@@ -118,13 +118,13 @@ export default function DiaryEntries({
           value={date}
           date={visibleMonth}
           onDateChange={(month) => {
-            if (!disabled) {
+            if (!disabled && !saving) {
               setVisibleMonth(month)
               setSelectionOpened(false)
             }
           }}
           onChange={(value) => {
-            if (value && value <= localDate()) {
+            if (!disabled && !saving && value && value <= localDate()) {
               if (dirty) {
                 setPendingDate(value)
                 return
@@ -149,7 +149,12 @@ export default function DiaryEntries({
           withCellSpacing={false}
           weekendDays={[]}
           getDayProps={(day) => ({
-            disabled: disabled || saving || day > today,
+            disabled: day > today,
+            'aria-disabled': disabled || saving || day > today,
+            className:
+              (disabled || saving) && day <= today
+                ? 'calendar-day-busy'
+                : undefined,
             'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
           })}
           renderDay={(day) => {
@@ -222,7 +227,7 @@ export default function DiaryEntries({
           </Text>
         </Group>
       </Box>
-      {current && (
+      {current?.status === 'migraine' && (
         <Paper
           component="section"
           bg="var(--app-intro-background)"

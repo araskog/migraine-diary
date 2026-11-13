@@ -60,3 +60,7 @@
 .diary-entries [data-selected]:active {
   background-color: var(--app-calendar-selected-hover);
 }
+
+.diary-entries .calendar-day-busy {
+  cursor: default;
+}

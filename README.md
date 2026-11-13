@@ -49,6 +49,10 @@ npm run typecheck
 npm run build
 ```
 
+For detail-autosave browser regressions, start the frontend and open
+[the regression page](http://127.0.0.1:5173/static/app/tests/diary-details.html).
+It uses synthetic API responses; backend persistence is checked separately below.
+
 From `backend/`, with PostgreSQL running:
 
 ```sh

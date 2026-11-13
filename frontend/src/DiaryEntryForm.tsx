@@ -55,7 +55,6 @@ export default function DiaryEntryForm({
   const pending = useRef<DiaryDetails | null>(null)
   const savingRef = useRef(false)
   const [errors, setErrors] = useState<string[]>([])
-  const [notice, setNotice] = useState('')
   const dirty =
     saving ||
     errors.length > 0 ||
@@ -85,7 +84,6 @@ export default function DiaryEntryForm({
     setSaving(true)
     onSavingChange(true)
     setErrors([])
-    setNotice('')
     try {
       while (pending.current) {
         const submitted = pending.current
@@ -99,7 +97,6 @@ export default function DiaryEntryForm({
         }
         onSaved(saved)
       }
-      setNotice('Saved')
     } catch {
       setErrors([
         'Unable to save your changes. Your answers are kept; please try again.',
@@ -128,7 +125,6 @@ export default function DiaryEntryForm({
         onChange={(value, commit = true) => {
           latest.current = value
           setDetails(value)
-          setNotice('')
           if (commit) void save(value)
         }}
       />
@@ -143,7 +139,7 @@ export default function DiaryEntryForm({
         </Button>
       )}
       <Text role="status" size="sm" c="dimmed" mih="1.5em">
-        {saving ? 'Saving…' : dirty ? 'Unsaved changes' : notice}
+        {saving ? 'Saving…' : ''}
       </Text>
     </Stack>
   )
