@@ -64,3 +64,13 @@
 .diary-entries [data-selected]:active {
   background-color: var(--app-calendar-selected-hover);
 }
+
+.diary-entries .calendar-day-busy:not([data-selected]):hover,
+.diary-entries .calendar-day-busy:not([data-selected]):active {
+  background-color: transparent;
+}
+
+.diary-entries .calendar-day-busy[data-selected]:hover,
+.diary-entries .calendar-day-busy[data-selected]:active {
+  background-color: var(--app-calendar-selected);
+}

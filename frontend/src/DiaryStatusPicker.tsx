@@ -69,25 +69,46 @@ export default function DiaryStatusPicker({
     }
   }
 
+  const retryAction = canRetry && (
+    <Button
+      size="md"
+      aria-disabled={disabled}
+      onClick={() => {
+        void save(status)
+      }}
+    >
+      Try again
+    </Button>
+  )
+
   if (confirmFree)
     return (
-      <Stack gap="sm">
+      <Stack gap="sm" aria-busy={disabled}>
         <Text size="sm">
           Changing to migraine-free removes this day’s pain rating. Your other
           answers stay.
         </Text>
-        <Button variant="default" onClick={() => setConfirmFree(false)}>
+        <Button
+          variant="default"
+          aria-disabled={disabled}
+          onClick={() => {
+            if (disabled) return
+            setStatus(entry?.status ?? '')
+            setErrors([])
+            setCanRetry(false)
+            setConfirmFree(false)
+          }}
+        >
           Keep migraine
         </Button>
         <Button
           aria-disabled={disabled}
-          onClick={() => {
-            setConfirmFree(false)
-            void save('migraine_free')
-          }}
+          onClick={() => void save('migraine_free')}
         >
           Mark migraine-free
         </Button>
+        <ErrorMessages messages={errors} />
+        {retryAction}
       </Stack>
     )
 
@@ -152,17 +173,7 @@ export default function DiaryStatusPicker({
         )}
       </Stack>
       <ErrorMessages messages={errors} />
-      {canRetry && (
-        <Button
-          size="md"
-          aria-disabled={disabled}
-          onClick={() => {
-            void save(status)
-          }}
-        >
-          Try again
-        </Button>
-      )}
+      {retryAction}
     </Stack>
   )
 }

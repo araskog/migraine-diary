@@ -38,6 +38,7 @@ window.fetch = async (url, options) => {
                 ...emptyDetails(),
                 date: body.date,
                 status: body.status,
+                pain_severity: body.status === 'migraine' ? 5 : null,
               }),
       )
     }
@@ -188,14 +189,40 @@ document.getElementById('run').onclick = async (event) => {
       const previousStatus = label === 'Migraine' ? undefined : 'migraine'
       day(previousStatus).click()
       await waitFor(() => action(label))
+      let saveLabel = label
+      if (status === 'migraine_free') {
+        action(label).click()
+        saveLabel = 'Mark migraine-free'
+        await waitFor(() => action(saveLabel))
+      }
       const commitStart = commits
-      await start(label)
+      await start(saveLabel)
       assert(day(previousStatus), 'Calendar changed before confirmation')
+      if (status === 'migraine_free') {
+        pending(true)
+        await waitFor(() => action('Try again'))
+        assert(
+          day(previousStatus),
+          'Failed confirmation changed the saved status',
+        )
+        action('Keep migraine').click()
+        await waitFor(() => action(label))
+        assert(
+          !action('Try again'),
+          'Cancelled confirmation retained its retry action',
+        )
+        action(label).click()
+        await waitFor(() => action(saveLabel))
+        await start(saveLabel)
+        pending(true)
+        await waitFor(() => action('Try again'))
+        await start('Try again')
+      }
       pending()
       await waitFor(() => day(status))
       if (!previousStatus)
         assert(!action('Clear day'), 'Clear day appeared during first close')
-      await waitFor(() => !action(label))
+      await waitFor(() => !action(saveLabel))
       pass(
         `${label}: confirmed marker, no loading restart (${commits - commitStart} subtree commits)`,
       )
