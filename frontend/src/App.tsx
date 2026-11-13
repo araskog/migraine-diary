@@ -48,7 +48,7 @@ function App() {
       {page !== 'diary' && <AppHeader />}
       {page === 'loading' && (
         <Text role="status" mt="xl">
-          Checking your session…
+          Getting your diary ready…
         </Text>
       )}
       {page === 'unavailable' && (
