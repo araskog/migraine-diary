@@ -70,7 +70,7 @@ export default function DiaryPage({
   }
 
   async function deleteAccount() {
-    if (busy || saving) return
+    if (busy || saving || statusSaving) return
     setBusy(true)
     setErrors([])
     try {
@@ -143,7 +143,7 @@ export default function DiaryPage({
           <ErrorMessages messages={errors} />
           <Button
             color="red"
-            disabled={busy || saving || !password}
+            disabled={busy || saving || statusSaving || !password}
             onClick={() => {
               void deleteAccount()
             }}
@@ -191,7 +191,7 @@ export default function DiaryPage({
             </Menu.Label>
             <Menu.Divider />
             <Menu.Item
-              disabled={busy || saving}
+              disabled={busy || saving || statusSaving}
               onClick={() => {
                 if (dirty) setConfirmSignOut(true)
                 else void signOut()
@@ -222,7 +222,7 @@ export default function DiaryPage({
             type="button"
             size="xs"
             c="dimmed"
-            disabled={busy || saving}
+            disabled={busy || saving || statusSaving}
             onClick={() => setDeleting(true)}
           >
             Delete account
