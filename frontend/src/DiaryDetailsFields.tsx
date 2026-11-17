@@ -25,16 +25,9 @@ export default function DiaryDetailsFields({
 }: DiaryDetailsFieldsProps) {
   return (
     <Stack gap="md">
-      <Stack
-        gap="xs"
-        role="group"
-        aria-label="Did you take migraine medication?"
-      >
-        <Text size="sm" fw={500}>
-          Did you take migraine medication?
-        </Text>
+      <Stack gap="xs">
         <Checkbox
-          label="Yes"
+          label="Took migraine medication"
           checked={value.medication_taken === true}
           disabled={disabled}
           onChange={(event) => {
