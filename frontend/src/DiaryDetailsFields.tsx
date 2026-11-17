@@ -27,7 +27,7 @@ export default function DiaryDetailsFields({
     <Stack gap="md">
       <Stack gap="xs">
         <Checkbox
-          label="Took migraine medication"
+          label="I took migraine medication"
           checked={value.medication_taken === true}
           disabled={disabled}
           onChange={(event) => {
