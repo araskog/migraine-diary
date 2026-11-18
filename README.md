@@ -65,24 +65,3 @@ uv run --env-file .env python manage.py migrate --noinput
 uv run --env-file .env python manage.py test
 ```
 
-## Production releases
-
-After successful main checks, the Production release workflow applies and verifies
-Django migrations using a direct, TLS-verified Neon connection, then deploys the API
-to Vercel. Releases run one at a time; outdated commits are skipped and failures
-stop deployment. Preview branches do not run production migrations.
-
-Before enabling this flow, configure the GitHub `production` environment for main
-only with secrets `DATABASE_URL_UNPOOLED`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and
-`VERCEL_PROJECT_ID`. Confirm Vercel uses `backend` as its Root Directory and respects
-`backend/vercel.json`, which disables competing automatic main deployments.
-Verify the first hosted release, including login and diary access. Missing secrets
-fail the job; adding the workflow alone does not activate a working release flow.
-
-Cloudflare deploys independently, so migrations and frontend/API changes must be
-backward-compatible. Destructive migrations need a separate rollout plan. Retry by
-re-running successful main checks; database rollback is never automatic.
-
-References: [Django migrations](https://docs.djangoproject.com/en/5.2/topics/migrations/),
-[Vercel Git configuration](https://vercel.com/docs/project-configuration/git-configuration),
-and [Vercel CLI deploy](https://vercel.com/docs/cli/deploy).
