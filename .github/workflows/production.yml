@@ -25,6 +25,8 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       DATABASE_URL: ${{ secrets.DATABASE_URL_UNPOOLED }}
+      # Use the runner trust store with uv-managed Python and psycopg/libpq.
+      SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt
     steps:
       - uses: actions/checkout@v7
         with:
@@ -45,6 +47,7 @@ jobs:
       - name: Validate release credentials
         if: steps.latest.outputs.release == 'true'
         run: |
+          test -r "$SSL_CERT_FILE"
           test -n "$DATABASE_URL"
           test -n "$VERCEL_TOKEN"
           test -n "$VERCEL_ORG_ID"
