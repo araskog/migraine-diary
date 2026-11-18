@@ -64,3 +64,4 @@ uv run --env-file .env python manage.py makemigrations --check --dry-run
 uv run --env-file .env python manage.py migrate --noinput
 uv run --env-file .env python manage.py test
 ```
+

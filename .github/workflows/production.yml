@@ -1,0 +1,64 @@
+name: Production release
+on:
+  workflow_run:
+    workflows: [Checks]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event == 'push'
+    environment: production
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Check this is still the latest main commit
+        id: latest
+        run: |
+          git fetch origin main
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ]; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: astral-sh/setup-uv@v7
+        if: steps.latest.outputs.release == 'true' 
+      - uses: actions/setup-node@v7
+        if: steps.latest.outputs.release == 'true'
+        with:
+          node-version: '24'
+      - name: Validate release credentials
+        if: steps.latest.outputs.release == 'true'
+        run: |
+          test -n "$DATABASE_URL"
+          test -n "$VERCEL_TOKEN"
+          test -n "$VERCEL_ORG_ID"
+          test -n "$VERCEL_PROJECT_ID"
+      - run: uv sync --locked --no-dev
+        if: steps.latest.outputs.release == 'true'
+      - name: Apply and verify production migrations
+        if: steps.latest.outputs.release == 'true'
+        env:
+          DJANGO_SETTINGS_MODULE: config.migrations
+        run: |
+          uv run python manage.py migrate --noinput
+          uv run python manage.py migrate --check
+      - name: Deploy API after successful migration
+        if: steps.latest.outputs.release == 'true'
+        working-directory: .
+        run: npx --yes vercel@65.17.0 deploy --prod --yes --token "$VERCEL_TOKEN"
