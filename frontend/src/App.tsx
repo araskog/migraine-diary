@@ -70,16 +70,18 @@ function App() {
   return (
     <Container component="main" size={960} px="lg" py="xl" className="app">
       {page !== 'diary' && (
-        <AppHeader>
-          {page === 'account' && session && (
-            <DemoInvite
-              busy={demoBusy || formBusy}
-              onStart={() => {
-                void handleStartDemo()
-              }}
-            />
-          )}
-        </AppHeader>
+        <AppHeader
+          brandExtra={
+            page === 'account' && session ? (
+              <DemoInvite
+                busy={demoBusy || formBusy}
+                onStart={() => {
+                  void handleStartDemo()
+                }}
+              />
+            ) : undefined
+          }
+        />
       )}
       {page === 'loading' && <LoadingIndicator fullPage />}
       {page === 'unavailable' && (

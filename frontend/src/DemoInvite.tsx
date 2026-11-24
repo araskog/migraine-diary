@@ -8,9 +8,10 @@ type DemoInviteProps = {
 export default function DemoInvite({ busy, onStart }: DemoInviteProps) {
   return (
     <Button
+      className="app-brand-demo"
       color="pink"
       radius="xl"
-      size="compact-md"
+      variant="light"
       aria-busy={busy}
       loading={busy}
       onClick={onStart}

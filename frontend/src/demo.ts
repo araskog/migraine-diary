@@ -1,8 +1,7 @@
 import { getSession, isSession, type Session } from './session'
 
 export const DEMO_DISPLAY_NAME = 'Jane Doe'
-export const DEMO_NOTICE_DESKTOP = 'Exploring the demo.'
-export const DEMO_NOTICE_MOBILE = 'Demo diary'
+export const DEMO_NOTICE_LABEL = 'Demo diary'
 
 function responseErrors(body: unknown, status: number): string[] {
   if (status === 403)

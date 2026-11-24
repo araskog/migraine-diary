@@ -40,6 +40,17 @@
   line-height: 1.2;
 }
 
+.app .app-brand-demo {
+  flex-shrink: 0;
+  margin-inline-start: clamp(0.35rem, 1.5vw, 0.75rem);
+  height: auto;
+  min-height: unset;
+  padding: 0.22em 0.8em;
+  font-size: clamp(0.78rem, 2.8vw, 1.1rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 .app .theme-toggle,
 .app .account-toggle {
   border: 1px solid var(--mantine-color-default-border);
