@@ -208,9 +208,7 @@ class InsightsApiTests(TestCase):
         instant = datetime(2026, 1, 15, 14, 0, tzinfo=dt_timezone.utc)
         with patch("diary.views.timezone.now", return_value=instant):
             utc = self.client.get(self.path, {"timezone": "UTC"}).json()
-            sydney = self.client.get(
-                self.path, {"timezone": "Australia/Sydney"}
-            ).json()
+            sydney = self.client.get(self.path, {"timezone": "Australia/Sydney"}).json()
         self.assertEqual(utc["today"], "2026-01-15")
         self.assertEqual(sydney["today"], "2026-01-16")
         self.assertEqual(utc["summary"]["recorded_days"], 1)
