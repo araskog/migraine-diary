@@ -11,6 +11,7 @@ import {
   Stack,
   Text,
 } from '@mantine/core'
+import { IconUser } from '@tabler/icons-react'
 import LoadingIndicator from './LoadingIndicator'
 import AppHeader from './AppHeader'
 import PrivacyNotice from './PrivacyNotice'
@@ -150,7 +151,7 @@ export default function DiaryPage({
         }}
         title="Delete your account?"
       >
-        <Stack>
+        <Stack gap="md">
           <Text>
             This withdraws consent and permanently deletes your account and
             diary from the active database. Before continuing, you may request a
@@ -178,27 +179,8 @@ export default function DiaryPage({
       <AppHeader>
         <Menu position="bottom-end" width={260} shadow="md">
           <Menu.Target>
-            <ActionIcon
-              variant="subtle"
-              className="account-toggle"
-              color="var(--app-color-positive)"
-              size={44}
-              radius="xl"
-              aria-label="Account menu"
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
-              </svg>
+            <ActionIcon aria-label="Account menu">
+              <IconUser size={22} stroke={1.8} aria-hidden />
             </ActionIcon>
           </Menu.Target>
           <Menu.Dropdown>
@@ -249,7 +231,8 @@ export default function DiaryPage({
         <ErrorMessages messages={errors} />
         <Group
           component="footer"
-          justify="flex-end"
+          justify={isDemo ? 'flex-end' : 'space-between'}
+          align="center"
           gap="md"
           mt="xl"
           wrap="wrap"

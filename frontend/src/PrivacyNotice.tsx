@@ -20,10 +20,9 @@ export default function PrivacyNotice() {
         opened={opened}
         onClose={() => setOpened(false)}
         title="Your privacy"
-        padding="lg"
         scrollAreaComponent={ScrollArea.Autosize}
       >
-        <Stack py="sm">
+        <Stack gap="md">
           <Text>
             We use your account details and the health information you choose to
             record to provide your saved diary.

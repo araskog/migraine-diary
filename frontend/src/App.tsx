@@ -68,7 +68,13 @@ function App() {
   }
 
   return (
-    <Container component="main" size={960} px="lg" py="xl" className="app">
+    <Container
+      component="main"
+      size={960}
+      px={{ base: 'md', sm: 'lg' }}
+      py="xl"
+      className="app"
+    >
       {page !== 'diary' && (
         <AppHeader
           brandExtra={

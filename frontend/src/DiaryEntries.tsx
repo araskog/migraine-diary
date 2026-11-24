@@ -5,6 +5,7 @@ import {
   Group,
   Paper,
   Popover,
+  SimpleGrid,
   Stack,
   Text,
   Title,
@@ -99,7 +100,12 @@ export default function DiaryEntries({
     )
 
   return (
-    <Box className="diary-entries">
+    <SimpleGrid
+      cols={{ base: 1, sm: 2 }}
+      spacing="xl"
+      verticalSpacing="xl"
+      className="diary-entries"
+    >
       <ConfirmDialog
         opened={pendingDate !== null}
         title="Unsaved details"
@@ -219,19 +225,25 @@ export default function DiaryEntries({
             )
           }}
         />
-        <Group gap="md" mt="md" wrap="wrap">
-          <Text size="xs">
-            <span className="migraine" aria-hidden="true">
-              ●{' '}
-            </span>
-            Migraine
-          </Text>
-          <Text size="xs">
-            <span className="migraine_free" aria-hidden="true">
-              ○{' '}
-            </span>
-            Migraine-free
-          </Text>
+        <Group gap="lg" mt="md" wrap="wrap">
+          <Group gap="xs">
+            <Text span size="xs" fw={700} c="var(--app-migraine)" aria-hidden>
+              ●
+            </Text>
+            <Text size="xs">Migraine</Text>
+          </Group>
+          <Group gap="xs">
+            <Text
+              span
+              size="xs"
+              fw={700}
+              c="light-dark(var(--mantine-color-sage-7), var(--mantine-color-sage-3))"
+              aria-hidden
+            >
+              ○
+            </Text>
+            <Text size="xs">Migraine-free</Text>
+          </Group>
         </Group>
       </Box>
       {current?.status === 'migraine' && (
@@ -240,7 +252,6 @@ export default function DiaryEntries({
           bg="var(--app-intro-background)"
           withBorder
           p="lg"
-          radius="lg"
           aria-label={`Details for ${dateLabel(date)}`}
         >
           <Stack gap="xs">
@@ -270,6 +281,6 @@ export default function DiaryEntries({
           </Stack>
         </Paper>
       )}
-    </Box>
+    </SimpleGrid>
   )
 }

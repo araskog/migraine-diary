@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import {
   Button,
   Checkbox,
+  Paper,
   SegmentedControl,
+  SimpleGrid,
   Stack,
   Text,
   TextInput,
@@ -108,116 +110,118 @@ export default function AccountForm({
 
   return (
     <Stack gap="md" className="account-shell">
-      <section className="account-page">
-        <Stack gap="md" className="account-intro">
-          <Title order={2}>Get to know your migraine patterns.</Title>
-          <Text c="dimmed">
-            Track migraine days over time and build a clearer picture of your
-            experience.
-          </Text>
-        </Stack>
-        <Stack gap="lg" className="account-form">
-          <Stack gap="xs">
-            <Title order={1}>
-              {mode === 'register' ? 'Create your account' : 'Welcome back'}
-            </Title>
+      <Paper withBorder className="account-page">
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing={0}>
+          <Stack gap="md" className="account-intro">
+            <Title order={2}>Get to know your migraine patterns.</Title>
             <Text c="dimmed">
-              {mode === 'register'
-                ? 'Start with an email and password.'
-                : 'Sign in to open your diary.'}
+              Track migraine days over time and build a clearer picture of your
+              experience.
             </Text>
           </Stack>
-          <SegmentedControl
-            size="lg"
-            fullWidth
-            bg="var(--app-control-background)"
-            value={mode}
-            disabled={inactive}
-            aria-label="Account options"
-            data={[
-              { value: 'sign-in', label: 'Sign in' },
-              { value: 'register', label: 'Create account' },
-            ]}
-            onChange={(value) => {
-              if (value !== 'sign-in' && value !== 'register') return
-              setMode(value)
-              setErrors([])
-            }}
-          />
-          <form
-            onSubmit={(event) => {
-              void submit(event)
-            }}
-          >
-            <Stack gap="lg">
-              <TextInput
-                id="email"
-                name="email"
-                label="Email"
-                type="email"
-                size="md"
-                autoComplete="email"
-                required
-                maxLength={254}
-                disabled={inactive}
-              />
-              <Stack gap="xs">
-                <TextInput
-                  key={mode}
-                  id="password"
-                  name="password"
-                  label="Password"
-                  type="password"
-                  size="md"
-                  autoComplete={
-                    mode === 'register' ? 'new-password' : 'current-password'
-                  }
-                  required
-                  maxLength={1024}
-                  disabled={inactive}
-                  aria-describedby={
-                    mode === 'register' ? 'password-help' : undefined
-                  }
-                />
-                <Text
-                  id="password-help"
-                  size="xs"
-                  c="dimmed"
-                  hidden={mode !== 'register'}
-                >
-                  Use at least 8 characters. Avoid common passwords, only
-                  numbers, or a password similar to your email.
-                </Text>
-              </Stack>
-              <PrivacyNotice />
-              {mode === 'register' && (
-                <Checkbox
-                  name="health_consent"
-                  required
-                  disabled={inactive}
-                  label="I explicitly consent to Migraine Diary storing and using my health entries to provide my diary. I can withdraw consent by deleting my account."
-                />
-              )}
-              <ErrorMessages messages={allErrors} />
-              <VisuallyHidden role="status">
-                {inactive
-                  ? mode === 'register'
-                    ? 'Creating account'
-                    : 'Signing in'
-                  : ''}
-              </VisuallyHidden>
-              <Button
-                size="md"
-                loading={busy}
-                aria-busy={inactive}
-                type="submit"
-              >
-                {mode === 'register' ? 'Create account' : 'Sign in'}
-              </Button>
+          <Stack gap="lg" className="account-form">
+            <Stack gap="xs">
+              <Title order={1}>
+                {mode === 'register' ? 'Create your account' : 'Welcome back'}
+              </Title>
+              <Text c="dimmed">
+                {mode === 'register'
+                  ? 'Start with an email and password.'
+                  : 'Sign in to open your diary.'}
+              </Text>
             </Stack>
-          </form>
-        </Stack>
-      </section>
+            <SegmentedControl
+              size="lg"
+              fullWidth
+              bg="var(--app-control-background)"
+              value={mode}
+              disabled={inactive}
+              aria-label="Account options"
+              data={[
+                { value: 'sign-in', label: 'Sign in' },
+                { value: 'register', label: 'Create account' },
+              ]}
+              onChange={(value) => {
+                if (value !== 'sign-in' && value !== 'register') return
+                setMode(value)
+                setErrors([])
+              }}
+            />
+            <form
+              onSubmit={(event) => {
+                void submit(event)
+              }}
+            >
+              <Stack gap="lg">
+                <TextInput
+                  id="email"
+                  name="email"
+                  label="Email"
+                  type="email"
+                  size="md"
+                  autoComplete="email"
+                  required
+                  maxLength={254}
+                  disabled={inactive}
+                />
+                <Stack gap="xs">
+                  <TextInput
+                    key={mode}
+                    id="password"
+                    name="password"
+                    label="Password"
+                    type="password"
+                    size="md"
+                    autoComplete={
+                      mode === 'register' ? 'new-password' : 'current-password'
+                    }
+                    required
+                    maxLength={1024}
+                    disabled={inactive}
+                    aria-describedby={
+                      mode === 'register' ? 'password-help' : undefined
+                    }
+                  />
+                  <Text
+                    id="password-help"
+                    size="xs"
+                    c="dimmed"
+                    hidden={mode !== 'register'}
+                  >
+                    Use at least 8 characters. Avoid common passwords, only
+                    numbers, or a password similar to your email.
+                  </Text>
+                </Stack>
+                <PrivacyNotice />
+                {mode === 'register' && (
+                  <Checkbox
+                    name="health_consent"
+                    required
+                    disabled={inactive}
+                    label="I explicitly consent to Migraine Diary storing and using my health entries to provide my diary. I can withdraw consent by deleting my account."
+                  />
+                )}
+                <ErrorMessages messages={allErrors} />
+                <VisuallyHidden role="status">
+                  {inactive
+                    ? mode === 'register'
+                      ? 'Creating account'
+                      : 'Signing in'
+                    : ''}
+                </VisuallyHidden>
+                <Button
+                  size="md"
+                  loading={busy}
+                  aria-busy={inactive}
+                  type="submit"
+                >
+                  {mode === 'register' ? 'Create account' : 'Sign in'}
+                </Button>
+              </Stack>
+            </form>
+          </Stack>
+        </SimpleGrid>
+      </Paper>
     </Stack>
   )
 }

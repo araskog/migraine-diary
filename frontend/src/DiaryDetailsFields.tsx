@@ -2,10 +2,10 @@ import {
   Anchor,
   Group,
   Checkbox,
+  Input,
   Select,
   Slider,
   Stack,
-  Text,
   TextInput,
 } from '@mantine/core'
 import type { DiaryDetails, DiaryStatus } from './diary'
@@ -101,16 +101,15 @@ export default function DiaryDetailsFields({
         }}
       />
       {status === 'migraine' && (
-        <Stack gap="xs">
-          <Text size="sm" fw={500}>
-            How severe was the pain at its worst?
-          </Text>
-          <Text size="sm" c="dimmed">
-            {value.pain_severity === null
+        <Input.Wrapper
+          label="How severe was the pain at its worst?"
+          description={
+            value.pain_severity === null
               ? 'Not answered'
-              : `${value.pain_severity} out of 10`}
-          </Text>
-          <Stack gap={4}>
+              : `${value.pain_severity} out of 10`
+          }
+        >
+          <Stack gap="xs" mt="xs">
             <Slider
               min={0}
               max={10}
@@ -132,30 +131,25 @@ export default function DiaryDetailsFields({
                 onChange({ ...value, pain_severity }, false)
               }
             />
-            <Group justify="space-between" wrap="nowrap">
-              <Text size="xs" c="dimmed">
-                0 · No pain
-              </Text>
-              <Text size="xs" c="dimmed">
-                10 · Worst
-              </Text>
+            <Group justify="space-between" wrap="nowrap" gap="xs">
+              <Input.Description>0 · No pain</Input.Description>
+              <Input.Description>10 · Worst</Input.Description>
             </Group>
+            {value.pain_severity !== null && (
+              <Anchor
+                component="button"
+                type="button"
+                size="xs"
+                c="dimmed"
+                w="fit-content"
+                disabled={disabled}
+                onClick={() => onChange({ ...value, pain_severity: null })}
+              >
+                Clear pain answer
+              </Anchor>
+            )}
           </Stack>
-          {value.pain_severity !== null && (
-            <Anchor
-              component="button"
-              ta="left"
-              style={{ alignSelf: 'flex-start' }}
-              type="button"
-              size="xs"
-              c="dimmed"
-              disabled={disabled}
-              onClick={() => onChange({ ...value, pain_severity: null })}
-            >
-              Clear pain answer
-            </Anchor>
-          )}
-        </Stack>
+        </Input.Wrapper>
       )}
     </Stack>
   )
