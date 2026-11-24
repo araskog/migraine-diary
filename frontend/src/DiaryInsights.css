@@ -2,8 +2,22 @@
   min-width: 0;
 }
 
-.diary-insights-summary {
-  flex-wrap: wrap;
+.diary-insights-narrative-slot {
+  display: none;
+}
+
+.diary-insights-hero {
+  background: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
+}
+
+.diary-insights-stat {
+  background: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-7)
+  );
 }
 
 .diary-insights-table {
@@ -13,4 +27,8 @@
 .diary-insights-table th,
 .diary-insights-table td {
   vertical-align: top;
+}
+
+.diary-insights-accordion {
+  --accordion-radius: var(--mantine-radius-md);
 }

@@ -17,7 +17,9 @@ class InsightsComputationTests(TestCase):
         body = compute_insights([], today)
         self.assertTrue(body["summary"]["insufficient_data"])
         self.assertEqual(body["summary"]["recorded_days"], 0)
-        self.assertIsNone(body["summary"]["migraine_rate"])
+        self.assertEqual(body["summary"]["calendar_days"], 90)
+        self.assertEqual(body["summary"]["unrecorded_days"], 90)
+        self.assertEqual(body["summary"]["migraine_rate"], 0.0)
 
     def test_window_excludes_out_of_range_entries(self):
         today = date(2026, 1, 15)
@@ -35,6 +37,7 @@ class InsightsComputationTests(TestCase):
         body = compute_insights(entries, today)
         self.assertEqual(body["summary"]["recorded_days"], 2)
         self.assertEqual(body["summary"]["migraine_days"], 1)
+        self.assertAlmostEqual(body["summary"]["migraine_rate"], 1 / 90, places=3)
 
     def test_sleep_duration_slice_requires_minimum_days(self):
         today = date(2026, 1, 15)

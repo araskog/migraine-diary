@@ -1,6 +1,7 @@
 export type InsightsSlice = {
   value: string | boolean
   label: string
+  calendar_days: number
   recorded_days: number
   migraine_days: number
   migraine_rate: number | null
@@ -10,6 +11,7 @@ export type InsightsSlice = {
 export type InsightsWeekdaySlice = {
   weekday: number
   label: string
+  calendar_days: number
   recorded_days: number
   migraine_days: number
   migraine_rate: number | null
@@ -30,7 +32,9 @@ export type DiaryInsights = {
   window_days: number
   today: string
   summary: {
+    calendar_days: number
     recorded_days: number
+    unrecorded_days: number
     migraine_days: number
     migraine_free_days: number
     migraine_rate: number | null
@@ -62,6 +66,8 @@ function isSlice(value: unknown): value is InsightsSlice {
     value !== null &&
     'label' in value &&
     typeof value.label === 'string' &&
+    'calendar_days' in value &&
+    isNumber(value.calendar_days) &&
     'recorded_days' in value &&
     isNumber(value.recorded_days) &&
     'migraine_days' in value &&
@@ -79,16 +85,7 @@ function isWeekdaySlice(value: unknown): value is InsightsWeekdaySlice {
     value !== null &&
     'weekday' in value &&
     isNumber(value.weekday) &&
-    'label' in value &&
-    typeof value.label === 'string' &&
-    'recorded_days' in value &&
-    isNumber(value.recorded_days) &&
-    'migraine_days' in value &&
-    isNumber(value.migraine_days) &&
-    'migraine_rate' in value &&
-    (value.migraine_rate === null || isNumber(value.migraine_rate)) &&
-    'sufficient_data' in value &&
-    typeof value.sufficient_data === 'boolean'
+    isSlice(value)
   )
 }
 
@@ -119,8 +116,12 @@ export function isDiaryInsights(value: unknown): value is DiaryInsights {
     typeof body.today === 'string' &&
     typeof summary === 'object' &&
     summary !== null &&
+    'calendar_days' in summary &&
+    isNumber(summary.calendar_days) &&
     'recorded_days' in summary &&
     isNumber(summary.recorded_days) &&
+    'unrecorded_days' in summary &&
+    isNumber(summary.unrecorded_days) &&
     'migraine_days' in summary &&
     isNumber(summary.migraine_days) &&
     'migraine_free_days' in summary &&
@@ -175,4 +176,8 @@ export async function loadInsights(
 export function formatRate(rate: number | null): string {
   if (rate === null) return '—'
   return `${Math.round(rate * 100)}%`
+}
+
+export function formatShareLabel(calendarDays: number): string {
+  return `Share of ${calendarDays} days`
 }
