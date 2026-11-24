@@ -12,7 +12,8 @@ export default function DemoNotice({ busy, onCreateAccount }: DemoNoticeProps) {
     <DemoBubble tail="calendar" className="demo-notice">
       <Group justify="space-between" align="center" wrap="wrap" gap="xs">
         <Text size="sm">
-          Explore Migraine Diary. Create your own account when you are ready.
+          Sample diary — explore how it works. Create your own account when you
+          are ready.
         </Text>
         <Button
           size="compact-sm"

@@ -24,6 +24,7 @@ Password recovery is out of scope for this feature. Hosting and performance work
 
 ## Verification
 
-Backend tests cover demo start, sample seeding, isolation, session persistence, and sign-in rejection for demo accounts. Frontend tests cover session typing for demo users where applicable. Manual verification uses synthetic data only.
+Backend tests in `accounts.test_demo_mode` cover demo start, sample seeding,
+isolation, session persistence, and sign-in rejection for demo accounts. Frontend tests cover session typing for demo users where applicable. Manual verification uses synthetic data only.
 
 References: [architecture](../architecture.md), [first usable diary](first-usable-diary.md), [workflow](../agents/workflow.md).
