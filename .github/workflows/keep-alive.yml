@@ -1,0 +1,19 @@
+name: Keep production warm
+on:
+  schedule:
+    # Neon free suspends after a few minutes of inactivity; Vercel serverless also cold-starts.
+    - cron: '*/4 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: keep-production-warm
+  cancel-in-progress: false
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify API health via Cloudflare Pages proxy
+        run: |
+          response="$(curl -fsS --max-time 55 "https://migraine-diary.pages.dev/api/health/")"
+          test "$(printf '%s' "$response" | jq -r .status)" = ok
