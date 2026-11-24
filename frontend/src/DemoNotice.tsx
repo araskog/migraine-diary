@@ -1,6 +1,6 @@
 import { Button, Group, Text } from '@mantine/core'
 
-import DemoBubble from './DemoBubble'
+import { DemoBubblePanel } from './DemoBubble'
 
 type DemoNoticeProps = {
   busy?: boolean
@@ -9,9 +9,9 @@ type DemoNoticeProps = {
 
 export default function DemoNotice({ busy, onCreateAccount }: DemoNoticeProps) {
   return (
-    <DemoBubble tail="calendar" className="demo-notice">
-      <Group justify="space-between" align="center" wrap="wrap" gap="xs">
-        <Text size="sm">
+    <DemoBubblePanel tail="calendar" className="demo-notice">
+      <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+        <Text size="sm" className="demo-bubble-text">
           Sample diary — explore how it works. Create your own account when you
           are ready.
         </Text>
@@ -25,6 +25,6 @@ export default function DemoNotice({ busy, onCreateAccount }: DemoNoticeProps) {
           Create account
         </Button>
       </Group>
-    </DemoBubble>
+    </DemoBubblePanel>
   )
 }

@@ -1,6 +1,4 @@
-import { Button } from '@mantine/core'
-
-import DemoBubble from './DemoBubble'
+import { DemoBubbleButton } from './DemoBubble'
 
 type DemoInviteProps = {
   busy?: boolean
@@ -9,17 +7,10 @@ type DemoInviteProps = {
 
 export default function DemoInvite({ busy, onStart }: DemoInviteProps) {
   return (
-    <DemoBubble tail="login">
-      <Button
-        color="pink"
-        size="md"
-        fullWidth
-        loading={busy}
-        aria-busy={busy}
-        onClick={onStart}
-      >
+    <div className="account-demo-slot">
+      <DemoBubbleButton tail="login" busy={busy} onClick={onStart}>
         Try the demo
-      </Button>
-    </DemoBubble>
+      </DemoBubbleButton>
+    </div>
   )
 }

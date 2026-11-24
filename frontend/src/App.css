@@ -105,46 +105,89 @@
   pointer-events: none;
 }
 
-.app .demo-speech-bubble {
-  position: relative;
-  padding: var(--mantine-spacing-sm);
-  border-radius: var(--mantine-radius-md);
-  background: var(--mantine-color-pink-light);
-  border: 1px solid var(--mantine-color-pink-outline);
+.app .account-demo-slot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 clamp(1.25rem, 4vw, 2rem) 0.35rem;
+  margin-bottom: -0.35rem;
 }
 
-.app .demo-speech-bubble::before,
-.app .demo-speech-bubble::after {
+.app .demo-bubble {
+  position: relative;
+  border-radius: var(--mantine-radius-lg);
+  background: var(--mantine-color-pink-6);
+  color: var(--mantine-color-white);
+  box-shadow: 0 6px 18px
+    color-mix(in srgb, var(--mantine-color-pink-6) 40%, transparent);
+}
+
+.app .demo-bubble--button {
+  padding: 0.7rem 1.35rem;
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+  line-height: 1.2;
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease;
+}
+
+.app .demo-bubble--button:hover:not(:disabled) {
+  background: var(--mantine-color-pink-7);
+}
+
+.app .demo-bubble--button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.app .demo-bubble--button:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.app .demo-bubble--panel {
+  padding: 0.65rem 0.85rem;
+}
+
+.app .demo-bubble-text {
+  color: var(--mantine-color-white);
+}
+
+.app .demo-bubble::after {
   content: '';
   position: absolute;
   top: 100%;
   width: 0;
   height: 0;
-  border-left: 9px solid transparent;
-  border-right: 9px solid transparent;
-  border-top: 10px solid var(--mantine-color-pink-outline);
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 11px solid var(--mantine-color-pink-6);
 }
 
-.app .demo-speech-bubble::after {
-  margin-top: -1px;
-  border-top-color: var(--mantine-color-pink-light);
+.app .demo-bubble--login::after {
+  right: 1.65rem;
 }
 
-.app .demo-speech-bubble--login::before,
-.app .demo-speech-bubble--login::after {
-  left: 50%;
-  transform: translateX(-50%);
+.app .demo-bubble--calendar::after {
+  left: clamp(1.5rem, 10vw, 3.25rem);
 }
 
-.app .demo-speech-bubble--calendar::before,
-.app .demo-speech-bubble--calendar::after {
-  left: clamp(1.5rem, 12vw, 4.5rem);
+.app .demo-bubble--login {
+  margin-bottom: 12px;
 }
 
-.app .demo-speech-bubble--login {
-  margin-bottom: 14px;
+.app .demo-bubble--calendar {
+  margin-bottom: 8px;
 }
 
-.app .demo-speech-bubble--calendar {
-  margin-bottom: 6px;
+@media (max-width: 700px) {
+  .app .account-demo-slot {
+    justify-content: center;
+    padding: 0 0 0.35rem;
+  }
+
+  .app .demo-bubble--login::after {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
