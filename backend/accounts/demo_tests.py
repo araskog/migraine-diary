@@ -102,9 +102,7 @@ class DemoModeTests(TestCase):
             "/api/sign-in/", {"email": demo_email, "password": "anything"}
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["detail"], "Email or password is incorrect."
-        )
+        self.assertEqual(response.json()["detail"], "Email or password is incorrect.")
 
     def test_signed_in_user_cannot_start_demo(self):
         User.objects.create_user("member@example.test", self.password)
