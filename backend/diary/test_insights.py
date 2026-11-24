@@ -101,31 +101,33 @@ class InsightsComputationTests(TestCase):
         less = compute_insights(three, today)["sleep_duration"][0]
         self.assertTrue(less["sufficient_data"])
 
-    def test_pain_slices_ignore_migraine_free_and_unanswered_pain(self):
+    def test_average_pain_uses_migraine_days_with_pain_only(self):
         today = date(2026, 1, 15)
         entries = [
             DiaryEntry(
                 date=today,
                 status=DiaryEntry.Status.MIGRAINE_FREE,
-                sleep=DiaryEntry.Sleep.POOR,
                 pain_severity=None,
             ),
             DiaryEntry(
                 date=today - timedelta(days=1),
                 status=DiaryEntry.Status.MIGRAINE,
-                sleep=DiaryEntry.Sleep.POOR,
                 pain_severity=None,
             ),
             DiaryEntry(
                 date=today - timedelta(days=2),
                 status=DiaryEntry.Status.MIGRAINE,
-                sleep=DiaryEntry.Sleep.POOR,
                 pain_severity=8,
             ),
+            DiaryEntry(
+                date=today - timedelta(days=3),
+                status=DiaryEntry.Status.MIGRAINE,
+                pain_severity=6,
+            ),
         ]
-        poor = compute_insights(entries, today)["pain_by_sleep_quality"][0]
-        self.assertEqual(poor["migraine_days"], 1)
-        self.assertEqual(poor["average_pain_severity"], 8.0)
+        summary = compute_insights(entries, today)["summary"]
+        self.assertEqual(summary["pain_answered_migraine_days"], 2)
+        self.assertEqual(summary["average_pain_severity"], 7.0)
 
 
 class InsightsApiTests(TestCase):
@@ -217,7 +219,7 @@ class InsightsApiTests(TestCase):
         self.assertEqual(utc["summary"]["recorded_days"], 1)
         self.assertEqual(sydney["summary"]["recorded_days"], 1)
 
-    def test_response_includes_weekday_and_pain_slices(self):
+    def test_response_includes_weekday_and_summary_pain(self):
         self.seed_window()
         monday = date(2026, 1, 12)
         self.assertEqual(monday.weekday(), 0)
@@ -231,7 +233,6 @@ class InsightsApiTests(TestCase):
         body = response.json()
         monday_slice = next(item for item in body["weekdays"] if item["weekday"] == 0)
         self.assertGreaterEqual(monday_slice["recorded_days"], 1)
-        pain_slice = next(
-            item for item in body["pain_by_sleep_quality"] if item["value"] == "poor"
-        )
-        self.assertIsNotNone(pain_slice["average_pain_severity"])
+        self.assertGreater(body["summary"]["pain_answered_migraine_days"], 0)
+        self.assertIsNotNone(body["summary"]["average_pain_severity"])
+        self.assertNotIn("pain_by_sleep_quality", body)

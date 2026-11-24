@@ -11,17 +11,15 @@ import {
   Stack,
   Table,
   Text,
-  ThemeIcon,
   Title,
 } from '@mantine/core'
 import LoadingIndicator from './LoadingIndicator'
 import ErrorMessages from './ErrorMessages'
 import {
   formatRate,
-  formatShareLabel,
   loadInsights,
+  periodPercentLabel,
   type DiaryInsights,
-  type InsightsPainSlice,
   type InsightsSlice,
   type InsightsWeekdaySlice,
 } from './insights'
@@ -57,7 +55,7 @@ function StatCard({
   )
 }
 
-function RateCell({
+function PeriodPercentCell({
   rate,
   sufficient,
 }: {
@@ -89,7 +87,7 @@ function SliceTable({
 }) {
   const visible = rows.filter((row) => row.recorded_days > 0)
   if (visible.length === 0) return null
-  const shareLabel = formatShareLabel(calendarDays)
+  const percentLabel = periodPercentLabel(calendarDays)
   return (
     <Table
       captionSide="top"
@@ -102,9 +100,9 @@ function SliceTable({
       <Table.Thead>
         <Table.Tr>
           <Table.Th scope="col">{valueLabel}</Table.Th>
-          <Table.Th scope="col">Answers</Table.Th>
+          <Table.Th scope="col">Days you logged this</Table.Th>
           <Table.Th scope="col">Migraine days</Table.Th>
-          <Table.Th scope="col">{shareLabel}</Table.Th>
+          <Table.Th scope="col">{percentLabel}</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
@@ -114,7 +112,7 @@ function SliceTable({
             <Table.Td>{row.recorded_days}</Table.Td>
             <Table.Td>{row.migraine_days}</Table.Td>
             <Table.Td>
-              <RateCell
+              <PeriodPercentCell
                 rate={row.migraine_rate}
                 sufficient={row.sufficient_data}
               />
@@ -135,7 +133,7 @@ function WeekdayTable({
 }) {
   const visible = rows.filter((row) => row.calendar_days > 0)
   if (visible.length === 0) return null
-  const shareLabel = formatShareLabel(calendarDays)
+  const percentLabel = periodPercentLabel(calendarDays)
   return (
     <Table
       captionSide="top"
@@ -145,7 +143,7 @@ function WeekdayTable({
       className="diary-insights-table"
     >
       <Table.Caption className="visually-hidden">
-        Migraine share by weekday
+        Migraine days by weekday
       </Table.Caption>
       <Table.Thead>
         <Table.Tr>
@@ -153,7 +151,7 @@ function WeekdayTable({
           <Table.Th scope="col">Days in period</Table.Th>
           <Table.Th scope="col">Recorded</Table.Th>
           <Table.Th scope="col">Migraine days</Table.Th>
-          <Table.Th scope="col">{shareLabel}</Table.Th>
+          <Table.Th scope="col">{percentLabel}</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
@@ -164,7 +162,7 @@ function WeekdayTable({
             <Table.Td>{row.recorded_days}</Table.Td>
             <Table.Td>{row.migraine_days}</Table.Td>
             <Table.Td>
-              <RateCell
+              <PeriodPercentCell
                 rate={row.migraine_rate}
                 sufficient={row.sufficient_data}
               />
@@ -176,61 +174,16 @@ function WeekdayTable({
   )
 }
 
-function PainTable({
-  caption,
-  rows,
-}: {
-  caption: string
-  rows: InsightsPainSlice[]
-}) {
-  const visible = rows.filter((row) => row.migraine_days > 0)
-  if (visible.length === 0) return null
-  return (
-    <Table
-      captionSide="top"
-      withTableBorder
-      striped
-      highlightOnHover
-      className="diary-insights-table"
-    >
-      <Table.Caption className="visually-hidden">{caption}</Table.Caption>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th scope="col">Group</Table.Th>
-          <Table.Th scope="col">Migraine days</Table.Th>
-          <Table.Th scope="col">Average pain</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {visible.map((row) => (
-          <Table.Tr
-            key={`${row.label}-${String(row.value)}-${String(row.medication_taken)}`}
-          >
-            <Table.Td>{row.label}</Table.Td>
-            <Table.Td>{row.migraine_days}</Table.Td>
-            <Table.Td>
-              {row.average_pain_severity !== null ? (
-                <Group gap="xs" wrap="nowrap">
-                  <Text size="sm">{row.average_pain_severity} / 10</Text>
-                  {!row.sufficient_data && (
-                    <Badge size="xs" variant="light" color="gray">
-                      Few answers
-                    </Badge>
-                  )}
-                </Group>
-              ) : (
-                '—'
-              )}
-            </Table.Td>
-          </Table.Tr>
-        ))}
-      </Table.Tbody>
-    </Table>
-  )
+function formatAveragePain(
+  average: number | null,
+  answeredDays: number,
+): string {
+  if (average === null || answeredDays === 0) return '—'
+  return `${average} / 10`
 }
 
 function InsightsContent({ insights }: { insights: DiaryInsights }) {
-  const { summary, coverage, window_days } = insights
+  const { summary, window_days } = insights
   const ratePercent = Math.round((summary.migraine_rate ?? 0) * 100)
 
   return (
@@ -242,12 +195,6 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
         className="diary-insights-narrative-slot"
         aria-hidden="true"
       />
-
-      <Alert variant="light" color="gray" title="How these numbers work">
-        Shares use all {summary.calendar_days} calendar days in the window.
-        Unrecorded days count as non-migraine in the share only; the calendar
-        still shows them as missing, not migraine-free. Not medical advice.
-      </Alert>
 
       {summary.insufficient_data ? (
         <Alert color="gray" title="More diary days needed">
@@ -265,19 +212,23 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
             roundCaps
             sections={[{ value: ratePercent, color: 'var(--app-migraine)' }]}
             label={
-              <Text ta="center" size="lg" fw={700}>
-                {formatRate(summary.migraine_rate)}
+              <Text ta="center" size="xl" fw={700}>
+                {summary.migraine_days}
               </Text>
             }
-            aria-label={`Migraine share ${formatRate(summary.migraine_rate)}`}
+            aria-label={`${summary.migraine_days} migraine days in the last ${window_days} days`}
           />
           <Stack gap="xs" flex={1} mih={0}>
             <Text size="sm" fw={600}>
-              Migraine share in the last {window_days} days
+              Migraine days in the last {window_days} days
             </Text>
             <Text size="sm" c="dimmed">
-              {summary.migraine_days} migraine days out of{' '}
-              {summary.calendar_days} calendar days (through {insights.today}).
+              {summary.migraine_days} of {summary.calendar_days} days (
+              {formatRate(summary.migraine_rate)} of the period, through{' '}
+              {insights.today}).
+            </Text>
+            <Text size="sm" c="dimmed">
+              Unrecorded days count as non-migraine.
             </Text>
             <Progress
               value={ratePercent}
@@ -289,7 +240,7 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
         </Group>
       </Paper>
 
-      <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="md">
+      <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="md">
         <StatCard label="Recorded" value={summary.recorded_days} />
         <StatCard label="Unrecorded" value={summary.unrecorded_days} />
         <StatCard
@@ -298,26 +249,19 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
           hint="Explicitly recorded"
         />
         <StatCard label="Migraine" value={summary.migraine_days} />
+        <StatCard
+          label="Average pain"
+          value={formatAveragePain(
+            summary.average_pain_severity,
+            summary.pain_answered_migraine_days,
+          )}
+          hint={
+            summary.pain_answered_migraine_days > 0
+              ? `On ${summary.pain_answered_migraine_days} migraine days with pain logged`
+              : 'Log pain on migraine days to see this'
+          }
+        />
       </SimpleGrid>
-
-      <Paper withBorder radius="md" p="md">
-        <Group gap="xs" mb="sm">
-          <ThemeIcon size="sm" variant="light" color="sage" radius="xl">
-            <Text size="xs" fw={700}>
-              i
-            </Text>
-          </ThemeIcon>
-          <Text size="sm" fw={600}>
-            Detail coverage
-          </Text>
-        </Group>
-        <Text size="sm" c="dimmed">
-          Sleep duration {coverage.sleep_duration_answered} · Sleep quality{' '}
-          {coverage.sleep_quality_answered} · Medication{' '}
-          {coverage.medication_answered} · Pain on migraine days{' '}
-          {coverage.pain_answered}
-        </Text>
-      </Paper>
 
       <Accordion
         variant="separated"
@@ -334,12 +278,10 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="sleep-duration">
-          <Accordion.Control>
-            Migraine share and sleep duration
-          </Accordion.Control>
+          <Accordion.Control>Migraine days by sleep duration</Accordion.Control>
           <Accordion.Panel>
             <SliceTable
-              caption="Migraine share by sleep duration"
+              caption="Migraine days when sleep duration was logged"
               valueLabel="Sleep duration"
               calendarDays={summary.calendar_days}
               rows={insights.sleep_duration}
@@ -347,12 +289,10 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="sleep-quality">
-          <Accordion.Control>
-            Migraine share and sleep quality
-          </Accordion.Control>
+          <Accordion.Control>Migraine days by sleep quality</Accordion.Control>
           <Accordion.Panel>
             <SliceTable
-              caption="Migraine share by sleep quality"
+              caption="Migraine days when sleep quality was logged"
               valueLabel="Sleep quality"
               calendarDays={summary.calendar_days}
               rows={insights.sleep_quality}
@@ -360,33 +300,14 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="medication">
-          <Accordion.Control>Migraine share and medication</Accordion.Control>
+          <Accordion.Control>Migraine days by medication</Accordion.Control>
           <Accordion.Panel>
             <SliceTable
-              caption="Migraine share when medication was recorded"
+              caption="Migraine days when medication was logged"
               valueLabel="Medication"
               calendarDays={summary.calendar_days}
               rows={insights.medication}
             />
-          </Accordion.Panel>
-        </Accordion.Item>
-        <Accordion.Item value="pain">
-          <Accordion.Control>Average pain</Accordion.Control>
-          <Accordion.Panel>
-            <Stack gap="lg">
-              <PainTable
-                caption="Average pain by sleep duration"
-                rows={insights.pain_by_sleep_duration}
-              />
-              <PainTable
-                caption="Average pain by sleep quality"
-                rows={insights.pain_by_sleep_quality}
-              />
-              <PainTable
-                caption="Average pain and medication"
-                rows={insights.pain_by_medication}
-              />
-            </Stack>
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>

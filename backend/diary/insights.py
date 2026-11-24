@@ -138,57 +138,6 @@ def _average_pain(days: list[DiaryEntry]) -> float | None:
     return round(mean(values), 1)
 
 
-def _pain_slices(
-    window_entries: list[DiaryEntry],
-    field: str,
-    values: tuple[str, ...],
-    labels: dict[str, str] | None = None,
-) -> list[dict]:
-    slices = []
-    for value in values:
-        days = [
-            entry
-            for entry in window_entries
-            if getattr(entry, field) == value
-            and entry.status == DiaryEntry.Status.MIGRAINE
-            and entry.pain_severity is not None
-        ]
-        migraine_days = len(days)
-        slices.append(
-            {
-                "value": value,
-                "label": (labels or {}).get(value, value.replace("_", " ").title()),
-                "migraine_days": migraine_days,
-                "average_pain_severity": _average_pain(days),
-                "sufficient_data": migraine_days >= MIN_SLICE_DAYS,
-            }
-        )
-    return slices
-
-
-def _medication_pain_slices(window_entries: list[DiaryEntry]) -> list[dict]:
-    slices = []
-    for taken, label in ((True, "Medication taken"), (False, "No medication")):
-        days = [
-            entry
-            for entry in window_entries
-            if entry.medication_taken is taken
-            and entry.status == DiaryEntry.Status.MIGRAINE
-            and entry.pain_severity is not None
-        ]
-        migraine_days = len(days)
-        slices.append(
-            {
-                "medication_taken": taken,
-                "label": label,
-                "migraine_days": migraine_days,
-                "average_pain_severity": _average_pain(days),
-                "sufficient_data": migraine_days >= MIN_SLICE_DAYS,
-            }
-        )
-    return slices
-
-
 def _coverage(window_entries: list[DiaryEntry]) -> dict:
     return {
         "sleep_duration_answered": sum(
@@ -220,6 +169,14 @@ def compute_insights(
         1 for entry in window_entries if entry.status == DiaryEntry.Status.MIGRAINE_FREE
     )
     unrecorded_days = calendar_days - recorded_days
+    migraine_with_pain = [
+        entry
+        for entry in window_entries
+        if entry.status == DiaryEntry.Status.MIGRAINE
+        and entry.pain_severity is not None
+    ]
+    pain_answered_migraine_days = len(migraine_with_pain)
+    average_pain_severity = _average_pain(migraine_with_pain)
 
     sleep_duration_labels = {
         DiaryEntry.SleepDuration.LESS: "Less than usual",
@@ -243,6 +200,8 @@ def compute_insights(
             "migraine_days": migraine_days,
             "migraine_free_days": migraine_free_days,
             "migraine_rate": _migraine_rate(migraine_days, calendar_days),
+            "pain_answered_migraine_days": pain_answered_migraine_days,
+            "average_pain_severity": average_pain_severity,
             "insufficient_data": recorded_days < MIN_RECORDED_DAYS,
             "minimum_recorded_days": MIN_RECORDED_DAYS,
         },
@@ -269,14 +228,4 @@ def compute_insights(
             calendar_days,
             {True: "Medication taken", False: "No medication"},
         ),
-        "pain_by_sleep_duration": _pain_slices(
-            window_entries,
-            "sleep_duration",
-            SLEEP_DURATION_VALUES,
-            sleep_duration_labels,
-        ),
-        "pain_by_sleep_quality": _pain_slices(
-            window_entries, "sleep", SLEEP_QUALITY_VALUES, sleep_quality_labels
-        ),
-        "pain_by_medication": _medication_pain_slices(window_entries),
     }

@@ -13,6 +13,8 @@ const sampleInsights = {
     migraine_days: 4,
     migraine_free_days: 8,
     migraine_rate: 0.044,
+    pain_answered_migraine_days: 3,
+    average_pain_severity: 6.5,
     insufficient_data: false,
     minimum_recorded_days: 10,
   },
@@ -46,9 +48,6 @@ const sampleInsights = {
   ],
   sleep_quality: [],
   medication: [],
-  pain_by_sleep_duration: [],
-  pain_by_sleep_quality: [],
-  pain_by_medication: [],
 }
 
 afterEach(() => mock.restoreAll())
@@ -68,5 +67,5 @@ test('loading passes timezone and accepts validated responses', async () => {
     return Response.json(sampleInsights)
   })
   const loaded = await loadInsights(new AbortController().signal)
-  assert.deepEqual(loaded.summary.calendar_days, 90)
+  assert.deepEqual(loaded.summary.average_pain_severity, 6.5)
 })

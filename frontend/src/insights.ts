@@ -18,15 +18,6 @@ export type InsightsWeekdaySlice = {
   sufficient_data: boolean
 }
 
-export type InsightsPainSlice = {
-  value?: string
-  medication_taken?: boolean
-  label: string
-  migraine_days: number
-  average_pain_severity: number | null
-  sufficient_data: boolean
-}
-
 export type DiaryInsights = {
   schema_version: number
   window_days: number
@@ -38,6 +29,8 @@ export type DiaryInsights = {
     migraine_days: number
     migraine_free_days: number
     migraine_rate: number | null
+    pain_answered_migraine_days: number
+    average_pain_severity: number | null
     insufficient_data: boolean
     minimum_recorded_days: number
   }
@@ -51,9 +44,6 @@ export type DiaryInsights = {
   sleep_duration: InsightsSlice[]
   sleep_quality: InsightsSlice[]
   medication: InsightsSlice[]
-  pain_by_sleep_duration: InsightsPainSlice[]
-  pain_by_sleep_quality: InsightsPainSlice[]
-  pain_by_medication: InsightsPainSlice[]
 }
 
 function isNumber(value: unknown): value is number {
@@ -89,22 +79,6 @@ function isWeekdaySlice(value: unknown): value is InsightsWeekdaySlice {
   )
 }
 
-function isPainSlice(value: unknown): value is InsightsPainSlice {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'label' in value &&
-    typeof value.label === 'string' &&
-    'migraine_days' in value &&
-    isNumber(value.migraine_days) &&
-    'average_pain_severity' in value &&
-    (value.average_pain_severity === null ||
-      isNumber(value.average_pain_severity)) &&
-    'sufficient_data' in value &&
-    typeof value.sufficient_data === 'boolean'
-  )
-}
-
 export function isDiaryInsights(value: unknown): value is DiaryInsights {
   if (typeof value !== 'object' || value === null) return false
   const body = value as Record<string, unknown>
@@ -128,6 +102,11 @@ export function isDiaryInsights(value: unknown): value is DiaryInsights {
     isNumber(summary.migraine_free_days) &&
     'migraine_rate' in summary &&
     (summary.migraine_rate === null || isNumber(summary.migraine_rate)) &&
+    'pain_answered_migraine_days' in summary &&
+    isNumber(summary.pain_answered_migraine_days) &&
+    'average_pain_severity' in summary &&
+    (summary.average_pain_severity === null ||
+      isNumber(summary.average_pain_severity)) &&
     'minimum_recorded_days' in summary &&
     isNumber(summary.minimum_recorded_days) &&
     'insufficient_data' in summary &&
@@ -149,13 +128,7 @@ export function isDiaryInsights(value: unknown): value is DiaryInsights {
     Array.isArray(body.sleep_quality) &&
     body.sleep_quality.every(isSlice) &&
     Array.isArray(body.medication) &&
-    body.medication.every(isSlice) &&
-    Array.isArray(body.pain_by_sleep_duration) &&
-    body.pain_by_sleep_duration.every(isPainSlice) &&
-    Array.isArray(body.pain_by_sleep_quality) &&
-    body.pain_by_sleep_quality.every(isPainSlice) &&
-    Array.isArray(body.pain_by_medication) &&
-    body.pain_by_medication.every(isPainSlice)
+    body.medication.every(isSlice)
   )
 }
 
@@ -178,6 +151,6 @@ export function formatRate(rate: number | null): string {
   return `${Math.round(rate * 100)}%`
 }
 
-export function formatShareLabel(calendarDays: number): string {
-  return `Share of ${calendarDays} days`
+export function periodPercentLabel(calendarDays: number): string {
+  return `% of ${calendarDays} days`
 }
