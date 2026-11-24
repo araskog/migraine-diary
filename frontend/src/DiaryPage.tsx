@@ -221,16 +221,18 @@ export default function DiaryPage({
           </Menu.Dropdown>
         </Menu>
       </AppHeader>
-      <Stack component="section" gap="lg" className="page diary-page">
+      {isDemo && (
+        <DemoNotice
+          busy={busy || saving || statusSaving}
+          onCreateAccount={() => requestLeave('create-account')}
+        />
+      )}
+      <Stack
+        component="section"
+        gap="lg"
+        className={`page diary-page${isDemo ? ' diary-page--demo' : ''}`}
+      >
         <DiaryEntries
-          calendarBanner={
-            isDemo ? (
-              <DemoNotice
-                busy={busy || saving || statusSaving}
-                onCreateAccount={() => requestLeave('create-account')}
-              />
-            ) : undefined
-          }
           csrfToken={csrfToken}
           disabled={busy || statusSaving}
           saving={saving || statusSaving}

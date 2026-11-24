@@ -12,6 +12,10 @@
   max-width: 940px;
 }
 
+.app .diary-page--demo {
+  margin-top: var(--mantine-spacing-md);
+}
+
 @media (max-width: 760px) {
   .app .diary-page {
     max-width: 440px;
@@ -111,7 +115,8 @@
 }
 
 .app .demo-notice-banner {
-  margin-bottom: var(--mantine-spacing-xs);
+  width: 100%;
+  margin-bottom: var(--mantine-spacing-md);
   background: light-dark(
     var(--mantine-color-pink-0),
     color-mix(
