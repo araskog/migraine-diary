@@ -45,6 +45,11 @@
   border: 1px solid var(--mantine-color-default-border);
 }
 
+.app .account-shell {
+  max-width: 840px;
+  margin: 48px auto 0;
+}
+
 .app .account-page {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -53,8 +58,6 @@
   border: 1px solid var(--mantine-color-default-border);
   border-radius: var(--mantine-radius-lg);
   background: var(--mantine-color-body);
-  max-width: 840px;
-  margin: 48px auto 0;
 }
 
 .app .account-intro {
@@ -77,10 +80,13 @@
 }
 
 @media (max-width: 700px) {
-  .app .account-page {
-    grid-template-columns: minmax(0, 1fr);
+  .app .account-shell {
     max-width: 440px;
     margin-top: 24px;
+  }
+
+  .app .account-page {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .app .account-intro,

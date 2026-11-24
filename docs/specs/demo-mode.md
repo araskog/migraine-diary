@@ -13,7 +13,7 @@ Password recovery is out of scope for this feature. Hosting and performance work
 | ID | Observable outcome |
 |---|---|
 | DM1 | From the account entry screen, a visitor can start a demo without registering. The app opens the diary with sample entries visible on the calendar. |
-| DM2 | Demo data is clearly labeled in the UI as sample or demo data, not the visitor's personal health record. |
+| DM2 | The demo is clearly labeled in everyday language (demo account and sample diary), not as technical test data. |
 | DM3 | A visitor can record, correct, clear, and edit details in the demo diary; changes persist while the same demo session remains active and after reload while still signed in. |
 | DM4 | Starting demo creates a separate session per visitor; two browsers do not share one editable demo diary. |
 | DM5 | While in a demo session, a visitor can create a real account with email and password. Conversion keeps existing diary entries on the same account; the session is no longer marked as demo. |

@@ -18,6 +18,7 @@ import DiaryEntries from './DiaryEntries'
 import ConfirmDialog from './ConfirmDialog'
 import DemoConvertForm from './DemoConvertForm'
 import DemoNotice from './DemoNotice'
+import { DEMO_DISPLAY_NAME } from './demo'
 import { getSession, isSession } from './session'
 import type { Session } from './session'
 
@@ -188,13 +189,13 @@ export default function DiaryPage({
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Label>
-              {isDemo ? 'Demo sample session' : 'Signed in as'}
+              {isDemo ? 'Demo account' : 'Signed in as'}
               <Text
                 size="sm"
                 c="var(--mantine-color-text)"
                 style={{ overflowWrap: 'anywhere' }}
               >
-                {isDemo ? 'Synthetic sample data only' : email}
+                {isDemo ? DEMO_DISPLAY_NAME : email}
               </Text>
             </Menu.Label>
             <Menu.Divider />

@@ -1,4 +1,6 @@
-import { Alert, Button, Group, Text } from '@mantine/core'
+import { Button, Group, Paper, Text } from '@mantine/core'
+
+import { DEMO_DISPLAY_NAME } from './demo'
 
 type DemoNoticeProps = {
   busy?: boolean
@@ -7,21 +9,31 @@ type DemoNoticeProps = {
 
 export default function DemoNotice({ busy, onCreateAccount }: DemoNoticeProps) {
   return (
-    <Alert
-      variant="light"
-      color="blue"
-      title="Demo sample diary"
+    <Paper
+      p="sm"
+      radius="md"
       className="demo-notice"
+      bg="var(--mantine-color-pink-light)"
+      withBorder
+      style={{ borderColor: 'var(--mantine-color-pink-outline)' }}
     >
-      <Text size="sm">
-        You are editing synthetic sample data so you can try the calendar and
-        details. Changes stay in this demo session until you create an account.
-      </Text>
-      <Group mt="sm">
-        <Button size="sm" disabled={busy} onClick={onCreateAccount}>
-          Create account from demo
+      <Group justify="space-between" align="center" wrap="wrap" gap="xs">
+        <Text size="sm">
+          <Text span fw={600} component="span">
+            {DEMO_DISPLAY_NAME} · Demo account:
+          </Text>{' '}
+          Changes stay in this demo session until you create an account.
+        </Text>
+        <Button
+          size="compact-sm"
+          variant="white"
+          color="pink"
+          disabled={busy}
+          onClick={onCreateAccount}
+        >
+          Create account
         </Button>
       </Group>
-    </Alert>
+    </Paper>
   )
 }
