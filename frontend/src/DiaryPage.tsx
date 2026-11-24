@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   ActionIcon,
   Anchor,
+  Box,
   Group,
   Button,
   Menu,
@@ -222,10 +223,12 @@ export default function DiaryPage({
         </Menu>
       </AppHeader>
       {isDemo && (
-        <DemoNotice
-          busy={busy || saving || statusSaving}
-          onCreateAccount={() => requestLeave('create-account')}
-        />
+        <Box mt="lg" mb="lg">
+          <DemoNotice
+            busy={busy || saving || statusSaving}
+            onCreateAccount={() => requestLeave('create-account')}
+          />
+        </Box>
       )}
       <Stack
         component="section"
