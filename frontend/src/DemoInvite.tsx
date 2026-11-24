@@ -1,4 +1,4 @@
-import { Button, Flex } from '@mantine/core'
+import { Button } from '@mantine/core'
 
 type DemoInviteProps = {
   busy?: boolean
@@ -7,17 +7,15 @@ type DemoInviteProps = {
 
 export default function DemoInvite({ busy, onStart }: DemoInviteProps) {
   return (
-    <Flex justify="flex-end" mb="sm">
-      <Button
-        color="pink"
-        radius="xl"
-        size="md"
-        aria-busy={busy}
-        loading={busy}
-        onClick={onStart}
-      >
-        Try the demo
-      </Button>
-    </Flex>
+    <Button
+      color="pink"
+      radius="xl"
+      size="compact-md"
+      aria-busy={busy}
+      loading={busy}
+      onClick={onStart}
+    >
+      Try the demo
+    </Button>
   )
 }

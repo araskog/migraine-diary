@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   ActionIcon,
   Anchor,
+  Box,
   Group,
   Button,
   Menu,
@@ -223,10 +224,12 @@ export default function DiaryPage({
       </AppHeader>
       <Stack component="section" gap="lg" className="page diary-page">
         {isDemo && (
-          <DemoNotice
-            busy={busy || saving || statusSaving}
-            onCreateAccount={() => requestLeave('create-account')}
-          />
+          <Box visibleFrom="sm">
+            <DemoNotice
+              busy={busy || saving || statusSaving}
+              onCreateAccount={() => requestLeave('create-account')}
+            />
+          </Box>
         )}
         <DiaryEntries
           csrfToken={csrfToken}
@@ -240,7 +243,22 @@ export default function DiaryPage({
           onSessionRefreshed={onSessionRefreshed}
         />
         <ErrorMessages messages={errors} />
-        <Group component="footer" justify="flex-end" gap="md" mt="xl">
+        <Group
+          component="footer"
+          justify="flex-end"
+          gap="md"
+          mt="xl"
+          wrap="wrap"
+        >
+          {isDemo && (
+            <Box hiddenFrom="sm" style={{ flex: '1 1 100%' }}>
+              <DemoNotice
+                compact
+                busy={busy || saving || statusSaving}
+                onCreateAccount={() => requestLeave('create-account')}
+              />
+            </Box>
+          )}
           <PrivacyNotice />
           {!isDemo && (
             <Anchor

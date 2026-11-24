@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Button,
   Checkbox,
@@ -10,7 +10,6 @@ import {
   VisuallyHidden,
 } from '@mantine/core'
 import type { FormEvent } from 'react'
-import DemoInvite from './DemoInvite'
 import ErrorMessages from './ErrorMessages'
 import PrivacyNotice, { privacyVersion } from './PrivacyNotice'
 import { getSession, isSession } from './session'
@@ -19,8 +18,11 @@ import type { Session } from './session'
 type AccountFormProps = {
   initialMode?: 'sign-in' | 'register'
   csrfToken: string
+  demoBusy?: boolean
+  demoErrors?: string[]
   onAuthenticated: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
+  onBusyChange?: (busy: boolean) => void
 }
 
 function responseErrors(body: unknown, status: number): string[] {
@@ -45,46 +47,25 @@ function responseErrors(body: unknown, status: number): string[] {
 export default function AccountForm({
   initialMode = 'sign-in',
   csrfToken,
+  demoBusy = false,
+  demoErrors = [],
   onAuthenticated,
   onSessionRefreshed,
+  onBusyChange,
 }: AccountFormProps) {
   const [mode, setMode] = useState<'sign-in' | 'register'>(initialMode)
   const [busy, setBusy] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
+  const inactive = busy || demoBusy
 
-  async function startDemo() {
-    if (busy) return
-    setBusy(true)
-    setErrors([])
-    try {
-      const response = await fetch('/api/demo/start/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify({
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        }),
-      })
-      const body: unknown = await response.json()
-      if (!response.ok) {
-        setErrors(responseErrors(body, response.status))
-        onSessionRefreshed(await getSession())
-        return
-      }
-      if (!isSession(body)) throw new Error('Unexpected response')
-      onAuthenticated(body)
-    } catch {
-      setErrors(['Unable to connect. Please try again.'])
-    } finally {
-      setBusy(false)
-    }
-  }
+  useEffect(() => {
+    onBusyChange?.(busy)
+    return () => onBusyChange?.(false)
+  }, [busy, onBusyChange])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (busy) return
+    if (inactive) return
     const form = event.currentTarget
     const values = new FormData(form)
     setBusy(true)
@@ -123,14 +104,10 @@ export default function AccountForm({
     }
   }
 
+  const allErrors = [...demoErrors, ...errors]
+
   return (
     <Stack gap="md" className="account-shell">
-      <DemoInvite
-        busy={busy}
-        onStart={() => {
-          void startDemo()
-        }}
-      />
       <section className="account-page">
         <Stack gap="md" className="account-intro">
           <Title order={2}>Get to know your migraine patterns.</Title>
@@ -155,7 +132,7 @@ export default function AccountForm({
             fullWidth
             bg="var(--app-control-background)"
             value={mode}
-            disabled={busy}
+            disabled={inactive}
             aria-label="Account options"
             data={[
               { value: 'sign-in', label: 'Sign in' },
@@ -182,7 +159,7 @@ export default function AccountForm({
                 autoComplete="email"
                 required
                 maxLength={254}
-                disabled={busy}
+                disabled={inactive}
               />
               <Stack gap="xs">
                 <TextInput
@@ -197,7 +174,7 @@ export default function AccountForm({
                   }
                   required
                   maxLength={1024}
-                  disabled={busy}
+                  disabled={inactive}
                   aria-describedby={
                     mode === 'register' ? 'password-help' : undefined
                   }
@@ -217,19 +194,24 @@ export default function AccountForm({
                 <Checkbox
                   name="health_consent"
                   required
-                  disabled={busy}
+                  disabled={inactive}
                   label="I explicitly consent to Migraine Diary storing and using my health entries to provide my diary. I can withdraw consent by deleting my account."
                 />
               )}
-              <ErrorMessages messages={errors} />
+              <ErrorMessages messages={allErrors} />
               <VisuallyHidden role="status">
-                {busy
+                {inactive
                   ? mode === 'register'
                     ? 'Creating account'
                     : 'Signing in'
                   : ''}
               </VisuallyHidden>
-              <Button size="md" loading={busy} aria-busy={busy} type="submit">
+              <Button
+                size="md"
+                loading={busy}
+                aria-busy={inactive}
+                type="submit"
+              >
                 {mode === 'register' ? 'Create account' : 'Sign in'}
               </Button>
             </Stack>

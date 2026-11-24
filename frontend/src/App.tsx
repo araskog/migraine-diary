@@ -3,7 +3,9 @@ import { Button, Container, Stack, Text, Title } from '@mantine/core'
 import LoadingIndicator from './LoadingIndicator'
 import AccountForm from './AccountForm'
 import AppHeader from './AppHeader'
+import DemoInvite from './DemoInvite'
 import DiaryPage from './DiaryPage'
+import { startDemoSession } from './demo'
 import { getSession } from './session'
 import type { Session } from './session'
 import './App.css'
@@ -17,6 +19,9 @@ function App() {
   const [accountMode, setAccountMode] = useState<'sign-in' | 'register'>(
     'sign-in',
   )
+  const [demoBusy, setDemoBusy] = useState(false)
+  const [demoErrors, setDemoErrors] = useState<string[]>([])
+  const [formBusy, setFormBusy] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -48,9 +53,34 @@ function App() {
     setPage('account')
   }
 
+  async function handleStartDemo() {
+    if (!session || demoBusy || formBusy) return
+    setDemoBusy(true)
+    setDemoErrors([])
+    const result = await startDemoSession(session.csrfToken)
+    if (result.ok) {
+      openDiary(result.session)
+    } else {
+      setDemoErrors(result.errors)
+      setSession(await getSession())
+    }
+    setDemoBusy(false)
+  }
+
   return (
     <Container component="main" size={960} px="lg" py="xl" className="app">
-      {page !== 'diary' && <AppHeader />}
+      {page !== 'diary' && (
+        <AppHeader>
+          {page === 'account' && session && (
+            <DemoInvite
+              busy={demoBusy || formBusy}
+              onStart={() => {
+                void handleStartDemo()
+              }}
+            />
+          )}
+        </AppHeader>
+      )}
       {page === 'loading' && <LoadingIndicator fullPage />}
       {page === 'unavailable' && (
         <Stack component="section" gap="lg" className="page">
@@ -73,8 +103,11 @@ function App() {
           key={accountMode}
           initialMode={accountMode}
           csrfToken={session.csrfToken}
+          demoBusy={demoBusy || formBusy}
+          demoErrors={demoErrors}
           onAuthenticated={openDiary}
           onSessionRefreshed={setSession}
+          onBusyChange={setFormBusy}
         />
       )}
       {page === 'diary' && session?.user && (
