@@ -104,3 +104,47 @@
   inset: 0;
   pointer-events: none;
 }
+
+.app .demo-speech-bubble {
+  position: relative;
+  padding: var(--mantine-spacing-sm);
+  border-radius: var(--mantine-radius-md);
+  background: var(--mantine-color-pink-light);
+  border: 1px solid var(--mantine-color-pink-outline);
+}
+
+.app .demo-speech-bubble::before,
+.app .demo-speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 10px solid var(--mantine-color-pink-outline);
+}
+
+.app .demo-speech-bubble::after {
+  margin-top: -1px;
+  border-top-color: var(--mantine-color-pink-light);
+}
+
+.app .demo-speech-bubble--login::before,
+.app .demo-speech-bubble--login::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.app .demo-speech-bubble--calendar::before,
+.app .demo-speech-bubble--calendar::after {
+  left: clamp(1.5rem, 12vw, 4.5rem);
+}
+
+.app .demo-speech-bubble--login {
+  margin-bottom: 14px;
+}
+
+.app .demo-speech-bubble--calendar {
+  margin-bottom: 6px;
+}
