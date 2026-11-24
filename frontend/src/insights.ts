@@ -123,12 +123,24 @@ export function isDiaryInsights(value: unknown): value is DiaryInsights {
     isNumber(summary.recorded_days) &&
     'migraine_days' in summary &&
     isNumber(summary.migraine_days) &&
+    'migraine_free_days' in summary &&
+    isNumber(summary.migraine_free_days) &&
+    'migraine_rate' in summary &&
+    (summary.migraine_rate === null || isNumber(summary.migraine_rate)) &&
+    'minimum_recorded_days' in summary &&
+    isNumber(summary.minimum_recorded_days) &&
     'insufficient_data' in summary &&
     typeof summary.insufficient_data === 'boolean' &&
     typeof coverage === 'object' &&
     coverage !== null &&
     'sleep_duration_answered' in coverage &&
     isNumber(coverage.sleep_duration_answered) &&
+    'sleep_quality_answered' in coverage &&
+    isNumber(coverage.sleep_quality_answered) &&
+    'medication_answered' in coverage &&
+    isNumber(coverage.medication_answered) &&
+    'pain_answered' in coverage &&
+    isNumber(coverage.pain_answered) &&
     Array.isArray(body.weekdays) &&
     body.weekdays.every(isWeekdaySlice) &&
     Array.isArray(body.sleep_duration) &&

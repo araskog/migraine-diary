@@ -58,6 +58,72 @@ class InsightsComputationTests(TestCase):
         )
         self.assertFalse(usual["sufficient_data"])
 
+    def test_summary_threshold_at_ten_recorded_days(self):
+        today = date(2026, 1, 15)
+        nine = [
+            DiaryEntry(
+                date=today - timedelta(days=offset),
+                status=DiaryEntry.Status.MIGRAINE,
+            )
+            for offset in range(9)
+        ]
+        self.assertTrue(compute_insights(nine, today)["summary"]["insufficient_data"])
+        ten = nine + [
+            DiaryEntry(
+                date=today - timedelta(days=9),
+                status=DiaryEntry.Status.MIGRAINE_FREE,
+            )
+        ]
+        self.assertFalse(compute_insights(ten, today)["summary"]["insufficient_data"])
+
+    def test_slice_threshold_at_three_days(self):
+        today = date(2026, 1, 15)
+        two = [
+            DiaryEntry(
+                date=today - timedelta(days=offset),
+                status=DiaryEntry.Status.MIGRAINE,
+                sleep_duration=DiaryEntry.SleepDuration.LESS,
+            )
+            for offset in range(2)
+        ]
+        less = compute_insights(two, today)["sleep_duration"][0]
+        self.assertFalse(less["sufficient_data"])
+        three = two + [
+            DiaryEntry(
+                date=today - timedelta(days=2),
+                status=DiaryEntry.Status.MIGRAINE_FREE,
+                sleep_duration=DiaryEntry.SleepDuration.LESS,
+            )
+        ]
+        less = compute_insights(three, today)["sleep_duration"][0]
+        self.assertTrue(less["sufficient_data"])
+
+    def test_pain_slices_ignore_migraine_free_and_unanswered_pain(self):
+        today = date(2026, 1, 15)
+        entries = [
+            DiaryEntry(
+                date=today,
+                status=DiaryEntry.Status.MIGRAINE_FREE,
+                sleep=DiaryEntry.Sleep.POOR,
+                pain_severity=None,
+            ),
+            DiaryEntry(
+                date=today - timedelta(days=1),
+                status=DiaryEntry.Status.MIGRAINE,
+                sleep=DiaryEntry.Sleep.POOR,
+                pain_severity=None,
+            ),
+            DiaryEntry(
+                date=today - timedelta(days=2),
+                status=DiaryEntry.Status.MIGRAINE,
+                sleep=DiaryEntry.Sleep.POOR,
+                pain_severity=8,
+            ),
+        ]
+        poor = compute_insights(entries, today)["pain_by_sleep_quality"][0]
+        self.assertEqual(poor["migraine_days"], 1)
+        self.assertEqual(poor["average_pain_severity"], 8.0)
+
 
 class InsightsApiTests(TestCase):
     path = "/api/diary/insights/"
@@ -123,10 +189,32 @@ class InsightsApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["summary"]["recorded_days"], 12)
         self.assertIn("no-store", response["Cache-Control"])
+        self.assertIn("private", response["Cache-Control"])
+
+    def test_missing_timezone_is_rejected(self):
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 400)
 
     def test_invalid_timezone_is_rejected(self):
         response = self.client.get(self.path, {"timezone": "Not/AZone"})
         self.assertEqual(response.status_code, 400)
+
+    def test_local_today_follows_timezone(self):
+        DiaryEntry.objects.create(
+            user=self.user,
+            date="2026-01-15",
+            status=DiaryEntry.Status.MIGRAINE,
+        )
+        instant = datetime(2026, 1, 15, 14, 0, tzinfo=dt_timezone.utc)
+        with patch("diary.views.timezone.now", return_value=instant):
+            utc = self.client.get(self.path, {"timezone": "UTC"}).json()
+            sydney = self.client.get(
+                self.path, {"timezone": "Australia/Sydney"}
+            ).json()
+        self.assertEqual(utc["today"], "2026-01-15")
+        self.assertEqual(sydney["today"], "2026-01-16")
+        self.assertEqual(utc["summary"]["recorded_days"], 1)
+        self.assertEqual(sydney["summary"]["recorded_days"], 1)
 
     def test_response_includes_weekday_and_pain_slices(self):
         self.seed_window()
