@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import {
   Box,
   Button,
@@ -26,6 +26,7 @@ const statusIcons: Record<DiaryStatus, string> = {
 }
 
 type DiaryEntriesProps = {
+  calendarBanner?: ReactNode
   csrfToken: string
   disabled: boolean
   saving: boolean
@@ -38,6 +39,7 @@ type DiaryEntriesProps = {
 }
 
 export default function DiaryEntries({
+  calendarBanner,
   csrfToken,
   disabled,
   saving,
@@ -114,6 +116,7 @@ export default function DiaryEntries({
         }}
       />
       <Box>
+        {calendarBanner}
         <DatePicker
           aria-label="Diary calendar"
           value={date}

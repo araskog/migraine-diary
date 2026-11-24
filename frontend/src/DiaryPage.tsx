@@ -223,6 +223,14 @@ export default function DiaryPage({
       </AppHeader>
       <Stack component="section" gap="lg" className="page diary-page">
         <DiaryEntries
+          calendarBanner={
+            isDemo ? (
+              <DemoNotice
+                busy={busy || saving || statusSaving}
+                onCreateAccount={() => requestLeave('create-account')}
+              />
+            ) : undefined
+          }
           csrfToken={csrfToken}
           disabled={busy || statusSaving}
           saving={saving || statusSaving}
@@ -241,14 +249,6 @@ export default function DiaryPage({
           mt="xl"
           wrap="wrap"
         >
-          {isDemo && (
-            <div className="demo-notice-footer" style={{ flex: '1 1 100%' }}>
-              <DemoNotice
-                busy={busy || saving || statusSaving}
-                onCreateAccount={() => requestLeave('create-account')}
-              />
-            </div>
-          )}
           <PrivacyNotice />
           {!isDemo && (
             <Anchor

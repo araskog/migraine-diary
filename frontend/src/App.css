@@ -110,6 +110,22 @@
   }
 }
 
+.app .demo-notice-banner {
+  margin-bottom: var(--mantine-spacing-xs);
+  background: light-dark(
+    var(--mantine-color-pink-0),
+    color-mix(
+      in srgb,
+      var(--mantine-color-pink-4) 14%,
+      var(--mantine-color-body)
+    )
+  );
+}
+
+.app .demo-notice-banner-text {
+  color: light-dark(var(--mantine-color-pink-9), var(--mantine-color-pink-2));
+}
+
 .app .page-loading {
   position: fixed;
   inset: 0;
