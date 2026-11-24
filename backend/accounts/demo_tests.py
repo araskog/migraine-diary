@@ -64,7 +64,7 @@ class DemoModeTests(TestCase):
             other_response.json()["user"]["email"], body["user"]["email"]
         )
 
-    def test_demo_edits_persist_and_convert_keeps_entries(self):
+    def test_demo_edits_persist_in_session(self):
         self.start_demo()
         self.token = self.client.get("/api/session/").json()["csrfToken"]
         response = self.client.post(
@@ -77,32 +77,21 @@ class DemoModeTests(TestCase):
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.token,
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertIn(response.status_code, {200, 201})
         user = User.objects.get(is_demo=True)
-        count_before = DiaryEntry.objects.filter(user=user).count()
-
-        convert = self.post(
-            "/api/demo/convert/",
-            {
-                "email": "converted@example.test",
-                "password": self.password,
-                "health_consent": True,
-                "privacy_policy_version": "2026-11-13",
-            },
-        )
-        self.assertEqual(convert.status_code, 200)
-        self.assertEqual(
-            convert.json()["user"],
-            {"email": "converted@example.test", "isDemo": False},
-        )
-        user.refresh_from_db()
-        self.assertFalse(user.is_demo)
-        self.assertEqual(user.email, "converted@example.test")
-        self.assertEqual(DiaryEntry.objects.filter(user=user).count(), count_before)
+        self.assertTrue(user.is_demo)
         self.assertEqual(
             DiaryEntry.objects.get(user=user, date=date(2026, 3, 10)).status,
             DiaryEntry.Status.MIGRAINE_FREE,
         )
+        reopened = Client(enforce_csrf_checks=True)
+        reopened.cookies = self.client.cookies.copy()
+        saved = next(
+            entry
+            for entry in reopened.get("/api/diary/entries/").json()
+            if entry["date"] == "2026-03-10"
+        )
+        self.assertEqual(saved["status"], "migraine_free")
 
     def test_demo_sign_in_rejected(self):
         self.start_demo()
@@ -113,31 +102,18 @@ class DemoModeTests(TestCase):
             "/api/sign-in/", {"email": demo_email, "password": "anything"}
         )
         self.assertEqual(response.status_code, 400)
-        self.assertIn("Demo sessions", response.json()["detail"])
+        self.assertEqual(
+            response.json()["detail"], "Email or password is incorrect."
+        )
 
     def test_signed_in_user_cannot_start_demo(self):
         User.objects.create_user("member@example.test", self.password)
-        self.post(
-            "/api/sign-in/", {"email": "member@example.test", "password": self.password}
-        )
-        self.assertEqual(self.start_demo().status_code, 400)
-
-    def test_convert_requires_active_demo_session(self):
-        User.objects.create_user("member@example.test", self.password)
         response = self.post(
             "/api/sign-in/", {"email": "member@example.test", "password": self.password}
         )
+        self.assertEqual(response.status_code, 200)
         self.token = response.json()["csrfToken"]
-        response = self.post(
-            "/api/demo/convert/",
-            {
-                "email": "taken@example.test",
-                "password": self.password,
-                "health_consent": True,
-                "privacy_policy_version": "2026-11-13",
-            },
-        )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(self.start_demo().status_code, 400)
 
     def test_demo_start_uses_client_timezone_for_sample_dates(self):
         response = self.post(

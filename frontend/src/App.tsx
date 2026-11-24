@@ -14,6 +14,9 @@ function App() {
     'loading' | 'account' | 'diary' | 'unavailable'
   >('loading')
   const [attempt, setAttempt] = useState(0)
+  const [accountMode, setAccountMode] = useState<'sign-in' | 'register'>(
+    'sign-in',
+  )
 
   useEffect(() => {
     let active = true
@@ -39,8 +42,9 @@ function App() {
     setPage(next.user ? 'diary' : 'account')
   }
 
-  function finishSignOut(next: Session) {
+  function finishSignOut(next: Session, options?: { register?: boolean }) {
     setSession(next)
+    setAccountMode(options?.register ? 'register' : 'sign-in')
     setPage('account')
   }
 
@@ -66,6 +70,8 @@ function App() {
       )}
       {page === 'account' && session && (
         <AccountForm
+          key={accountMode}
+          initialMode={accountMode}
           csrfToken={session.csrfToken}
           onAuthenticated={openDiary}
           onSessionRefreshed={setSession}
@@ -78,7 +84,6 @@ function App() {
           csrfToken={session.csrfToken}
           onSignedOut={finishSignOut}
           onSessionRefreshed={setSession}
-          onConverted={openDiary}
         />
       )}
       {import.meta.env.DEV && (

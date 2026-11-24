@@ -106,7 +106,7 @@ def sign_in(request):
             {
                 "detail": (
                     "Demo sessions cannot be signed into. Start a new demo or "
-                    "create an account from your current demo session."
+                    "create your own account after signing out."
                 )
             },
             status=400,
@@ -160,48 +160,6 @@ def start_demo(request):
     user = create_demo_user(reference_date=reference_date)
     login(request, user)
     return Response(identity(request), status=201)
-
-
-class DemoConvertInput(Credentials):
-    health_consent = serializers.BooleanField()
-    privacy_policy_version = serializers.ChoiceField(choices=[PRIVACY_POLICY_VERSION])
-
-    def validate_health_consent(self, value):
-        if not value:
-            raise serializers.ValidationError(
-                "Explicit health-data consent is required."
-            )
-        return value
-
-
-@never_cache
-@api_view(["POST"])
-def convert_demo(request):
-    SessionAuthentication().enforce_csrf(request)
-    if not request.user.is_demo:
-        return Response({"detail": "No demo session is active."}, status=400)
-    payload = DemoConvertInput(data=request.data)
-    payload.is_valid(raise_exception=True)
-    email = payload.validated_data["email"]
-    password = payload.validated_data["password"]
-    try:
-        validate_password(password, user=User(email=email))
-    except ValidationError as error:
-        return Response({"password": error.messages}, status=400)
-    if User.objects.filter(email__iexact=email).exclude(pk=request.user.pk).exists():
-        return Response(
-            {"email": ["An account with this email already exists."]}, status=400
-        )
-    with transaction.atomic():
-        user = User.objects.select_for_update().get(pk=request.user.pk)
-        user.email = email
-        user.set_password(password)
-        user.is_demo = False
-        user.health_consent_at = timezone.now()
-        user.privacy_policy_version = PRIVACY_POLICY_VERSION
-        user.save()
-    login(request, user)
-    return Response(identity(request))
 
 
 @never_cache

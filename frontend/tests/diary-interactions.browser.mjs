@@ -71,7 +71,6 @@ createRoot(document.getElementById('root')).render(
             throw new Error('Unexpected sign-out')
           },
           onSessionRefreshed: () => {},
-          onConverted: () => {},
         }),
       ),
     ),

@@ -17,6 +17,7 @@ import { getSession, isSession } from './session'
 import type { Session } from './session'
 
 type AccountFormProps = {
+  initialMode?: 'sign-in' | 'register'
   csrfToken: string
   onAuthenticated: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
@@ -42,11 +43,12 @@ function responseErrors(body: unknown, status: number): string[] {
 }
 
 export default function AccountForm({
+  initialMode = 'sign-in',
   csrfToken,
   onAuthenticated,
   onSessionRefreshed,
 }: AccountFormProps) {
-  const [mode, setMode] = useState<'sign-in' | 'register'>('sign-in')
+  const [mode, setMode] = useState<'sign-in' | 'register'>(initialMode)
   const [busy, setBusy] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
 

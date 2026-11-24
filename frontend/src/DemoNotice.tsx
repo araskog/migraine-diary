@@ -22,7 +22,8 @@ export default function DemoNotice({ busy, onCreateAccount }: DemoNoticeProps) {
           <Text span fw={600} component="span">
             {DEMO_DISPLAY_NAME} · Demo account:
           </Text>{' '}
-          Changes stay in this demo session until you create an account.
+          Explore the sample diary here. Create your own account when you are
+          ready for an empty personal diary.
         </Text>
         <Button
           size="compact-sm"
