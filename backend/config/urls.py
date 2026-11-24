@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 
 from accounts import views
-from diary.views import entries
+from diary.views import entries, insights
 from health.views import health
 
 urlpatterns = [
@@ -16,4 +16,5 @@ urlpatterns = [
     path("api/account/delete/", views.delete_account),
     path("api/diary/", views.diary),
     path("api/diary/entries/", entries),
+    path("api/diary/insights/", insights),
 ]

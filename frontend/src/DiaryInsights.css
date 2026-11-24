@@ -1,0 +1,16 @@
+.diary-insights-page {
+  min-width: 0;
+}
+
+.diary-insights-summary {
+  flex-wrap: wrap;
+}
+
+.diary-insights-table {
+  font-size: var(--mantine-font-size-sm);
+}
+
+.diary-insights-table th,
+.diary-insights-table td {
+  vertical-align: top;
+}

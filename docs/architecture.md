@@ -35,7 +35,7 @@ On free tiers, Neon and Vercel scale down after idle time, so the first request 
 
 Keep diary capabilities API-first. The browser, a planned public MCP service, and the in-app assistant must use the same backend validation and ownership rules. The MCP service and in-app AI chat will share one set of tool definitions and execution handlers backed by diary operations. Strands Agents is a candidate for the agent runtime and MCP integration. See [AI Chat and MCP Diary Tools](specs/first-mcp-integration.md) for scope, authorization, and acceptance criteria.
 
-AI summaries follow the usable diary; reports follow summaries. No LLM framework is selected.
+Deterministic pattern insights ([pattern insights MVP](specs/pattern-insights-mvp.md)) follow extended diary fields and precede LLM narratives. AI summaries follow insights; reports follow summaries. No LLM framework is selected.
 
 ## References
 

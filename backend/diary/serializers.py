@@ -74,6 +74,16 @@ class DiaryEntryInput(DiaryDateInput):
         return attrs
 
 
+class InsightsQuery(serializers.Serializer):
+    timezone = serializers.CharField(max_length=255)
+
+    def validate_timezone(self, value):
+        try:
+            return ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError):
+            raise serializers.ValidationError("Supply a valid IANA timezone.")
+
+
 class DiaryEntryOutput(serializers.ModelSerializer):
     class Meta:
         model = DiaryEntry
