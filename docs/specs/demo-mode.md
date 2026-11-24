@@ -1,6 +1,6 @@
 # Demo Mode
 
-Status: Delivered in demo-mode PR; pending owner merge.
+Status: Complete.
 
 ## Goal and Scope
 
