@@ -16,22 +16,29 @@ import PrivacyNotice from './PrivacyNotice'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
 import ConfirmDialog from './ConfirmDialog'
+import DemoConvertForm from './DemoConvertForm'
+import DemoNotice from './DemoNotice'
 import { getSession, isSession } from './session'
 import type { Session } from './session'
 
 type DiaryPageProps = {
   email: string
+  isDemo: boolean
   csrfToken: string
   onSignedOut: (session: Session) => void
   onSessionRefreshed: (session: Session) => void
+  onConverted: (session: Session) => void
 }
 
 export default function DiaryPage({
   email,
+  isDemo,
   csrfToken,
   onSignedOut,
   onSessionRefreshed,
+  onConverted,
 }: DiaryPageProps) {
+  const [converting, setConverting] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
@@ -181,13 +188,13 @@ export default function DiaryPage({
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Label>
-              Signed in as
+              {isDemo ? 'Demo sample session' : 'Signed in as'}
               <Text
                 size="sm"
                 c="var(--mantine-color-text)"
                 style={{ overflowWrap: 'anywhere' }}
               >
-                {email}
+                {isDemo ? 'Synthetic sample data only' : email}
               </Text>
             </Menu.Label>
             <Menu.Divider />
@@ -203,7 +210,21 @@ export default function DiaryPage({
           </Menu.Dropdown>
         </Menu>
       </AppHeader>
+      <DemoConvertForm
+        opened={converting}
+        csrfToken={csrfToken}
+        busy={busy || saving || statusSaving}
+        onClose={() => setConverting(false)}
+        onConverted={onConverted}
+        onSessionRefreshed={onSessionRefreshed}
+      />
       <Stack component="section" gap="lg" className="page diary-page">
+        {isDemo && (
+          <DemoNotice
+            busy={busy || saving || statusSaving}
+            onCreateAccount={() => setConverting(true)}
+          />
+        )}
         <DiaryEntries
           csrfToken={csrfToken}
           disabled={busy || statusSaving}
@@ -218,16 +239,18 @@ export default function DiaryPage({
         <ErrorMessages messages={errors} />
         <Group component="footer" justify="flex-end" gap="md" mt="xl">
           <PrivacyNotice />
-          <Anchor
-            component="button"
-            type="button"
-            size="xs"
-            c="dimmed"
-            disabled={busy || saving || statusSaving}
-            onClick={() => setDeleting(true)}
-          >
-            Delete account
-          </Anchor>
+          {!isDemo && (
+            <Anchor
+              component="button"
+              type="button"
+              size="xs"
+              c="dimmed"
+              disabled={busy || saving || statusSaving}
+              onClick={() => setDeleting(true)}
+            >
+              Delete account
+            </Anchor>
+          )}
         </Group>
       </Stack>
     </>

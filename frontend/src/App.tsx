@@ -74,9 +74,11 @@ function App() {
       {page === 'diary' && session?.user && (
         <DiaryPage
           email={session.user.email}
+          isDemo={session.user.isDemo}
           csrfToken={session.csrfToken}
           onSignedOut={finishSignOut}
           onSessionRefreshed={setSession}
+          onConverted={openDiary}
         />
       )}
       {import.meta.env.DEV && (

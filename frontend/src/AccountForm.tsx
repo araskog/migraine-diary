@@ -49,6 +49,36 @@ export default function AccountForm({
   const [busy, setBusy] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
 
+  async function startDemo() {
+    if (busy) return
+    setBusy(true)
+    setErrors([])
+    try {
+      const response = await fetch('/api/demo/start/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
+      })
+      const body: unknown = await response.json()
+      if (!response.ok) {
+        setErrors(responseErrors(body, response.status))
+        onSessionRefreshed(await getSession())
+        return
+      }
+      if (!isSession(body)) throw new Error('Unexpected response')
+      onAuthenticated(body)
+    } catch {
+      setErrors(['Unable to connect. Please try again.'])
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (busy) return
@@ -191,6 +221,16 @@ export default function AccountForm({
             </VisuallyHidden>
             <Button size="md" loading={busy} aria-busy={busy} type="submit">
               {mode === 'register' ? 'Create account' : 'Sign in'}
+            </Button>
+            <Button
+              size="md"
+              variant="light"
+              disabled={busy}
+              onClick={() => {
+                void startDemo()
+              }}
+            >
+              Try the demo
             </Button>
           </Stack>
         </form>

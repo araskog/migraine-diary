@@ -1,3 +1,5 @@
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -11,6 +13,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from .demo import create_demo_user
 from .models import User
 
 PRIVACY_POLICY_VERSION = "2026-11-13"
@@ -37,10 +40,13 @@ class Credentials(serializers.Serializer):
 
 
 def identity(request):
+    if not request.user.is_authenticated:
+        return {"user": None, "csrfToken": get_token(request)}
     return {
-        "user": {"email": request.user.email}
-        if request.user.is_authenticated
-        else None,
+        "user": {
+            "email": request.user.email,
+            "isDemo": request.user.is_demo,
+        },
         "csrfToken": get_token(request),
     }
 
@@ -95,6 +101,16 @@ def sign_in(request):
     user = authenticate(request, **credentials.validated_data)
     if user is None:
         return Response({"detail": "Email or password is incorrect."}, status=400)
+    if user.is_demo:
+        return Response(
+            {
+                "detail": (
+                    "Demo sessions cannot be signed into. Start a new demo or "
+                    "create an account from your current demo session."
+                )
+            },
+            status=400,
+        )
     login(request, user)
     return Response(identity(request))
 
@@ -110,6 +126,82 @@ def sign_out(request):
 @api_view(["GET"])
 def diary(request):
     return Response({"title": "Your diary", "recordingAvailable": False})
+
+
+class DemoStartInput(serializers.Serializer):
+    timezone = serializers.CharField(max_length=255, required=False, allow_blank=True)
+
+    def validate_timezone(self, value):
+        if not value:
+            return ZoneInfo("UTC")
+        try:
+            return ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError):
+            raise serializers.ValidationError("Supply a valid IANA timezone.")
+
+
+@never_cache
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def start_demo(request):
+    SessionAuthentication().enforce_csrf(request)
+    if request.user.is_authenticated and not request.user.is_demo:
+        return Response(
+            {"detail": "Sign out before starting a demo."},
+            status=400,
+        )
+    if request.user.is_authenticated and request.user.is_demo:
+        return Response(identity(request))
+    start = DemoStartInput(data=request.data)
+    start.is_valid(raise_exception=True)
+    reference_date = timezone.localdate(
+        timezone.now(), start.validated_data["timezone"]
+    )
+    user = create_demo_user(reference_date=reference_date)
+    login(request, user)
+    return Response(identity(request), status=201)
+
+
+class DemoConvertInput(Credentials):
+    health_consent = serializers.BooleanField()
+    privacy_policy_version = serializers.ChoiceField(choices=[PRIVACY_POLICY_VERSION])
+
+    def validate_health_consent(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                "Explicit health-data consent is required."
+            )
+        return value
+
+
+@never_cache
+@api_view(["POST"])
+def convert_demo(request):
+    SessionAuthentication().enforce_csrf(request)
+    if not request.user.is_demo:
+        return Response({"detail": "No demo session is active."}, status=400)
+    payload = DemoConvertInput(data=request.data)
+    payload.is_valid(raise_exception=True)
+    email = payload.validated_data["email"]
+    password = payload.validated_data["password"]
+    try:
+        validate_password(password, user=User(email=email))
+    except ValidationError as error:
+        return Response({"password": error.messages}, status=400)
+    if User.objects.filter(email__iexact=email).exclude(pk=request.user.pk).exists():
+        return Response(
+            {"email": ["An account with this email already exists."]}, status=400
+        )
+    with transaction.atomic():
+        user = User.objects.select_for_update().get(pk=request.user.pk)
+        user.email = email
+        user.set_password(password)
+        user.is_demo = False
+        user.health_consent_at = timezone.now()
+        user.privacy_policy_version = PRIVACY_POLICY_VERSION
+        user.save()
+    login(request, user)
+    return Response(identity(request))
 
 
 @never_cache

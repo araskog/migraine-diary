@@ -10,7 +10,10 @@ import DiaryPage from '../src/DiaryPage'
 import { emptyDetails, localDate } from '../src/diary'
 import { theme, cssVariablesResolver } from '../src/theme'
 
-const session = { csrfToken: 'synthetic', user: { email: 'test@example.test' } }
+const session = {
+  csrfToken: 'synthetic',
+  user: { email: 'test@example.test', isDemo: false },
+}
 const entry = { date: localDate(), status: 'migraine', ...emptyDetails() }
 let pending
 let loads = 0
@@ -38,11 +41,13 @@ createRoot(document.getElementById('root')).render(
       { theme, cssVariablesResolver, defaultColorScheme: 'dark' },
       createElement(DiaryPage, {
         email: session.user.email,
+        isDemo: false,
         csrfToken: session.csrfToken,
         onSignedOut: () => {
           throw new Error('Unexpected sign-out')
         },
         onSessionRefreshed: () => {},
+        onConverted: () => {},
       }),
     ),
   ),

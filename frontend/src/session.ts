@@ -1,4 +1,17 @@
-export type Session = { user: { email: string } | null; csrfToken: string }
+export type SessionUser = { email: string; isDemo: boolean }
+
+export type Session = { user: SessionUser | null; csrfToken: string }
+
+export function isSessionUser(value: unknown): value is SessionUser {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'email' in value &&
+    typeof value.email === 'string' &&
+    'isDemo' in value &&
+    typeof value.isDemo === 'boolean'
+  )
+}
 
 export function isSession(value: unknown): value is Session {
   if (
@@ -9,12 +22,7 @@ export function isSession(value: unknown): value is Session {
     !('user' in value)
   )
     return false
-  return (
-    value.user === null ||
-    (typeof value.user === 'object' &&
-      'email' in value.user &&
-      typeof value.user.email === 'string')
-  )
+  return value.user === null || isSessionUser(value.user)
 }
 
 export async function getSession(): Promise<Session> {

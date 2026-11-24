@@ -10,6 +10,8 @@ urlpatterns = [
     path("api/health/", health),
     path("api/session/", views.session),
     path("api/register/", views.register),
+    path("api/demo/start/", views.start_demo),
+    path("api/demo/convert/", views.convert_demo),
     path("api/sign-in/", views.sign_in),
     path("api/sign-out/", views.sign_out),
     path("api/account/delete/", views.delete_account),
