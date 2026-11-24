@@ -1,18 +1,5 @@
-.diary-entries {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
-  gap: var(--mantine-spacing-xl);
-}
-
 .diary-entries > * {
   min-width: 0;
-}
-
-@media (max-width: 760px) {
-  .diary-entries {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 .diary-entries .calendar-day {

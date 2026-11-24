@@ -4,25 +4,25 @@
 }
 
 .app .page {
-  max-width: 440px;
+  max-width: 27.5rem;
   margin: calc(var(--mantine-spacing-xl) * 2) auto 0;
 }
 
 .app .diary-page {
-  max-width: 940px;
+  max-width: 58.75rem;
 }
 
 .app .diary-page--demo {
   margin-top: 0;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 47.99em) {
   .app .diary-page {
-    max-width: 440px;
+    max-width: 27.5rem;
   }
 }
 
-@media (max-width: 540px) {
+@media (max-width: 33.75em) {
   .app .page {
     margin-top: var(--mantine-spacing-xl);
   }
@@ -32,8 +32,8 @@
   min-width: 0;
 }
 .app .app-brand-icon {
-  width: clamp(36px, 8vw, 56px);
-  height: clamp(36px, 8vw, 56px);
+  width: clamp(2.25rem, 8vw, 3.5rem);
+  height: clamp(2.25rem, 8vw, 3.5rem);
   flex-shrink: 0;
   color: var(--app-color-positive);
 }
@@ -55,31 +55,21 @@
   line-height: 1.2;
 }
 
-.app .theme-toggle,
-.app .account-toggle {
-  border: 1px solid var(--mantine-color-default-border);
-}
-
 .app .account-shell {
-  max-width: 840px;
-  margin: 48px auto 0;
+  max-width: 52.5rem;
+  margin: var(--mantine-spacing-xl) auto 0;
 }
 
 .app .account-page {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: stretch;
   overflow: hidden;
-  border: 1px solid var(--mantine-color-default-border);
-  border-radius: var(--mantine-radius-lg);
-  background: var(--mantine-color-body);
 }
 
 .app .account-intro {
-  padding: 32px;
+  padding: var(--mantine-spacing-xl);
   justify-content: center;
   background: var(--app-intro-background);
   color: var(--app-brand-text);
+  height: 100%;
 }
 
 .app .account-intro h2 {
@@ -91,22 +81,18 @@
 
 .app .account-form {
   min-width: 0;
-  padding: 32px;
+  padding: var(--mantine-spacing-xl);
 }
 
-@media (max-width: 700px) {
+@media (max-width: 47.99em) {
   .app .account-shell {
-    max-width: 440px;
-    margin-top: 24px;
-  }
-
-  .app .account-page {
-    grid-template-columns: minmax(0, 1fr);
+    max-width: 27.5rem;
+    margin-top: var(--mantine-spacing-lg);
   }
 
   .app .account-intro,
   .app .account-form {
-    padding: 24px;
+    padding: var(--mantine-spacing-lg);
   }
 
   .app .account-intro h2 {

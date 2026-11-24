@@ -1,4 +1,4 @@
-import { Button, Group, Modal, Text } from '@mantine/core'
+import { Button, Group, Modal, Stack, Text } from '@mantine/core'
 
 type ConfirmDialogProps = {
   opened: boolean
@@ -18,14 +18,16 @@ export default function ConfirmDialog({
   onClose,
 }: ConfirmDialogProps) {
   return (
-    <Modal opened={opened} onClose={onClose} title={title} centered>
-      <Text size="sm">{message}</Text>
-      <Group justify="flex-end" mt="lg">
-        <Button variant="default" onClick={onClose}>
-          Keep editing
-        </Button>
-        <Button onClick={onConfirm}>{confirmLabel}</Button>
-      </Group>
+    <Modal opened={opened} onClose={onClose} title={title}>
+      <Stack gap="md">
+        <Text size="sm">{message}</Text>
+        <Group justify="flex-end" gap="sm">
+          <Button variant="default" onClick={onClose}>
+            Keep editing
+          </Button>
+          <Button onClick={onConfirm}>{confirmLabel}</Button>
+        </Group>
+      </Stack>
     </Modal>
   )
 }

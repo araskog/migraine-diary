@@ -1,4 +1,12 @@
-import { Button, createTheme, Loader, SegmentedControl } from '@mantine/core'
+import {
+  ActionIcon,
+  Button,
+  createTheme,
+  Loader,
+  Modal,
+  Paper,
+  SegmentedControl,
+} from '@mantine/core'
 import type { CSSVariablesResolver } from '@mantine/core'
 
 export const theme = createTheme({
@@ -15,6 +23,20 @@ export const theme = createTheme({
     }),
     SegmentedControl: SegmentedControl.extend({
       defaultProps: { color: 'sage', autoContrast: true },
+    }),
+    ActionIcon: ActionIcon.extend({
+      defaultProps: {
+        variant: 'default',
+        size: 44,
+        radius: 'xl',
+        color: 'sage',
+      },
+    }),
+    Modal: Modal.extend({
+      defaultProps: { padding: 'lg', radius: 'lg', centered: true },
+    }),
+    Paper: Paper.extend({
+      defaultProps: { radius: 'lg' },
     }),
   },
   colors: {

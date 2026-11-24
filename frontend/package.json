@@ -17,6 +17,7 @@
     "@mantine/core": "^9.8.0",
     "@mantine/dates": "^9.8.0",
     "@mantine/hooks": "^9.8.0",
+    "@tabler/icons-react": "^3.52.0",
     "dayjs": "^1.11.23",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
