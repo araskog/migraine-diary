@@ -36,7 +36,10 @@ class AccountTests(TestCase):
     def test_registration_hashes_password_and_creates_persistent_session(self):
         response = self.register("Synthetic@Example.test")
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["user"], {"email": "synthetic@example.test"})
+        self.assertEqual(
+            response.json()["user"],
+            {"email": "synthetic@example.test", "isDemo": False},
+        )
         user = User.objects.get()
         self.assertNotEqual(user.password, self.password)
         self.assertTrue(user.check_password(self.password))

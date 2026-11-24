@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   ActionIcon,
   Anchor,
+  Box,
   Group,
   Button,
   Menu,
@@ -16,18 +17,22 @@ import PrivacyNotice from './PrivacyNotice'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
 import ConfirmDialog from './ConfirmDialog'
+import DemoNotice from './DemoNotice'
+import { DEMO_DISPLAY_NAME } from './demo'
 import { getSession, isSession } from './session'
 import type { Session } from './session'
 
 type DiaryPageProps = {
   email: string
+  isDemo: boolean
   csrfToken: string
-  onSignedOut: (session: Session) => void
+  onSignedOut: (session: Session, options?: { register?: boolean }) => void
   onSessionRefreshed: (session: Session) => void
 }
 
 export default function DiaryPage({
   email,
+  isDemo,
   csrfToken,
   onSignedOut,
   onSessionRefreshed,
@@ -38,10 +43,18 @@ export default function DiaryPage({
   const [saving, setSaving] = useState(false)
   const [statusSaving, setStatusSaving] = useState(false)
   const [dirty, setDirty] = useState(false)
-  const [confirmSignOut, setConfirmSignOut] = useState(false)
+  const [confirmLeave, setConfirmLeave] = useState<
+    false | 'sign-out' | 'create-account'
+  >(false)
   const [errors, setErrors] = useState<string[]>([])
 
-  async function signOut() {
+  function requestLeave(intent: 'sign-out' | 'create-account') {
+    if (busy || saving || statusSaving) return
+    if (dirty) setConfirmLeave(intent)
+    else void leaveDemo(intent)
+  }
+
+  async function leaveDemo(intent: 'sign-out' | 'create-account') {
     if (busy) return
     setBusy(true)
     setErrors([])
@@ -54,7 +67,7 @@ export default function DiaryPage({
       if (!response.ok) {
         const current = await getSession()
         if (current.user === null) {
-          onSignedOut(current)
+          onSignedOut(current, { register: intent === 'create-account' })
           return
         }
         onSessionRefreshed(current)
@@ -62,7 +75,7 @@ export default function DiaryPage({
       }
       if (!isSession(body) || body.user !== null)
         throw new Error('Unexpected response')
-      onSignedOut(body)
+      onSignedOut(body, { register: intent === 'create-account' })
     } catch {
       setErrors(['Unable to sign out. Please try again.'])
     } finally {
@@ -108,14 +121,23 @@ export default function DiaryPage({
   return (
     <>
       <ConfirmDialog
-        opened={confirmSignOut}
+        opened={confirmLeave !== false}
         title="Unsaved details"
-        message="Discard your unfinished details and sign out?"
-        confirmLabel="Discard and sign out"
-        onClose={() => setConfirmSignOut(false)}
+        message={
+          confirmLeave === 'create-account'
+            ? 'Discard your unfinished details and continue to create your account?'
+            : 'Discard your unfinished details and sign out?'
+        }
+        confirmLabel={
+          confirmLeave === 'create-account'
+            ? 'Continue to create account'
+            : 'Discard and sign out'
+        }
+        onClose={() => setConfirmLeave(false)}
         onConfirm={() => {
-          setConfirmSignOut(false)
-          void signOut()
+          const intent = confirmLeave === false ? 'sign-out' : confirmLeave
+          setConfirmLeave(false)
+          void leaveDemo(intent)
         }}
       />
       <Modal
@@ -181,29 +203,38 @@ export default function DiaryPage({
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Label>
-              Signed in as
+              {isDemo ? 'Demo account' : 'Signed in as'}
               <Text
                 size="sm"
                 c="var(--mantine-color-text)"
                 style={{ overflowWrap: 'anywhere' }}
               >
-                {email}
+                {isDemo ? DEMO_DISPLAY_NAME : email}
               </Text>
             </Menu.Label>
             <Menu.Divider />
             <Menu.Item
               disabled={busy || saving || statusSaving}
-              onClick={() => {
-                if (dirty) setConfirmSignOut(true)
-                else void signOut()
-              }}
+              onClick={() => requestLeave('sign-out')}
             >
               {busy ? <LoadingIndicator label="Signing out" /> : 'Sign out'}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
       </AppHeader>
-      <Stack component="section" gap="lg" className="page diary-page">
+      {isDemo && (
+        <Box mt="lg" mb="lg">
+          <DemoNotice
+            busy={busy || saving || statusSaving}
+            onCreateAccount={() => requestLeave('create-account')}
+          />
+        </Box>
+      )}
+      <Stack
+        component="section"
+        gap="lg"
+        className={`page diary-page${isDemo ? ' diary-page--demo' : ''}`}
+      >
         <DiaryEntries
           csrfToken={csrfToken}
           disabled={busy || statusSaving}
@@ -216,18 +247,26 @@ export default function DiaryPage({
           onSessionRefreshed={onSessionRefreshed}
         />
         <ErrorMessages messages={errors} />
-        <Group component="footer" justify="flex-end" gap="md" mt="xl">
+        <Group
+          component="footer"
+          justify="flex-end"
+          gap="md"
+          mt="xl"
+          wrap="wrap"
+        >
           <PrivacyNotice />
-          <Anchor
-            component="button"
-            type="button"
-            size="xs"
-            c="dimmed"
-            disabled={busy || saving || statusSaving}
-            onClick={() => setDeleting(true)}
-          >
-            Delete account
-          </Anchor>
+          {!isDemo && (
+            <Anchor
+              component="button"
+              type="button"
+              size="xs"
+              c="dimmed"
+              disabled={busy || saving || statusSaving}
+              onClick={() => setDeleting(true)}
+            >
+              Delete account
+            </Anchor>
+          )}
         </Group>
       </Stack>
     </>

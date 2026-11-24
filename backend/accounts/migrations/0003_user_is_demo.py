@@ -1,0 +1,13 @@
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+    dependencies = [("accounts", "0002_user_health_consent")]
+
+    operations = [
+        migrations.AddField(
+            model_name="user",
+            name="is_demo",
+            field=models.BooleanField(default=False, editable=False),
+        ),
+    ]

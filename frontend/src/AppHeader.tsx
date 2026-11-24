@@ -8,9 +8,9 @@ import {
   useMantineColorScheme,
 } from '@mantine/core'
 
-type AppHeaderProps = { children?: ReactNode }
+type AppHeaderProps = { brandExtra?: ReactNode; children?: ReactNode }
 
-export default function AppHeader({ children }: AppHeaderProps) {
+export default function AppHeader({ brandExtra, children }: AppHeaderProps) {
   const { toggleColorScheme } = useMantineColorScheme()
   const colorScheme = useComputedColorScheme('dark')
   const themeLabel = `Switch to ${colorScheme === 'dark' ? 'light' : 'dark'} mode`
@@ -46,6 +46,7 @@ export default function AppHeader({ children }: AppHeaderProps) {
           <path d="M79 106c-11-3-14-11-12-20 10 2 14 10 12 20Z" />
         </svg>
         <Text className="app-brand-name">Migraine Diary</Text>
+        {brandExtra}
       </Group>
       <Group gap="xs" wrap="nowrap">
         <Tooltip label={themeLabel}>
