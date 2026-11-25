@@ -1,37 +1,54 @@
 # Development Workflow
 
-## Scope and Planning
+This repo uses a **three-layer** agent workflow. Layers 1–2 are in git; Matt Pocock skills install locally (see [Skills](#skills)).
 
-Agree on the task and acceptance criteria once. Unless explicitly limited, delivery approval covers implementation, checks, commits, push, PR creation, review comments, and in-scope corrections. Ask about material scope changes, not routine implementation choices. Unrelated installations, deployment, and spending require separate agreement.
+| Layer | What | Where |
+| ----- | ---- | ----- |
+| 1. Process | What agents do, in order | This file + `AGENTS.md` |
+| 2. CI | Lint, tests, build | `.github/workflows/checks.yml` |
+| 3. Review | Standards + spec before merge | `/code-review` skill (see [reviews.md](reviews.md)) |
 
-For small changes, put agreed requirements in the PR description. For larger features, maintain a specification in `docs/specs/` and link the relevant criteria from each PR. Ask product questions in chat and record the agreed answers. Do not change requirements to make an implementation pass review.
+Issue tracker, triage labels, and domain docs: `docs/agents/issue-tracker.md`, `triage-labels.md`, `domain.md`.
 
-Agree on important test boundaries per feature. Use a short plan for bounded tasks; a detailed execution plan is useful only when complexity warrants it. Concurrent implementation tasks use separate worktrees to avoid overwriting each other's work.
+## Planning and intake
 
-## Delivery
+1. **`/triage`** on GitHub issues ([`triage`](../../.agents/skills/triage/SKILL.md)).
+2. **`/to-spec`** or **`/to-tickets`** for agent-ready work ([`to-spec`](../../.agents/skills/to-spec/SKILL.md), [`to-tickets`](../../.agents/skills/to-tickets/SKILL.md)).
+3. Larger milestones: keep specs in `docs/specs/` and link them from the issue or PR.
+4. Use [`GLOSSARY.md`](../../GLOSSARY.md) vocabulary; see [`domain.md`](domain.md).
 
-Before completing an increment, check the documentation affected by the change and update it in the same PR. Keep architecture descriptions aligned with implemented structure, interfaces, and deployment; move delivered capabilities out of future-direction sections. Update specifications when agreed behavior or milestone status changes, and README setup/check commands when those change. Follow the source responsibilities in AGENTS.md and link to existing details instead of duplicating them. Verify claims against the implementation and available check evidence; distinguish implemented configuration from verified live behavior.
+Agree acceptance criteria once. Record product answers in the issue or spec. Do not change requirements to make review pass.
 
-1. Work on a task branch. Reuse the branch for its existing task.
-2. One implementation agent reads the coding standards before writing code, implements only the approved increment, runs required checks, reports results, and stops when that increment is complete.
-3. Prefer small, focused commits, each representing one coherent change, so reviewers can follow the work. Keep related code and tests together and avoid mixing unrelated changes. Use Conventional Commits, push, and open a PR. The PR description covers the problem, final behavior, scope, and requirements or spec link. Put test results and review follow-ups in commit messages and review comments.
-4. Use the [review-pr skill](../../.agents/skills/review-pr/SKILL.md) for the two independent reviews, PR comments, and correction rechecks.
-5. Present checks and both review reports. The owner decides and performs the merge. Agents never merge, enable auto-merge, bypass branch protections, or push directly to `main`.
+## Implementation loop (Matt Pocock skills)
 
-Honor narrower task limits, including no-commit or no-push instructions.
+Run these skills from `.agents/skills/` after [installing](#skills) them.
 
-## Agent Roles
+1. **Branch** — Task branch; reuse for the same task.
+2. **`/implement`** or **`/implement-spec`** — [`implement`](../../.agents/skills/implement/SKILL.md), [`implement-spec`](../../.agents/skills/implement-spec/SKILL.md). Prefer **`/tdd`** ([`tdd`](../../.agents/skills/tdd/SKILL.md)) at agreed seams. Read [`CODING_STANDARDS.md`](../../CODING_STANDARDS.md) first.
+3. **Checks** — Run [README](../../README.md) commands for every touched area. Report gaps honestly.
+4. **`/code-review`** — Compare `main...HEAD` ([`code-review`](../../.agents/skills/code-review/SKILL.md)). Fix or defer findings; re-run after material changes. Details in [reviews.md](reviews.md).
+5. **`/pr`** — PR body ([`pr`](../../.agents/skills/pr/SKILL.md)). Link the issue or spec. Update docs in the same PR when behavior or setup changes.
+6. **Push** — Open or update the PR; CI (layer 2) runs on GitHub.
 
-### Builder Agent
+Honor narrower limits (no-commit, no-push) when given.
 
-Implements approved changes, writes and updates tests, follows repository conventions and coding standards, and runs required checks. Documents changes and verification in commit messages and review comments, keeping the PR description focused on final behavior and scope. Addresses review findings and stops after the approved increment.
+## Merge
 
-### Reviewers
+Agents never merge, enable auto-merge, or push to `main`. The owner merges when:
 
-The [review-pr skill](../../.agents/skills/review-pr/SKILL.md) defines the Code Reviewer Agent and Quality Reviewer Agent responsibilities and review procedure.
+- Layer 2 CI is green
+- Layer 3 **`/code-review`** is done for the increment (required for feature work tied to a spec or issue; optional for trivial fixes — owner’s call)
 
-## Attribution
+## Skills
 
-Builder commits use the Git name `Builder Agent` and the repository's existing commit email, applied per commit. Do not change global Git settings or rewrite earlier commits. Reviewers remain read-only and do not create commits.
+Matt Pocock skills are **not** vendored in git. Install or refresh:
 
-Git author metadata does not change the account authenticating pushes or GitHub comments. With the current connection, those actions use the owner's GitHub account. Head review reports with the exact reviewer role name. Distinct GitHub actors require separately authorized accounts or a GitHub App; do not claim that role labels create separate accounts.
+```sh
+npx skills@latest add mattpocock/skills
+```
+
+Pin versions with [`skills-lock.json`](../../skills-lock.json) at the repo root.
+
+## Concurrent work
+
+Use separate worktrees for parallel implementation tasks.

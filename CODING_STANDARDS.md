@@ -30,4 +30,4 @@ Apply the relevant application conventions from [Django 5.2 coding style](https:
 
 Test observable behavior within agreed boundaries, especially persistence, ownership, validation, and failures. Keep behavioral inputs deterministic; generate valid synthetic credentials with standard-library helpers. Fixed invalid credentials are appropriate for failure tests. Add regression tests for fixes; do not mock away the behavior under test.
 
-Use the checks in [README](README.md) and the [review workflow](docs/agents/workflow.md). Report unavailable checks and distinguish defects from optional suggestions.
+Use the checks in [README](README.md) and [reviews](docs/agents/reviews.md). Report unavailable checks and distinguish defects from optional suggestions.
