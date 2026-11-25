@@ -33,3 +33,17 @@ Keep this guide current as the repository develops. Use these sources when chang
 - [OpenAI best practices](https://learn.chatgpt.com/docs/learn/best-practices)
 - [OpenAI AGENTS.md guidance](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
 - [Matt Pocock: writing for agents](https://github.com/mattpocock/skills/blob/main/skills/productivity/writing-for-agents/SKILL.md)
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as GitHub issues in `araskog/migraine-diary`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five canonical triage roles use GitHub label strings with the same names. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout: root `GLOSSARY.md` and `docs/adr/` when present. See `docs/agents/domain.md`.
