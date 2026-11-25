@@ -5,9 +5,10 @@
 Migraine Diary tracks migraine days. The application lives in `frontend/` (React/TypeScript/Vite) and `backend/` (Django REST Framework/PostgreSQL). See [README](README.md) for verified setup and checks.
 
 - Read the [workflow](docs/agents/workflow.md) for the full agent process (plan → implement → review → PR → merge).
-- Read [reviews](docs/agents/reviews.md) for **`/code-review`** (Standards + Spec) before merge.
+- Read [reviews](docs/agents/reviews.md) for **`/code-review`** (local) and **[`review-pr`](.agents/skills/review-pr/SKILL.md)** (publish Standards + Spec to GitHub).
 - Install Matt Pocock skills locally: `npx skills@latest add mattpocock/skills` (pinned in `skills-lock.json`).
-- **Skills:** [`implement`](.agents/skills/implement/SKILL.md), [`tdd`](.agents/skills/tdd/SKILL.md), [`code-review`](.agents/skills/code-review/SKILL.md), [`pr`](.agents/skills/pr/SKILL.md); intake: [`triage`](.agents/skills/triage/SKILL.md), [`to-spec`](.agents/skills/to-spec/SKILL.md), [`to-tickets`](.agents/skills/to-tickets/SKILL.md).
+- **Skills (local install):** [`implement`](.agents/skills/implement/SKILL.md), [`tdd`](.agents/skills/tdd/SKILL.md), [`code-review`](.agents/skills/code-review/SKILL.md), [`pr`](.agents/skills/pr/SKILL.md); intake: [`triage`](.agents/skills/triage/SKILL.md), [`to-spec`](.agents/skills/to-spec/SKILL.md), [`to-tickets`](.agents/skills/to-tickets/SKILL.md).
+- **Skill (in git):** [`review-pr`](.agents/skills/review-pr/SKILL.md) — PR review history on GitHub.
 - For structure and design, read [architecture](docs/architecture.md).
 - For code style, read [coding standards](CODING_STANDARDS.md).
 - For behavior and tests, read the relevant [specification](docs/specs/) and [glossary](GLOSSARY.md).
