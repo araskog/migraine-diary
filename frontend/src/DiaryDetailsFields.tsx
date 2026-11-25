@@ -264,7 +264,12 @@ export default function DiaryDetailsFields({
               radius="sm"
               value={value.personal_note}
               disabled={disabled}
-              onBlur={() => onChange(value)}
+              onBlur={(event) =>
+                onChange({
+                  ...value,
+                  personal_note: event.currentTarget.value,
+                })
+              }
               onChange={(event) =>
                 onChange(
                   { ...value, personal_note: event.currentTarget.value },

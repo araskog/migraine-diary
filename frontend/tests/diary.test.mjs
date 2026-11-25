@@ -149,6 +149,8 @@ test('saving optional details retains explicit no and zero and sends clearing va
   ]) {
     mock.method(globalThis, 'fetch', async (_url, options) => {
       const body = JSON.parse(options.body)
+      assert.equal(Object.hasOwn(body, 'symptoms'), false)
+      assert.equal(Object.hasOwn(body, 'personal_note'), false)
       for (const [key, value] of Object.entries(apiDetailsFrom(details)))
         assert.deepEqual(body[key], value)
       return Response.json({
