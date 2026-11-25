@@ -8,7 +8,7 @@ Migraine Diary tracks migraine days. The application lives in `frontend/` (React
 - For structure, dependency, or interface design decisions, read the [architecture](docs/architecture.md).
 - When writing or reviewing code, read the [coding standards](CODING_STANDARDS.md).
 - When defining behavior or tests, read the relevant specification and [glossary](GLOSSARY.md).
-- The initial milestone is [First Usable Diary](docs/specs/first-usable-diary.md).
+- Shipped milestones include [First Usable Diary](docs/specs/first-usable-diary.md) and [Demo mode](docs/specs/demo-mode.md). Planned work includes [Expanded diary fields](docs/specs/expanded-diary-fields.md).
 
 README covers setup and checks; AGENTS.md provides repository context; specifications define agreed behavior; PR descriptions cover the problem, final behavior, and scope. Commit messages and review comments hold rationale, verification results, and review follow-ups. Avoid duplicating these sources.
 
