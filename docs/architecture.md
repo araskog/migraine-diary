@@ -4,7 +4,7 @@
 
 | Component | Technology and responsibility |
 |---|---|
-| `frontend/` | React, TypeScript, and Vite: diary interaction, display, and user feedback. |
+| `frontend/` | React, TypeScript, Vite, and Mantine: diary interaction, display, and user feedback. |
 | `backend/` | Python, Django, and Django REST Framework: authentication, authorization, validation, API, and persistence. |
 | Database | PostgreSQL: durable records associated with their owners. |
 | `docs/` | Architecture, feature specifications, and agent workflow. |
@@ -19,7 +19,7 @@ Local development uses an isolated Python environment managed by uv and local Po
 
 Use the approved clear, approachable direction: neutral surfaces and sage accents, with theme-appropriate contrast for primary actions and selected states. Keep typography simple, spacing generous, and forms uncluttered, with visible keyboard focus and a mobile-friendly layout.
 
-Use [Mantine](https://mantine.dev/) components and theme tokens for controls, typography, spacing, and surfaces. The shared theme in `frontend/src/theme.ts` defines the sage palette and control radii; `frontend/src/main.tsx` applies it with dark mode as the default and a browser-persisted light/dark choice. Keep custom CSS scoped to application layout or UI the library does not provide.
+For Mantine usage, theming, API clients, and related implementation rules, see [CODING_STANDARDS.md](../CODING_STANDARDS.md) (UI and Theming, Boundaries and Errors).
 
 ## Deployment
 
