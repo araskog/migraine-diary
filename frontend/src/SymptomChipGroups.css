@@ -1,0 +1,7 @@
+.symptom-chip-groups .symptom-chip-row {
+  flex-wrap: wrap;
+}
+
+.symptom-chip-groups .symptom-chip-label {
+  font-weight: 500;
+}

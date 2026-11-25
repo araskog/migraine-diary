@@ -1,14 +1,19 @@
+import { useState } from 'react'
 import {
   Anchor,
+  Button,
   Group,
   Checkbox,
   Input,
   Select,
   Slider,
   Stack,
+  Text,
+  Textarea,
   TextInput,
 } from '@mantine/core'
 import type { DiaryDetails, DiaryStatus } from './diary'
+import SymptomChipGroups from './SymptomChipGroups'
 
 type DiaryDetailsFieldsProps = {
   status: DiaryStatus
@@ -17,14 +22,147 @@ type DiaryDetailsFieldsProps = {
   onChange: (value: DiaryDetails, save?: boolean) => void
 }
 
+function SeveritySlider({
+  label,
+  thumbLabel,
+  value,
+  lowLabel,
+  highLabel,
+  clearLabel,
+  disabled,
+  onChange,
+}: {
+  label: string
+  thumbLabel: string
+  value: number | null
+  lowLabel: string
+  highLabel: string
+  clearLabel: string
+  disabled: boolean
+  onChange: (value: number | null, save?: boolean) => void
+}) {
+  return (
+    <Input.Wrapper
+      label={label}
+      description={value === null ? 'Not answered' : `${value} out of 10`}
+    >
+      <Stack gap="xs" mt="xs">
+        <Slider
+          min={0}
+          max={10}
+          step={1}
+          value={value ?? 0}
+          color={value === null ? 'gray' : 'sage'}
+          thumbLabel={thumbLabel}
+          thumbValueText={
+            value === null ? 'Not answered' : `${value} out of 10`
+          }
+          marks={[{ value: 0 }, { value: 10 }]}
+          disabled={disabled}
+          onChangeEnd={(next) => onChange(next)}
+          onChange={(next) => onChange(next, false)}
+        />
+        <Group justify="space-between" wrap="nowrap" gap="xs">
+          <Input.Description>{lowLabel}</Input.Description>
+          <Input.Description>{highLabel}</Input.Description>
+        </Group>
+        {value !== null && (
+          <Anchor
+            component="button"
+            type="button"
+            size="xs"
+            c="dimmed"
+            w="fit-content"
+            disabled={disabled}
+            onClick={() => onChange(null)}
+          >
+            {clearLabel}
+          </Anchor>
+        )}
+      </Stack>
+    </Input.Wrapper>
+  )
+}
+
 export default function DiaryDetailsFields({
   status,
   value,
   disabled,
   onChange,
 }: DiaryDetailsFieldsProps) {
+  const [noteOpen, setNoteOpen] = useState(
+    () => value.personal_note.trim().length > 0,
+  )
+  const noteVisible = noteOpen || value.personal_note.length > 0
+
   return (
     <Stack gap="md">
+      {status === 'migraine' && (
+        <>
+          <SymptomChipGroups
+            value={value.symptoms}
+            disabled={disabled}
+            onChange={(symptoms, save) =>
+              onChange({ ...value, symptoms }, save)
+            }
+          />
+          <SeveritySlider
+            label="How stressed did you feel?"
+            thumbLabel="Stress level"
+            lowLabel="0 · None"
+            highLabel="10 · Extreme"
+            clearLabel="Clear stress answer"
+            value={value.stress}
+            disabled={disabled}
+            onChange={(stress, save = true) =>
+              onChange({ ...value, stress }, save)
+            }
+          />
+          <Stack gap="xs">
+            {!noteVisible ? (
+              <Button
+                variant="subtle"
+                size="compact-sm"
+                disabled={disabled}
+                onClick={() => setNoteOpen(true)}
+              >
+                Add a personal note
+              </Button>
+            ) : (
+              <Textarea
+                label="Personal note"
+                description="Optional. Plain text, up to 2,000 characters."
+                placeholder="Anything you want to remember about today"
+                autosize
+                minRows={3}
+                maxLength={2000}
+                value={value.personal_note}
+                disabled={disabled}
+                onBlur={() => onChange(value)}
+                onChange={(event) =>
+                  onChange(
+                    { ...value, personal_note: event.currentTarget.value },
+                    false,
+                  )
+                }
+              />
+            )}
+            {noteVisible && value.personal_note.length === 0 && (
+              <Anchor
+                component="button"
+                type="button"
+                size="xs"
+                c="dimmed"
+                w="fit-content"
+                disabled={disabled}
+                onClick={() => setNoteOpen(false)}
+              >
+                Hide note
+              </Anchor>
+            )}
+          </Stack>
+        </>
+      )}
       <Stack gap="xs">
         <Checkbox
           label="I took migraine medication"
@@ -101,55 +239,24 @@ export default function DiaryDetailsFields({
         }}
       />
       {status === 'migraine' && (
-        <Input.Wrapper
+        <SeveritySlider
           label="How severe was the pain at its worst?"
-          description={
-            value.pain_severity === null
-              ? 'Not answered'
-              : `${value.pain_severity} out of 10`
+          thumbLabel="Worst pain severity"
+          lowLabel="0 · No pain"
+          highLabel="10 · Worst"
+          clearLabel="Clear pain answer"
+          value={value.pain_severity}
+          disabled={disabled}
+          onChange={(pain_severity, save = true) =>
+            onChange({ ...value, pain_severity }, save)
           }
-        >
-          <Stack gap="xs" mt="xs">
-            <Slider
-              min={0}
-              max={10}
-              step={1}
-              value={value.pain_severity ?? 0}
-              color={value.pain_severity === null ? 'gray' : 'sage'}
-              thumbLabel="Worst pain severity"
-              thumbValueText={
-                value.pain_severity === null
-                  ? 'Not answered'
-                  : `${value.pain_severity} out of 10`
-              }
-              marks={[{ value: 0 }, { value: 10 }]}
-              disabled={disabled}
-              onChangeEnd={(pain_severity) =>
-                onChange({ ...value, pain_severity })
-              }
-              onChange={(pain_severity) =>
-                onChange({ ...value, pain_severity }, false)
-              }
-            />
-            <Group justify="space-between" wrap="nowrap" gap="xs">
-              <Input.Description>0 · No pain</Input.Description>
-              <Input.Description>10 · Worst</Input.Description>
-            </Group>
-            {value.pain_severity !== null && (
-              <Anchor
-                component="button"
-                type="button"
-                size="xs"
-                c="dimmed"
-                w="fit-content"
-                disabled={disabled}
-                onClick={() => onChange({ ...value, pain_severity: null })}
-              >
-                Clear pain answer
-              </Anchor>
-            )}
-          </Stack>
-        </Input.Wrapper>
+        />
+      )}
+      {status === 'migraine' && (
+        <Text size="xs" c="dimmed">
+          Symptoms, stress, and notes are stored on this device until Phase A
+          server support lands (see issue #51).
+        </Text>
       )}
     </Stack>
   )

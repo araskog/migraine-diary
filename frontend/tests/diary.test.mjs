@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { afterEach, mock, test } from 'node:test'
 import {
+  apiDetailsFrom,
   emptyDetails,
   isDiaryDate,
   clearEntry,
@@ -148,13 +149,21 @@ test('saving optional details retains explicit no and zero and sends clearing va
   ]) {
     mock.method(globalThis, 'fetch', async (_url, options) => {
       const body = JSON.parse(options.body)
-      for (const [key, value] of Object.entries(details))
+      for (const [key, value] of Object.entries(apiDetailsFrom(details)))
         assert.deepEqual(body[key], value)
-      return Response.json({ date: body.date, status: body.status, ...details })
+      return Response.json({
+        date: body.date,
+        status: body.status,
+        ...apiDetailsFrom(details),
+      })
     })
     assert.deepEqual(
       await saveEntry('2026-11-10', 'migraine', 'synthetic-csrf', details),
-      { date: '2026-11-10', status: 'migraine', ...details },
+      {
+        date: '2026-11-10',
+        status: 'migraine',
+        ...apiDetailsFrom(details),
+      },
     )
     mock.restoreAll()
   }

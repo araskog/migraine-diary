@@ -17,6 +17,7 @@ import DiaryStatusPicker from './DiaryStatusPicker'
 import ConfirmDialog from './ConfirmDialog'
 import ErrorMessages from './ErrorMessages'
 import { dateLabel, loadEntries, localDate, statusLabel } from './diary'
+import { clearPhaseAStorage } from './phaseAPrototypeStorage'
 import type { DiaryEntry, DiaryStatus } from './diary'
 import type { Session } from './session'
 import './DiaryEntries.css'
@@ -203,6 +204,7 @@ export default function DiaryEntries({
                     disabled={disabled || saving}
                     onCleared={() => {
                       setSelectionOpened(false)
+                      clearPhaseAStorage(date)
                       setEntries((previous) =>
                         previous.filter((entry) => entry.date !== date),
                       )
