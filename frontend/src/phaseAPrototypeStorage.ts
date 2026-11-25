@@ -1,4 +1,5 @@
-import type { PhaseADiaryDetails } from './diary'
+import { emptyPhaseADetails, type PhaseADiaryDetails } from './diary.ts'
+import { SYMPTOM_CODES, type SymptomCode } from './symptomCatalog.ts'
 
 const STORAGE_PREFIX = 'migraine-diary-phase-a:'
 
@@ -6,8 +7,17 @@ function storageKey(date: string): string {
   return `${STORAGE_PREFIX}${date}`
 }
 
-function emptyPhaseA(): PhaseADiaryDetails {
-  return { symptoms: [], personal_note: '' }
+function catalogSymptoms(symptoms: string[]): string[] {
+  return symptoms.filter((code): code is SymptomCode =>
+    SYMPTOM_CODES.has(code as SymptomCode),
+  )
+}
+
+function sanitizePhaseA(value: PhaseADiaryDetails): PhaseADiaryDetails {
+  return {
+    symptoms: catalogSymptoms(value.symptoms),
+    personal_note: value.personal_note,
+  }
 }
 
 function isPhaseA(value: unknown): value is PhaseADiaryDetails {
@@ -26,21 +36,21 @@ function normalizePhaseA(value: Record<string, unknown>): PhaseADiaryDetails {
     : []
   const personal_note =
     typeof value.personal_note === 'string' ? value.personal_note : ''
-  if (personal_note.length > 2000) return emptyPhaseA()
-  return { symptoms, personal_note }
+  if (personal_note.length > 2000) return emptyPhaseADetails()
+  return sanitizePhaseA({ symptoms, personal_note })
 }
 
 export function readPhaseAStorage(date: string): PhaseADiaryDetails {
   try {
     const raw = localStorage.getItem(storageKey(date))
-    if (raw === null) return emptyPhaseA()
+    if (raw === null) return emptyPhaseADetails()
     const parsed: unknown = JSON.parse(raw)
-    if (isPhaseA(parsed)) return parsed
+    if (isPhaseA(parsed)) return sanitizePhaseA(parsed)
     if (typeof parsed === 'object' && parsed !== null)
       return normalizePhaseA(parsed as Record<string, unknown>)
-    return emptyPhaseA()
+    return emptyPhaseADetails()
   } catch {
-    return emptyPhaseA()
+    return emptyPhaseADetails()
   }
 }
 
@@ -61,6 +71,12 @@ export function clearPhaseAStorage(date: string): void {
   } catch {
     // Ignore storage errors on clear.
   }
+}
+
+/** Clears stored symptoms when status becomes migraine-free; keeps personal note. */
+export function clearStoredSymptoms(date: string): void {
+  const { personal_note } = readPhaseAStorage(date)
+  writePhaseAStorage(date, { symptoms: [], personal_note })
 }
 
 export function phaseAFromDetails(
