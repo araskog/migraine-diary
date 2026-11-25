@@ -2,7 +2,6 @@ export type DiaryStatus = 'migraine' | 'migraine_free'
 
 export type PhaseADiaryDetails = {
   symptoms: string[]
-  stress: number | null
   personal_note: string
 }
 
@@ -19,7 +18,7 @@ export type DiaryDetails = ApiDiaryDetails & PhaseADiaryDetails
 export type DiaryEntry = { date: string; status: DiaryStatus } & ApiDiaryDetails
 
 export function emptyPhaseADetails(): PhaseADiaryDetails {
-  return { symptoms: [], stress: null, personal_note: '' }
+  return { symptoms: [], personal_note: '' }
 }
 
 export function emptyDetails(): DiaryDetails {

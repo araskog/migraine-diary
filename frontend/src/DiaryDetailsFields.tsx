@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   Anchor,
   Button,
+  Collapse,
   Group,
   Checkbox,
   Input,
@@ -11,9 +12,12 @@ import {
   Text,
   Textarea,
   TextInput,
+  UnstyledButton,
 } from '@mantine/core'
+import { IconChevronDown, IconChevronRight } from '@tabler/icons-react'
 import type { DiaryDetails, DiaryStatus } from './diary'
 import SymptomChipGroups from './SymptomChipGroups'
+import './SymptomChipGroups.css'
 
 type DiaryDetailsFieldsProps = {
   status: DiaryStatus
@@ -22,28 +26,18 @@ type DiaryDetailsFieldsProps = {
   onChange: (value: DiaryDetails, save?: boolean) => void
 }
 
-function SeveritySlider({
-  label,
-  thumbLabel,
+function PainSeveritySlider({
   value,
-  lowLabel,
-  highLabel,
-  clearLabel,
   disabled,
   onChange,
 }: {
-  label: string
-  thumbLabel: string
   value: number | null
-  lowLabel: string
-  highLabel: string
-  clearLabel: string
   disabled: boolean
-  onChange: (value: number | null, save?: boolean) => void
+  onChange: (pain_severity: number | null, save?: boolean) => void
 }) {
   return (
     <Input.Wrapper
-      label={label}
+      label="How severe was the pain at its worst?"
       description={value === null ? 'Not answered' : `${value} out of 10`}
     >
       <Stack gap="xs" mt="xs">
@@ -53,18 +47,18 @@ function SeveritySlider({
           step={1}
           value={value ?? 0}
           color={value === null ? 'gray' : 'sage'}
-          thumbLabel={thumbLabel}
+          thumbLabel="Worst pain severity"
           thumbValueText={
             value === null ? 'Not answered' : `${value} out of 10`
           }
           marks={[{ value: 0 }, { value: 10 }]}
           disabled={disabled}
-          onChangeEnd={(next) => onChange(next)}
-          onChange={(next) => onChange(next, false)}
+          onChangeEnd={(pain_severity) => onChange(pain_severity)}
+          onChange={(pain_severity) => onChange(pain_severity, false)}
         />
         <Group justify="space-between" wrap="nowrap" gap="xs">
-          <Input.Description>{lowLabel}</Input.Description>
-          <Input.Description>{highLabel}</Input.Description>
+          <Input.Description>0 · No pain</Input.Description>
+          <Input.Description>10 · Worst</Input.Description>
         </Group>
         {value !== null && (
           <Anchor
@@ -76,11 +70,70 @@ function SeveritySlider({
             disabled={disabled}
             onClick={() => onChange(null)}
           >
-            {clearLabel}
+            Clear pain answer
           </Anchor>
         )}
       </Stack>
     </Input.Wrapper>
+  )
+}
+
+function SymptomsSection({
+  value,
+  disabled,
+  onChange,
+}: {
+  value: DiaryDetails
+  disabled: boolean
+  onChange: (value: DiaryDetails, save?: boolean) => void
+}) {
+  const [opened, setOpened] = useState(() => value.symptoms.length > 0)
+  const selectedCount = value.symptoms.length
+  const summary =
+    selectedCount === 0
+      ? 'None selected'
+      : selectedCount === 1
+        ? '1 selected'
+        : `${selectedCount} selected`
+
+  return (
+    <Stack gap={0}>
+      <UnstyledButton
+        type="button"
+        aria-expanded={opened}
+        aria-controls="symptoms-panel"
+        disabled={disabled}
+        className="symptoms-foldout-trigger"
+        onClick={() => setOpened((current) => !current)}
+      >
+        <Group justify="space-between" wrap="nowrap" gap="sm">
+          <Group gap="xs" wrap="nowrap">
+            {opened ? (
+              <IconChevronDown size={16} stroke={2} aria-hidden />
+            ) : (
+              <IconChevronRight size={16} stroke={2} aria-hidden />
+            )}
+            <Text size="sm" fw={500} id="symptoms-label">
+              Symptoms
+            </Text>
+          </Group>
+          <Text size="xs" c="dimmed">
+            {summary}
+          </Text>
+        </Group>
+      </UnstyledButton>
+      <Collapse expanded={opened} id="symptoms-panel">
+        <Stack gap="sm" pt="sm">
+          <SymptomChipGroups
+            value={value.symptoms}
+            disabled={disabled}
+            onChange={(symptoms, save) =>
+              onChange({ ...value, symptoms }, save)
+            }
+          />
+        </Stack>
+      </Collapse>
+    </Stack>
   )
 }
 
@@ -98,70 +151,20 @@ export default function DiaryDetailsFields({
   return (
     <Stack gap="md">
       {status === 'migraine' && (
-        <>
-          <SymptomChipGroups
-            value={value.symptoms}
-            disabled={disabled}
-            onChange={(symptoms, save) =>
-              onChange({ ...value, symptoms }, save)
-            }
-          />
-          <SeveritySlider
-            label="How stressed did you feel?"
-            thumbLabel="Stress level"
-            lowLabel="0 · None"
-            highLabel="10 · Extreme"
-            clearLabel="Clear stress answer"
-            value={value.stress}
-            disabled={disabled}
-            onChange={(stress, save = true) =>
-              onChange({ ...value, stress }, save)
-            }
-          />
-          <Stack gap="xs">
-            {!noteVisible ? (
-              <Button
-                variant="subtle"
-                size="compact-sm"
-                disabled={disabled}
-                onClick={() => setNoteOpen(true)}
-              >
-                Add a personal note
-              </Button>
-            ) : (
-              <Textarea
-                label="Personal note"
-                description="Optional. Plain text, up to 2,000 characters."
-                placeholder="Anything you want to remember about today"
-                autosize
-                minRows={3}
-                maxLength={2000}
-                value={value.personal_note}
-                disabled={disabled}
-                onBlur={() => onChange(value)}
-                onChange={(event) =>
-                  onChange(
-                    { ...value, personal_note: event.currentTarget.value },
-                    false,
-                  )
-                }
-              />
-            )}
-            {noteVisible && value.personal_note.length === 0 && (
-              <Anchor
-                component="button"
-                type="button"
-                size="xs"
-                c="dimmed"
-                w="fit-content"
-                disabled={disabled}
-                onClick={() => setNoteOpen(false)}
-              >
-                Hide note
-              </Anchor>
-            )}
-          </Stack>
-        </>
+        <PainSeveritySlider
+          value={value.pain_severity}
+          disabled={disabled}
+          onChange={(pain_severity, save = true) =>
+            onChange({ ...value, pain_severity }, save)
+          }
+        />
+      )}
+      {status === 'migraine' && (
+        <SymptomsSection
+          value={value}
+          disabled={disabled}
+          onChange={onChange}
+        />
       )}
       <Stack gap="xs">
         <Checkbox
@@ -239,24 +242,51 @@ export default function DiaryDetailsFields({
         }}
       />
       {status === 'migraine' && (
-        <SeveritySlider
-          label="How severe was the pain at its worst?"
-          thumbLabel="Worst pain severity"
-          lowLabel="0 · No pain"
-          highLabel="10 · Worst"
-          clearLabel="Clear pain answer"
-          value={value.pain_severity}
-          disabled={disabled}
-          onChange={(pain_severity, save = true) =>
-            onChange({ ...value, pain_severity }, save)
-          }
-        />
-      )}
-      {status === 'migraine' && (
-        <Text size="xs" c="dimmed">
-          Symptoms, stress, and notes are stored on this device until Phase A
-          server support lands (see issue #51).
-        </Text>
+        <Stack gap="xs">
+          {!noteVisible ? (
+            <Button
+              variant="default"
+              size="compact-sm"
+              radius="sm"
+              fullWidth
+              disabled={disabled}
+              onClick={() => setNoteOpen(true)}
+            >
+              Add a personal note
+            </Button>
+          ) : (
+            <Textarea
+              label="Personal note"
+              placeholder="Anything you want to remember about today"
+              autosize
+              minRows={3}
+              maxLength={2000}
+              radius="sm"
+              value={value.personal_note}
+              disabled={disabled}
+              onBlur={() => onChange(value)}
+              onChange={(event) =>
+                onChange(
+                  { ...value, personal_note: event.currentTarget.value },
+                  false,
+                )
+              }
+            />
+          )}
+          {noteVisible && value.personal_note.length === 0 && (
+            <Anchor
+              component="button"
+              type="button"
+              size="xs"
+              c="dimmed"
+              w="fit-content"
+              disabled={disabled}
+              onClick={() => setNoteOpen(false)}
+            >
+              Hide note
+            </Anchor>
+          )}
+        </Stack>
       )}
     </Stack>
   )
