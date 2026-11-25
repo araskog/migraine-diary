@@ -1,6 +1,5 @@
 # Local configuration and generated files
-.agents/skills/*
-!.agents/skills/review-pr/
+.agents/skills/
 .env
 .env.*
 !.env.example
