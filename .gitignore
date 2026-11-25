@@ -1,4 +1,5 @@
 # Local configuration and generated files
+.agents/skills/
 .env
 .env.*
 !.env.example
