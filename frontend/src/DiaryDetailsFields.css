@@ -1,0 +1,16 @@
+.diary-details-fields {
+  width: 100%;
+}
+
+.diary-details-accordion {
+  background-color: var(--app-control-background);
+}
+
+.diary-details-accordion .mantine-Accordion-control {
+  padding-inline: var(--mantine-spacing-md);
+}
+
+.diary-details-accordion .mantine-Accordion-panel {
+  padding: var(--mantine-spacing-md);
+  padding-block-start: 0;
+}

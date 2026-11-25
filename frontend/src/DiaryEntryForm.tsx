@@ -143,7 +143,7 @@ export default function DiaryEntryForm({
   }
 
   return (
-    <Stack gap="sm">
+    <Stack gap="md">
       <DiaryDetailsFields
         status={status}
         value={details}

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import {
+  Accordion,
   Anchor,
   Button,
-  Collapse,
+  Divider,
   Group,
   Checkbox,
   Input,
@@ -12,12 +13,10 @@ import {
   Text,
   Textarea,
   TextInput,
-  UnstyledButton,
 } from '@mantine/core'
-import { IconChevronDown, IconChevronRight } from '@tabler/icons-react'
 import type { DiaryDetails, DiaryStatus } from './diary'
 import SymptomChipGroups from './SymptomChipGroups'
-import './SymptomChipGroups.css'
+import './DiaryDetailsFields.css'
 
 type DiaryDetailsFieldsProps = {
   status: DiaryStatus
@@ -25,6 +24,9 @@ type DiaryDetailsFieldsProps = {
   disabled: boolean
   onChange: (value: DiaryDetails, save?: boolean) => void
 }
+
+const fieldStack = { gap: 'lg' as const }
+const controlRadius = 'sm' as const
 
 function PainSeveritySlider({
   value,
@@ -87,7 +89,9 @@ function SymptomsSection({
   disabled: boolean
   onChange: (value: DiaryDetails, save?: boolean) => void
 }) {
-  const [opened, setOpened] = useState(() => value.symptoms.length > 0)
+  const [accordion, setAccordion] = useState<string | null>(
+    value.symptoms.length > 0 ? 'symptoms' : null,
+  )
   const selectedCount = value.symptoms.length
   const summary =
     selectedCount === 0
@@ -97,43 +101,43 @@ function SymptomsSection({
         : `${selectedCount} selected`
 
   return (
-    <Stack gap={0}>
-      <UnstyledButton
-        type="button"
-        aria-expanded={opened}
-        aria-controls="symptoms-panel"
-        disabled={disabled}
-        className="symptoms-foldout-trigger"
-        onClick={() => setOpened((current) => !current)}
-      >
-        <Group justify="space-between" wrap="nowrap" gap="sm">
-          <Group gap="xs" wrap="nowrap">
-            {opened ? (
-              <IconChevronDown size={16} stroke={2} aria-hidden />
-            ) : (
-              <IconChevronRight size={16} stroke={2} aria-hidden />
-            )}
-            <Text size="sm" fw={500} id="symptoms-label">
+    <Accordion
+      variant="contained"
+      radius={controlRadius}
+      chevronPosition="left"
+      value={accordion}
+      classNames={{ root: 'diary-details-accordion' }}
+      onChange={setAccordion}
+    >
+      <Accordion.Item value="symptoms">
+        <Accordion.Control disabled={disabled} id="symptoms-label">
+          <Group
+            justify="space-between"
+            wrap="nowrap"
+            gap="md"
+            w="100%"
+            pr="xs"
+          >
+            <Text size="sm" fw={500}>
               Symptoms
             </Text>
+            <Text size="xs" c="dimmed">
+              {summary}
+            </Text>
           </Group>
-          <Text size="xs" c="dimmed">
-            {summary}
-          </Text>
-        </Group>
-      </UnstyledButton>
-      <Collapse expanded={opened} id="symptoms-panel">
-        <Stack gap="sm" pt="sm">
+        </Accordion.Control>
+        <Accordion.Panel>
           <SymptomChipGroups
             value={value.symptoms}
             disabled={disabled}
+            id="symptoms-label"
             onChange={(symptoms, save) =>
               onChange({ ...value, symptoms }, save)
             }
           />
-        </Stack>
-      </Collapse>
-    </Stack>
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
   )
 }
 
@@ -149,7 +153,7 @@ export default function DiaryDetailsFields({
   const noteVisible = noteOpen || value.personal_note.length > 0
 
   return (
-    <Stack gap="md">
+    <Stack className="diary-details-fields" {...fieldStack}>
       {status === 'migraine' && (
         <PainSeveritySlider
           value={value.pain_severity}
@@ -166,7 +170,7 @@ export default function DiaryDetailsFields({
           onChange={onChange}
         />
       )}
-      <Stack gap="xs">
+      <Stack gap="md">
         <Checkbox
           label="I took migraine medication"
           checked={value.medication_taken === true}
@@ -185,6 +189,7 @@ export default function DiaryDetailsFields({
             label="Which medication?"
             placeholder="Medication name"
             maxLength={200}
+            radius={controlRadius}
             value={value.medication_name}
             disabled={disabled}
             onBlur={() => onChange(value)}
@@ -197,101 +202,108 @@ export default function DiaryDetailsFields({
           />
         )}
       </Stack>
-      <Select
-        label="How was your sleep quality?"
-        placeholder="Select quality"
-        data={[
-          { value: 'poor', label: 'Poor' },
-          { value: 'okay', label: 'Okay' },
-          { value: 'good', label: 'Good' },
-        ]}
-        value={value.sleep || null}
-        clearable
-        clearButtonProps={{ 'aria-label': 'Clear sleep answer' }}
-        disabled={disabled}
-        onChange={(sleep) => {
-          if (
-            sleep === null ||
-            sleep === 'poor' ||
-            sleep === 'okay' ||
-            sleep === 'good'
-          )
-            onChange({ ...value, sleep: sleep ?? '' })
-        }}
-      />
-      <Select
-        label="How long did you sleep?"
-        placeholder="Select duration"
-        data={[
-          { value: 'less', label: 'Less than usual' },
-          { value: 'usual', label: 'Usual' },
-          { value: 'more', label: 'More than usual' },
-        ]}
-        value={value.sleep_duration || null}
-        clearable
-        clearButtonProps={{ 'aria-label': 'Clear sleep duration answer' }}
-        disabled={disabled}
-        onChange={(duration) => {
-          if (
-            duration === null ||
-            duration === 'less' ||
-            duration === 'usual' ||
-            duration === 'more'
-          )
-            onChange({ ...value, sleep_duration: duration ?? '' })
-        }}
-      />
+      <Stack gap="md">
+        <Select
+          label="How was your sleep quality?"
+          placeholder="Select quality"
+          radius={controlRadius}
+          data={[
+            { value: 'poor', label: 'Poor' },
+            { value: 'okay', label: 'Okay' },
+            { value: 'good', label: 'Good' },
+          ]}
+          value={value.sleep || null}
+          clearable
+          clearButtonProps={{ 'aria-label': 'Clear sleep answer' }}
+          disabled={disabled}
+          onChange={(sleep) => {
+            if (
+              sleep === null ||
+              sleep === 'poor' ||
+              sleep === 'okay' ||
+              sleep === 'good'
+            )
+              onChange({ ...value, sleep: sleep ?? '' })
+          }}
+        />
+        <Select
+          label="How long did you sleep?"
+          placeholder="Select duration"
+          radius={controlRadius}
+          data={[
+            { value: 'less', label: 'Less than usual' },
+            { value: 'usual', label: 'Usual' },
+            { value: 'more', label: 'More than usual' },
+          ]}
+          value={value.sleep_duration || null}
+          clearable
+          clearButtonProps={{ 'aria-label': 'Clear sleep duration answer' }}
+          disabled={disabled}
+          onChange={(duration) => {
+            if (
+              duration === null ||
+              duration === 'less' ||
+              duration === 'usual' ||
+              duration === 'more'
+            )
+              onChange({ ...value, sleep_duration: duration ?? '' })
+          }}
+        />
+      </Stack>
       {status === 'migraine' && (
-        <Stack gap="xs">
-          {!noteVisible ? (
-            <Button
-              variant="default"
-              size="compact-sm"
-              radius="sm"
-              fullWidth
-              disabled={disabled}
-              onClick={() => setNoteOpen(true)}
-            >
-              Add a personal note
-            </Button>
-          ) : (
-            <Textarea
-              label="Personal note"
-              placeholder="Anything you want to remember about today"
-              autosize
-              minRows={3}
-              maxLength={2000}
-              radius="sm"
-              value={value.personal_note}
-              disabled={disabled}
-              onBlur={(event) =>
-                onChange({
-                  ...value,
-                  personal_note: event.currentTarget.value,
-                })
-              }
-              onChange={(event) =>
-                onChange(
-                  { ...value, personal_note: event.currentTarget.value },
-                  false,
-                )
-              }
-            />
-          )}
-          {noteVisible && value.personal_note.length === 0 && (
-            <Anchor
-              component="button"
-              type="button"
-              size="xs"
-              c="dimmed"
-              w="fit-content"
-              disabled={disabled}
-              onClick={() => setNoteOpen(false)}
-            >
-              Hide note
-            </Anchor>
-          )}
-        </Stack>
+        <>
+          <Divider />
+          <Stack gap="sm">
+            {!noteVisible ? (
+              <Button
+                variant="default"
+                size="sm"
+                radius={controlRadius}
+                fullWidth
+                disabled={disabled}
+                onClick={() => setNoteOpen(true)}
+              >
+                Add a personal note
+              </Button>
+            ) : (
+              <Textarea
+                label="Personal note"
+                placeholder="Anything you want to remember about today"
+                autosize
+                minRows={3}
+                maxLength={2000}
+                radius={controlRadius}
+                value={value.personal_note}
+                disabled={disabled}
+                onBlur={(event) =>
+                  onChange({
+                    ...value,
+                    personal_note: event.currentTarget.value,
+                  })
+                }
+                onChange={(event) =>
+                  onChange(
+                    { ...value, personal_note: event.currentTarget.value },
+                    false,
+                  )
+                }
+              />
+            )}
+            {noteVisible && value.personal_note.length === 0 && (
+              <Anchor
+                component="button"
+                type="button"
+                size="xs"
+                c="dimmed"
+                w="fit-content"
+                disabled={disabled}
+                onClick={() => setNoteOpen(false)}
+              >
+                Hide note
+              </Anchor>
+            )}
+          </Stack>
+        </>
       )}
     </Stack>
   )

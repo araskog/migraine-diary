@@ -261,13 +261,15 @@ export default function DiaryEntries({
           p="lg"
           aria-label={`Details for ${dateLabel(date)}`}
         >
-          <Stack gap="xs">
-            <Title order={2} size="h3">
-              Daily details
-            </Title>
-            <Text c="dimmed" size="sm">
-              {dateLabel(date)}
-            </Text>
+          <Stack gap="lg">
+            <Stack gap={4}>
+              <Title order={2} size="h3">
+                Daily details
+              </Title>
+              <Text c="dimmed" size="sm">
+                {dateLabel(date)}
+              </Text>
+            </Stack>
             <DiaryEntryForm
               key={`${date}-${current?.status ?? ''}-${revision}`}
               date={date}
