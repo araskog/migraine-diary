@@ -20,11 +20,11 @@ Do not use explicit `any` or non-null assertions. Use explicit types or `unknown
 
 ## UI and Theming
 
-Follow the visual direction in [architecture](docs/architecture.md) (Interface Design): calm surfaces, sage accents, generous spacing, and accessible focus states.
+Follow the visual direction in [architecture](docs/architecture.md) (Interface Design): neutral surfaces, sage accents, generous spacing, and accessible focus states.
 
 Use [Mantine](https://mantine.dev/) for controls, typography, spacing, and surfaces. Prefer Mantine props and theme tokens over bespoke markup. Extend shared defaults in `frontend/src/theme.ts` with `createTheme` and component `.extend()` when a pattern repeats. Register app-specific colors and per-scheme variables in `cssVariablesResolver`; reference them in CSS as `--mantine-*` or `--app-*`.
 
-Wrap the application in `MantineProvider` with the shared theme (see `frontend/src/main.tsx`). Import Mantine package styles there or in test setup that renders components. Reserve custom CSS for layout the library does not cover, scoped under a component root (for example `.app` in `App.css`).
+Wrap the application in `MantineProvider` with the shared theme (see `frontend/src/main.tsx`), `defaultColorScheme="dark"`, and Mantine's built-in light/dark persistence. Import Mantine package styles there or in test setup that renders components. Reserve custom CSS for layout the library does not cover, scoped under a component root (for example `.app` in `App.css`).
 
 ## CSS and Formatting
 
