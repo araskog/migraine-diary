@@ -21,7 +21,7 @@ uv run --env-file .env python manage.py migrate
 uv run --env-file .env python manage.py runserver 127.0.0.1:8000
 ```
 
-Adjust PostgreSQL connection settings in `backend/.env` if needed; the role must be able to create a test database. Keep `.env` untracked. `DJANGO_DEBUG=1` enables local development static assets and error pages; it defaults to off when unset.
+Adjust PostgreSQL connection settings in `backend/.env` if needed; the role must be able to create a test database. Keep `.env` untracked. Local `config.settings` defaults `DJANGO_DEBUG` to on (Django admin CSS and debug pages); set `DJANGO_DEBUG=0` in `.env` for production-like behavior.
 
 In another terminal, from the repository root:
 
