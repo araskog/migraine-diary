@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   Alert,
-  Badge,
+  Box,
   Group,
   Paper,
   Progress,
@@ -11,6 +11,7 @@ import {
   Text,
   Title,
 } from '@mantine/core'
+import { BarChart } from '@mantine/charts'
 import LoadingIndicator from './LoadingIndicator'
 import ErrorMessages from './ErrorMessages'
 import {
@@ -91,10 +92,12 @@ function MigraineStapleChart({
   title,
   description,
   staples,
+  compactXLabels = false,
 }: {
   title: string
   description: string
   staples: StapleRow[]
+  compactXLabels?: boolean
 }) {
   if (staples.length === 0) {
     return (
@@ -109,65 +112,52 @@ function MigraineStapleChart({
     )
   }
 
-  const maxMigraineDays = Math.max(...staples.map((row) => row.migraineDays), 1)
+  const chartData = staples.map((row) => ({
+    category: row.label,
+    migraineDays: row.migraineDays,
+  }))
+  const needsAngledLabels =
+    compactXLabels || staples.some((row) => row.label.length > 8)
+  const hasSparseSlices = staples.some((row) => !row.sufficientData)
 
   return (
     <Paper withBorder radius="md" p="md" className="diary-insights-section">
       <Text fw={600} size="sm">
         {title}
       </Text>
-      <Text size="xs" c="dimmed" mt={4}>
+      <Text size="xs" c="dimmed" mt={4} mb="sm">
         {description}
       </Text>
-      <div className="diary-insights-staples" role="list">
-        {staples.map((row) => {
-          const heightPercent = (row.migraineDays / maxMigraineDays) * 100
-          return (
-            <div
-              key={row.key}
-              className="diary-insights-staple"
-              role="listitem"
-            >
-              <Text
-                size="sm"
-                fw={600}
-                ta="center"
-                className="diary-insights-staple-count"
-              >
-                {row.migraineDays}
-              </Text>
-              <div
-                className="diary-insights-staple-track"
-                aria-label={`${row.label}: ${row.migraineDays} migraine days`}
-              >
-                <div
-                  className="diary-insights-staple-bar"
-                  style={{
-                    height:
-                      row.migraineDays === 0
-                        ? 0
-                        : `${Math.max(heightPercent, 4)}%`,
-                  }}
-                />
-              </div>
-              <Stack gap={2} align="center" mt={6}>
-                <Text
-                  size="xs"
-                  ta="center"
-                  className="diary-insights-staple-label"
-                >
-                  {row.label}
-                </Text>
-                {!row.sufficientData ? (
-                  <Badge size="xs" variant="light" color="gray">
-                    Few answers
-                  </Badge>
-                ) : null}
-              </Stack>
-            </div>
-          )
-        })}
-      </div>
+      <Box className="diary-insights-chart-scroll">
+        <BarChart
+          h={220}
+          miw={Math.max(staples.length * 52, 280)}
+          data={chartData}
+          dataKey="category"
+          series={[
+            { name: 'migraineDays', color: 'migraine.6', label: 'Migraine days' },
+          ]}
+          withLegend={false}
+          withTooltip
+          withBarValueLabel
+          tickLine="x"
+          gridAxis="y"
+          maxBarWidth={36}
+          barProps={{ radius: 8 }}
+          yAxisProps={{ allowDecimals: false, width: 32 }}
+          xAxisProps={
+            needsAngledLabels
+              ? { height: 64, angle: -32, textAnchor: 'end', interval: 0 }
+              : { interval: 0, tickMargin: 10 }
+          }
+        />
+      </Box>
+      {hasSparseSlices ? (
+        <Text size="xs" c="dimmed" mt="xs">
+          Some categories have fewer than three logged answers, so bars may
+          change as you log more.
+        </Text>
+      ) : null}
     </Paper>
   )
 }
@@ -278,11 +268,13 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
             title="Sleep duration"
             description="Migraine days when each sleep duration was logged."
             staples={sliceStaples(insights.sleep_duration)}
+            compactXLabels
           />
           <MigraineStapleChart
             title="Sleep quality"
             description="Migraine days when each sleep quality was logged."
             staples={sliceStaples(insights.sleep_quality)}
+            compactXLabels
           />
         </Stack>
       ) : null}
