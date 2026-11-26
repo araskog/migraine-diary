@@ -27,6 +27,8 @@ class DiaryEntry(models.Model):
         max_length=5, choices=SleepDuration.choices, blank=True
     )
     pain_severity = models.PositiveSmallIntegerField(null=True, blank=True)
+    symptoms = models.JSONField(default=list, blank=True)
+    personal_note = models.CharField(max_length=2000, blank=True)
 
     class Meta:
         constraints = [

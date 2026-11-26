@@ -3,9 +3,9 @@ import {
   Accordion,
   Anchor,
   Button,
+  Checkbox,
   Divider,
   Group,
-  Checkbox,
   Input,
   Select,
   Slider,
@@ -139,35 +139,107 @@ function SymptomsSection({
   )
 }
 
-export default function DiaryDetailsFields({
-  status,
+function PersonalNoteSection({
   value,
   disabled,
   onChange,
-}: DiaryDetailsFieldsProps) {
+  leadingDivider = false,
+}: {
+  value: DiaryDetails
+  disabled: boolean
+  onChange: (value: DiaryDetails, save?: boolean) => void
+  leadingDivider?: boolean
+}) {
   const [noteOpen, setNoteOpen] = useState(
     () => value.personal_note.trim().length > 0,
   )
   const noteVisible = noteOpen || value.personal_note.length > 0
 
   return (
-    <Stack className="diary-details-fields" {...fieldStack}>
-      {status === 'migraine' && (
-        <PainSeveritySlider
-          value={value.pain_severity}
-          disabled={disabled}
-          onChange={(pain_severity, save = true) =>
-            onChange({ ...value, pain_severity }, save)
-          }
-        />
-      )}
-      {status === 'migraine' && (
-        <SymptomsSection
+    <>
+      {leadingDivider && <Divider />}
+      <Stack gap="sm">
+        {!noteVisible ? (
+          <Button
+            variant="default"
+            size="sm"
+            radius={controlRadius}
+            fullWidth
+            disabled={disabled}
+            onClick={() => setNoteOpen(true)}
+          >
+            Add a personal note
+          </Button>
+        ) : (
+          <Textarea
+            label="Personal note"
+            placeholder="Anything you want to remember about today"
+            autosize
+            minRows={3}
+            maxLength={2000}
+            radius={controlRadius}
+            value={value.personal_note}
+            disabled={disabled}
+            onBlur={(event) =>
+              onChange({
+                ...value,
+                personal_note: event.currentTarget.value,
+              })
+            }
+            onChange={(event) =>
+              onChange(
+                { ...value, personal_note: event.currentTarget.value },
+                false,
+              )
+            }
+          />
+        )}
+        {noteVisible && value.personal_note.length === 0 && (
+          <Anchor
+            component="button"
+            type="button"
+            size="xs"
+            c="dimmed"
+            w="fit-content"
+            disabled={disabled}
+            onClick={() => setNoteOpen(false)}
+          >
+            Hide note
+          </Anchor>
+        )}
+      </Stack>
+    </>
+  )
+}
+
+export default function DiaryDetailsFields({
+  status,
+  value,
+  disabled,
+  onChange,
+}: DiaryDetailsFieldsProps) {
+  if (status === 'migraine_free') {
+    return (
+      <Stack className="diary-details-fields" {...fieldStack}>
+        <PersonalNoteSection
           value={value}
           disabled={disabled}
           onChange={onChange}
         />
-      )}
+      </Stack>
+    )
+  }
+
+  return (
+    <Stack className="diary-details-fields" {...fieldStack}>
+      <PainSeveritySlider
+        value={value.pain_severity}
+        disabled={disabled}
+        onChange={(pain_severity, save = true) =>
+          onChange({ ...value, pain_severity }, save)
+        }
+      />
+      <SymptomsSection value={value} disabled={disabled} onChange={onChange} />
       <Stack gap="md">
         <Checkbox
           label="I took migraine medication"
@@ -248,61 +320,12 @@ export default function DiaryDetailsFields({
           }}
         />
       </Stack>
-      {status === 'migraine' && (
-        <>
-          <Divider />
-          <Stack gap="sm">
-            {!noteVisible ? (
-              <Button
-                variant="default"
-                size="sm"
-                radius={controlRadius}
-                fullWidth
-                disabled={disabled}
-                onClick={() => setNoteOpen(true)}
-              >
-                Add a personal note
-              </Button>
-            ) : (
-              <Textarea
-                label="Personal note"
-                placeholder="Anything you want to remember about today"
-                autosize
-                minRows={3}
-                maxLength={2000}
-                radius={controlRadius}
-                value={value.personal_note}
-                disabled={disabled}
-                onBlur={(event) =>
-                  onChange({
-                    ...value,
-                    personal_note: event.currentTarget.value,
-                  })
-                }
-                onChange={(event) =>
-                  onChange(
-                    { ...value, personal_note: event.currentTarget.value },
-                    false,
-                  )
-                }
-              />
-            )}
-            {noteVisible && value.personal_note.length === 0 && (
-              <Anchor
-                component="button"
-                type="button"
-                size="xs"
-                c="dimmed"
-                w="fit-content"
-                disabled={disabled}
-                onClick={() => setNoteOpen(false)}
-              >
-                Hide note
-              </Anchor>
-            )}
-          </Stack>
-        </>
-      )}
+      <PersonalNoteSection
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        leadingDivider
+      />
     </Stack>
   )
 }

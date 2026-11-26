@@ -3,13 +3,8 @@ import { Box, Button, Stack } from '@mantine/core'
 import LoadingIndicator from './LoadingIndicator'
 import DiaryDetailsFields from './DiaryDetailsFields'
 import ErrorMessages from './ErrorMessages'
-import { apiDetailsFrom, localDate, saveEntry } from './diary'
+import { localDate, saveEntry } from './diary'
 import type { DiaryDetails, DiaryEntry } from './diary'
-import {
-  phaseAFromDetails,
-  readPhaseAStorage,
-  writePhaseAStorage,
-} from './phaseAPrototypeStorage'
 import { getSession } from './session'
 import type { Session } from './session'
 
@@ -32,20 +27,18 @@ function detailsOf(entry: DiaryEntry): DiaryDetails {
     sleep,
     sleep_duration,
     pain_severity,
+    symptoms,
+    personal_note,
   } = entry
-  const phaseA = readPhaseAStorage(entry.date)
   return {
     medication_taken,
     medication_name,
     sleep,
     sleep_duration,
     pain_severity,
-    ...phaseA,
+    symptoms,
+    personal_note,
   }
-}
-
-function persistPhaseA(date: string, details: DiaryDetails): void {
-  writePhaseAStorage(date, phaseAFromDetails(details))
 }
 
 export default function DiaryEntryForm({
@@ -100,7 +93,6 @@ export default function DiaryEntryForm({
       while (pending.current) {
         const submitted = pending.current
         pending.current = null
-        persistPhaseA(date, submitted)
         const saved = await saveEntry(date, status, csrfToken, submitted)
         const confirmed = detailsOf(saved)
         setSavedDetails(confirmed)
@@ -132,14 +124,9 @@ export default function DiaryEntryForm({
   function applyChange(value: DiaryDetails, commit = true) {
     latest.current = value
     setDetails(value)
-    persistPhaseA(date, value)
-    const apiChanged =
-      JSON.stringify(apiDetailsFrom(value)) !==
-      JSON.stringify(apiDetailsFrom(savedDetails))
-    if (commit && apiChanged) void save(value)
-    else if (commit && !apiChanged) {
-      setSavedDetails(value)
-    }
+    const changed = JSON.stringify(value) !== JSON.stringify(savedDetails)
+    if (commit && changed) void save(value)
+    else if (commit && !changed) setSavedDetails(value)
   }
 
   return (

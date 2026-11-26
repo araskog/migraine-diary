@@ -86,8 +86,8 @@ export default function DiaryStatusPicker({
     return (
       <Stack gap="sm" aria-busy={disabled}>
         <Text size="sm">
-          Changing to migraine-free removes this day’s pain rating. Your other
-          answers stay.
+          Changing to migraine-free clears this day’s pain rating and symptoms.
+          Your personal note and other answers stay.
         </Text>
         <Button
           variant="default"
@@ -139,8 +139,9 @@ export default function DiaryStatusPicker({
           onClick={() => {
             if (disabled) return
             if (
-              entry?.pain_severity !== null &&
-              entry?.pain_severity !== undefined
+              (entry?.pain_severity !== null &&
+                entry?.pain_severity !== undefined) ||
+              (entry?.symptoms?.length ?? 0) > 0
             )
               setConfirmFree(true)
             else void save('migraine_free')

@@ -14,19 +14,29 @@ A user can record richer information on **recorded days** without losing the dis
 
 | Phase | Focus |
 |-------|--------|
-| **A** | All recorded days: optional **stress** and **personal note**. Migraine days additionally: symptom catalog and existing pain and acute medication fields |
-| **B** | Migraine-free **wellness** UI (sleep, sleep duration, stress, note); **Tracking preferences** (menstruation); cycle fields when enabled on any recorded day |
+| **A** | **Migraine days:** symptom catalog, personal note, and existing pain and acute medication and sleep fields. **Migraine-free days:** personal note only (prototype-style minimal details panel). **Stress is not in v1 UI** — deferred to Phase B with the wellness block. |
+| **B** | Migraine-free **wellness** UI (sleep, sleep duration, **stress**, note); **Tracking preferences** (menstruation); cycle fields when enabled on any recorded day |
 | **C** | Structured **treatment log** per migraine date; replace simple acute medication fields |
 
-**Product design reference:** symptom chips use four grouped multi-select sections (pain characteristics, sensory, other, early warning signs) as in the Phase A design mockup. The treatment log UI mockup informs Phase C.
+**Product design reference:** symptom chips use four grouped multi-select sections (pain characteristics, sensory, other, early warning signs) as in the Phase A design mockup ([PR #52](https://github.com/araskog/migraine-diary/pull/52)). Migraine-free v1 follows that prototype: status on the calendar plus an optional **personal note** in daily details, without sleep, medication, or symptom controls until Phase B.
+
+The treatment log UI mockup informs Phase C.
 
 See [Symptom catalog](#symptom-catalog) for the fixed v1 list.
+
+### Phase A product decisions (issue #51)
+
+| Topic | Decision |
+|-------|----------|
+| **Stress** | Out of **v1 UI**; first stress control ships with Phase B wellness on migraine-free days. |
+| **Personal note** | Optional on **any recorded day** (migraine or migraine-free). |
+| **Migraine-free UX** | Prototype-style **minimal** daily details: personal note only; no symptom, pain, sleep, or medication controls in Phase A. |
 
 ## Design and interaction
 
 - Record **status** first; optional sections stay collapsed until opened.
-- **Migraine day** sections include symptoms (chip multi-select), stress, personal note, and existing pain and acute medication fields.
-- **Migraine-free day** in Phase A shows stress and personal note only. Phase B adds the full wellness block (sleep fields) and hides symptom, pain, and acute medication controls.
+- **Migraine day** sections include symptoms (chip multi-select), personal note, and existing pain, acute medication, and sleep fields. **No stress control in Phase A.**
+- **Migraine-free day** in Phase A shows **personal note only** in daily details (same progressive “Add a personal note” pattern as migraine days). Phase B adds the full wellness block (sleep, duration, stress) and continues to hide symptom, pain, and acute medication controls.
 - Detail edits **autosave** like existing diary details, with visible save failures and unsaved-leave warnings.
 - Symptoms (including early warning signs) are recorded only while the day has **migraine** status; they are not offered on migraine-free days.
 
@@ -38,9 +48,10 @@ When a recorded date changes between migraine and migraine-free:
 |-------|----------------------------|
 | Symptoms | Cleared (not shown) |
 | Pain severity | Cleared (existing rule) |
-| Stress, personal note | **Preserved** unless the user clears them |
-| Sleep / cycle (when present) | **Preserved** |
+| Personal note | **Preserved** unless the user clears it |
+| Sleep / cycle (when present) | **Preserved** in storage; Phase A migraine-free UI does not edit sleep until Phase B |
 | Acute medication fields | **Preserved** until Phase C replaces them |
+| Stress (when present) | **Preserved** once stored; no Phase A UI |
 
 Changing back to migraine does **not** restore previously cleared symptoms or pain.
 
@@ -50,12 +61,14 @@ Changing back to migraine does **not** restore previously cleared symptoms or pa
 |---|---|
 | EA1 | On a **migraine day**, a user can select zero or more symptoms from the fixed catalog, grouped in four sections matching the product design. Selections autosave and persist after reload. |
 | EA2 | The backend accepts only valid catalog codes for that migraine entry. Invalid codes are rejected without overwriting previously saved symptoms. |
-| EA3 | Changing a date to **migraine-free** clears saved symptoms and pain severity. Stress and personal note remain unless the user clears them. Changing back to migraine does not restore prior symptom selections unless the user selects them again. |
-| EA4 | On any **recorded day**, a user can optionally set **stress** (0–10 integer) or leave it unanswered. `0` is an explicit answer, distinct from unanswered. |
-| EA5 | On any **recorded day**, a user can optionally enter a **personal note** (plain text, max 2 000 characters). Empty means no note. |
-| EA6 | Symptom, stress, and note edits use the same autosave, failure, and unsaved-change behaviour as existing diary details. Saving optional fields does not reload the whole diary list. |
+| EA3 | Changing a date to **migraine-free** clears saved symptoms and pain severity. Personal note remains unless the user clears it. Changing back to migraine does not restore prior symptom selections unless the user selects them again. |
+| EA4 | On any **recorded day**, a user can optionally enter a **personal note** (plain text, max 2 000 characters). Empty means no note. |
+| EA5 | On a **migraine-free day**, daily details offer **personal note only** (no Phase A stress, sleep, symptom, pain, or medication controls). |
+| EA6 | Symptom and note edits use the same autosave, failure, and unsaved-change behaviour as existing diary details. Saving optional fields does not reload the whole diary list. |
 | EA7 | Another user cannot read or change these fields via the API. |
 | EA8 | Demo sessions can use Phase A fields under the same validation, ownership, and CSRF rules as real accounts. |
+
+**Deferred from Phase A:** stress UI and API (moves to Phase B with wellness).
 
 ## Acceptance Criteria — Phase B
 
@@ -67,6 +80,7 @@ Changing back to migraine does **not** restore previously cleared symptoms or pa
 | EB4 | When menstruation tracking is on, each **recorded day** (migraine or migraine-free) can optionally record **on period** (yes, no, or unknown) and optional **cycle day** (positive integer). Unanswered remains valid. |
 | EB5 | The app may offer an optional, dismissible hint to enable menstruation tracking after the user saves their first diary entry; it does not block diary use. |
 | EB6 | Demo sessions follow the same rules for Phase B fields as for real accounts. |
+| EB7 | On any **recorded day**, a user can optionally set **stress** (0–10 integer) or leave it unanswered. `0` is an explicit answer, distinct from unanswered. |
 
 ## Acceptance Criteria — Phase C
 

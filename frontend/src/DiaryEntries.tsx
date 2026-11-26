@@ -17,10 +17,6 @@ import DiaryStatusPicker from './DiaryStatusPicker'
 import ConfirmDialog from './ConfirmDialog'
 import ErrorMessages from './ErrorMessages'
 import { dateLabel, loadEntries, localDate, statusLabel } from './diary'
-import {
-  clearPhaseAStorage,
-  clearStoredSymptoms,
-} from './phaseAPrototypeStorage'
 import type { DiaryEntry, DiaryStatus } from './diary'
 import type { Session } from './session'
 import './DiaryEntries.css'
@@ -207,15 +203,12 @@ export default function DiaryEntries({
                     disabled={disabled || saving}
                     onCleared={() => {
                       setSelectionOpened(false)
-                      clearPhaseAStorage(date)
                       setEntries((previous) =>
                         previous.filter((entry) => entry.date !== date),
                       )
                     }}
                     onSaved={(saved) => {
                       setSelectionOpened(false)
-                      if (saved.status === 'migraine_free')
-                        clearStoredSymptoms(saved.date)
                       setEntries((previous) => [
                         ...previous.filter(
                           (entry) => entry.date !== saved.date,
@@ -253,7 +246,7 @@ export default function DiaryEntries({
           </Group>
         </Group>
       </Box>
-      {current?.status === 'migraine' && (
+      {current && (
         <Paper
           component="section"
           className="diary-day-details"

@@ -19,6 +19,8 @@ def entry_output(day, status, **details):
         "sleep": "",
         "sleep_duration": "",
         "pain_severity": None,
+        "symptoms": [],
+        "personal_note": "",
         **details,
     }
 
@@ -378,3 +380,54 @@ class DiaryEntryTests(TestCase):
                     self.assertEqual(
                         DiaryEntry.objects.get(user=self.user).sleep_duration, duration
                     )
+
+    def test_phase_a_symptoms_persist_on_migraine_days(self):
+        self.save()
+        response = self.save(symptoms=["nausea", "throbbing"])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["symptoms"], ["nausea", "throbbing"])
+        self.client.post("/api/sign-out/", HTTP_X_CSRFTOKEN=self.token)
+        self.client = Client(enforce_csrf_checks=True)
+        self.sign_in()
+        self.assertEqual(
+            self.client.get(self.path).json()[0]["symptoms"],
+            ["nausea", "throbbing"],
+        )
+
+    def test_phase_a_invalid_symptoms_rejected_without_overwrite(self):
+        self.save(symptoms=["nausea"])
+        for payload in [
+            {"symptoms": ["not_a_symptom"]},
+            {"symptoms": ["nausea", "unknown"]},
+        ]:
+            with self.subTest(payload=payload):
+                self.assertEqual(self.save(**payload).status_code, 400)
+                self.assertEqual(
+                    DiaryEntry.objects.get(user=self.user).symptoms, ["nausea"]
+                )
+
+    def test_phase_a_symptoms_cleared_when_migraine_free(self):
+        self.save(symptoms=["fatigue"], pain_severity=6)
+        response = self.save(status="migraine_free")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["symptoms"], [])
+        self.assertIsNone(response.json()["pain_severity"])
+        response = self.save(status="migraine")
+        self.assertEqual(response.json()["symptoms"], [])
+
+    def test_phase_a_personal_note_on_any_recorded_day(self):
+        response = self.save(personal_note="Afternoon headache", status="migraine")
+        self.assertEqual(response.json()["personal_note"], "Afternoon headache")
+        response = self.save(
+            status="migraine_free",
+            personal_note="Afternoon headache",
+        )
+        self.assertEqual(response.json()["personal_note"], "Afternoon headache")
+        response = self.save(status="migraine_free", personal_note="")
+        self.assertEqual(response.json()["personal_note"], "")
+
+    def test_phase_a_symptoms_rejected_on_migraine_free(self):
+        self.save(status="migraine_free")
+        self.assertEqual(
+            self.save(status="migraine_free", symptoms=["nausea"]).status_code, 400
+        )

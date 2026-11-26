@@ -31,6 +31,7 @@ def entries(request):
         defaults["medication_name"] = ""
     if data["status"] == DiaryEntry.Status.MIGRAINE_FREE:
         defaults["pain_severity"] = None
+        defaults["symptoms"] = []
     entry, created = DiaryEntry.objects.update_or_create(
         user=request.user,
         date=data["date"],
