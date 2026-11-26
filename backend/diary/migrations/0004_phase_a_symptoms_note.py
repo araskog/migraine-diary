@@ -3,7 +3,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("diary", "0001_initial"),
+        ("diary", "0003_diaryentry_sleep_duration"),
     ]
 
     operations = [
