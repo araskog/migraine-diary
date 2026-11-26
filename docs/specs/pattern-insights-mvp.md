@@ -26,7 +26,7 @@ A later step may add a short written summary at the top of Insights, generated f
 | Surface | What the user (or client) can rely on |
 |---|---|
 | **Insights API** | Authenticated read of pattern statistics for the signed-in user, scoped to the rolling window, with `today` computed from a supplied IANA timezone; responses are private and not cached. |
-| **Insights UI** | Calendar / Insights toggle; window migraine summary; medication-taken day count; migraine and pain summary cards; weekday and sleep breakdowns when data is sufficient. |
+| **Insights UI** | Calendar / Insights toggle; window migraine summary; side-by-side medication-taken and average-pain summary cards; weekday and sleep breakdowns when data is sufficient. |
 
 ## Delivery and Verification
 

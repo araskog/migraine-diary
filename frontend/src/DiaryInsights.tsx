@@ -248,15 +248,12 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
         </Group>
       </Paper>
 
-      <StatCard
-        label="Medication taken"
-        value={medDays}
-        hint={`Days you logged taking medication in the last ${window_days} days`}
-      />
-
-      <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="md">
-        <StatCard label="Migraine-free" value={summary.migraine_free_days} />
-        <StatCard label="Migraine" value={summary.migraine_days} />
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+        <StatCard
+          label="Medication taken"
+          value={medDays}
+          hint={`Days you logged taking medication in the last ${window_days} days`}
+        />
         <StatCard
           label="Average pain"
           value={formatAveragePain(
