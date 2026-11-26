@@ -31,24 +31,24 @@ type InsightsPanelProps = {
 }
 
 function InsightLineCards({ lines }: { lines: string[] }) {
+  const multiple = lines.length > 1
   return (
-    <Stack gap="xs">
+    <Stack gap={multiple ? 'sm' : 0}>
       {lines.map((line, index) => (
         <Paper
           key={line}
           component="article"
-          p="sm"
-          radius="lg"
-          withBorder
+          p="md"
+          radius="md"
           className={
             index === 0
               ? 'insights-panel-line insights-panel-line--lead'
               : 'insights-panel-line'
           }
         >
-          <Group gap="sm" wrap="nowrap" align="flex-start">
+          <Group gap="md" wrap="nowrap" align="center">
             <ThemeIcon
-              size={28}
+              size={26}
               radius="xl"
               variant="light"
               color={index === 0 ? 'migraine' : 'sage'}
@@ -58,7 +58,7 @@ function InsightLineCards({ lines }: { lines: string[] }) {
                 {index + 1}
               </Text>
             </ThemeIcon>
-            <Text size="sm" lh={1.5} style={{ flex: 1 }}>
+            <Text size="sm" lh={1.55} style={{ flex: 1, minWidth: 0 }}>
               {line}
             </Text>
           </Group>
@@ -141,7 +141,7 @@ export default function InsightsPanel({
   return (
     <Box component="section" aria-label="Insights" className="insights-panel">
       <Accordion
-      radius="lg"
+        radius="lg"
         value={opened}
         onChange={setOpened}
         chevronPosition="right"
@@ -154,8 +154,8 @@ export default function InsightsPanel({
               </ThemeIcon>
             }
           >
-            <Group gap="xs" wrap="wrap">
-              <div>
+            <Group gap="sm" wrap="wrap" align="center">
+              <Stack gap={2}>
                 <Text
                   fw={700}
                   size="sm"
@@ -166,7 +166,7 @@ export default function InsightsPanel({
                 <Text size="xs" c="dimmed">
                   From your recorded diary days
                 </Text>
-              </div>
+              </Stack>
               {hasFactInsights ? (
                 <Badge size="sm" variant="light" color="sage" visibleFrom="xs">
                   {analysis.facts.length}{' '}
@@ -176,7 +176,7 @@ export default function InsightsPanel({
             </Group>
           </Accordion.Control>
           <Accordion.Panel>
-            <Stack gap="md">
+            <Stack gap="md" className="insights-panel-body">
               {loading ? (
                 <LoadingIndicator label="Loading diary" />
               ) : wordingBusy && lines === null ? (
@@ -184,7 +184,7 @@ export default function InsightsPanel({
               ) : (
                 <>
                   {aiWorded ? (
-                    <Group gap={6}>
+                    <Group gap={6} mb={-4}>
                       <ThemeIcon
                         size="sm"
                         radius="xl"
@@ -203,12 +203,7 @@ export default function InsightsPanel({
                     </Group>
                   ) : null}
                   <InsightLineCards lines={displayLines} />
-                  <Paper
-                    component="p"
-                    p="sm"
-                    radius="lg"
-                    className="insights-panel-disclaimer"
-                  >
+                  <Box className="insights-panel-disclaimer">
                     <Text size="xs" c="dimmed" lh={1.55}>
                       These observations reflect what you logged. They are not
                       medical advice and do not prove cause and effect.
@@ -216,7 +211,7 @@ export default function InsightsPanel({
                         ? ' Wording may use Cloudflare Workers AI on aggregated counts only.'
                         : ''}
                     </Text>
-                  </Paper>
+                  </Box>
                 </>
               )}
             </Stack>
