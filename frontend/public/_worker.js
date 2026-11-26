@@ -84,6 +84,7 @@ export async function hasAuthenticatedSession(request, apiOrigin) {
 function narratePrompt(facts) {
   return `Rephrase the following migraine diary statistics as ${MAX_LINES} short, friendly sentences.
 Use only the facts provided. Do not diagnose, predict, or invent numbers.
+When total counts are small, use cautious wording (for example "so far" or "in your logs") without claiming strong trends.
 One fact may become one sentence. Facts as JSON:
 ${JSON.stringify(facts)}`
 }

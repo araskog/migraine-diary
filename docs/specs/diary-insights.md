@@ -24,7 +24,8 @@ The existing **Pattern insights** statistics view ([pattern-insights-mvp.md](pat
 ## Data and thresholds
 
 - Analyze **migraine days** only for pattern facts.
-- Minimum migraine days before facts: **5** (`N_min`).
+- Minimum migraine days before any pattern facts (and narrate): **1** (`N_min`).
+- Compound sleep-duration × weekday facts still require at least **5** migraine days (`N_compound`) for a stable weekday baseline.
 - At most **3** insight lines (`K`).
 - Compound sleep-duration × weekday facts require at least **3** supporting days and **1.5×** lift over baseline weekday share.
 
@@ -45,7 +46,7 @@ Fields used: calendar date (weekday), `sleep_duration`, `sleep_quality`, `medica
 | ID | Observable outcome |
 |---|---|
 | DI1 | On the calendar view, a collapsible Insights panel is available while signed in. |
-| DI2 | With fewer than five migraine days recorded, the panel explains that more migraine days are needed; no narrate request is sent. |
+| DI2 | With no migraine days recorded, the panel asks the user to log migraine days; no narrate request is sent. With one or more migraine days and at least one ranked fact, narrate may run (subject to fallback rules). |
 | DI3 | With enough data, the user sees up to three observations with a non-medical disclaimer. |
 | DI4 | Template wording works without Workers AI (local Vite dev and narrate failures). |
 | DI5 | When narrate succeeds in production, lines reflect only supplied facts (no new clinical claims); failure falls back to templates without breaking the page. |
