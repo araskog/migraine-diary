@@ -50,6 +50,14 @@ Matt Pocock skills are **not** vendored in git (except [`review-pr`](../../.agen
 npx skills@latest add mattpocock/skills
 ```
 
+Restore from the lockfile (Cloud Agent builds and CI-friendly):
+
+```sh
+npx skills@latest experimental_install -a cursor -y --frozen-lockfile
+```
+
+Cloud Agent environment builds run the restore command via [`.cursor/environment.json`](../../.cursor/environment.json).
+
 Pin versions with [`skills-lock.json`](../../skills-lock.json) at the repo root.
 
 ## Concurrent work

@@ -1,0 +1,19 @@
+---
+description: Follow the migraine-diary agent development workflow for implementation, review, and PRs.
+alwaysApply: true
+---
+
+# Agent workflow (required)
+
+Before planning or changing product behavior, read and follow [docs/agents/workflow.md](docs/agents/workflow.md). Use it as the ordered checklist (triage → spec/tickets → implement or implement-spec → checks → code-review → pr → review-pr on the PR).
+
+Supporting docs (read when relevant, not instead of the workflow):
+
+- [AGENTS.md](AGENTS.md) — repo navigation, skills, and working rules
+- [docs/agents/reviews.md](docs/agents/reviews.md) — local vs GitHub review
+- [CODING_STANDARDS.md](CODING_STANDARDS.md) — style before implementation
+- [docs/specs/](docs/specs/) and [GLOSSARY.md](GLOSSARY.md) — behavior and vocabulary
+
+When a named skill applies (`/implement`, `/tdd`, `/code-review`, `/pr`, intake skills, etc.), **read the skill’s `SKILL.md` under `.agents/skills/`** and follow it. Matt Pocock skills are restored from `skills-lock.json` during Cloud Agent environment builds; on a fresh machine run `npx skills@latest experimental_install -a cursor -y` or `npx skills@latest add mattpocock/skills`.
+
+Do not skip workflow steps unless the user explicitly limits scope (e.g. question-only, no PR).

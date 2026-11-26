@@ -4,6 +4,8 @@
 
 Migraine Diary tracks migraine days. The application lives in `frontend/` (React/TypeScript/Vite) and `backend/` (Django REST Framework/PostgreSQL). See [README](README.md) for verified setup and checks.
 
+**Every agent chat** should follow the [workflow](docs/agents/workflow.md) (see also `.cursor/rules/agent-workflow.mdc`). Read that file at the start of implementation, review, or PR work.
+
 - Read the [workflow](docs/agents/workflow.md) for the full agent process (plan → implement → review → PR → merge).
 - Read [reviews](docs/agents/reviews.md) for **`/code-review`** (local) and **[`review-pr`](.agents/skills/review-pr/SKILL.md)** (publish Standards + Spec to GitHub).
 - Install Matt Pocock skills locally: `npx skills@latest add mattpocock/skills` (pinned in `skills-lock.json`).
@@ -51,3 +53,12 @@ Five canonical triage roles use GitHub label strings with the same names. See `d
 ### Domain docs
 
 Single-context layout: root `GLOSSARY.md` and `docs/adr/` when present. See `docs/agents/domain.md`.
+
+### Cloud Agents and skills on disk
+
+Matt skills under `.agents/skills/` are gitignored except [`review-pr`](.agents/skills/review-pr/SKILL.md). Cloud Agents must restore them from [`skills-lock.json`](skills-lock.json):
+
+- **Environment build:** [`.cursor/environment.json`](.cursor/environment.json) runs `npx skills@latest experimental_install -a cursor -y --frozen-lockfile` during the image build.
+- **Local / one-off:** `npx skills@latest add mattpocock/skills` or the same `experimental_install` command.
+
+If `.agents/skills/` is missing, only `review-pr` is available until restore runs. Point the Cloud Agent environment at this repository’s `.cursor/environment.json` (repo-managed environment) or add the same `install` line in the dashboard environment settings.
