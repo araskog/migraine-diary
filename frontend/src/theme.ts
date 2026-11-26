@@ -79,6 +79,18 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--mantine-color-dimmed': theme.colors.gray[7],
     '--app-control-background': theme.colors.sage[0],
     '--app-color-positive': theme.colors.sage[8],
+    '--app-insights-surface': theme.white,
+    '--app-insights-control-idle':
+      'color-mix(in srgb, var(--mantine-color-sage-0) 45%, white)',
+    '--app-insights-control-hover':
+      'color-mix(in srgb, var(--mantine-color-sage-1) 70%, white)',
+    '--app-insights-line-surface': theme.colors.gray[0],
+    '--app-insights-border': theme.colors.sage[2],
+    '--app-insights-chevron': theme.colors.sage[7],
+    '--app-insights-shell-shadow':
+      '0 1px 2px color-mix(in srgb, var(--mantine-color-sage-9) 6%, transparent)',
+    '--app-insights-line-shadow':
+      '0 1px 2px color-mix(in srgb, var(--mantine-color-sage-9) 4%, transparent)',
   },
   dark: {
     '--app-intro-background':
@@ -88,5 +100,13 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--mantine-color-dimmed': theme.colors.gray[3],
     '--app-control-background': theme.colors.dark[6],
     '--app-color-positive': theme.colors.sage[3],
+    '--app-insights-surface': theme.colors.dark[7],
+    '--app-insights-control-idle': theme.colors.dark[6],
+    '--app-insights-control-hover': theme.colors.dark[5],
+    '--app-insights-line-surface': theme.colors.dark[6],
+    '--app-insights-border': theme.colors.dark[4],
+    '--app-insights-chevron': theme.colors.sage[3],
+    '--app-insights-shell-shadow': 'none',
+    '--app-insights-line-shadow': 'none',
   },
 })
