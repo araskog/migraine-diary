@@ -219,9 +219,6 @@ export default function InsightsPanel({
                     <Text size="xs" c="dimmed" lh={1.55}>
                       These observations reflect what you logged. They are not
                       medical advice and do not prove cause and effect.
-                      {!aiWorded && hasFactInsights
-                        ? ' Wording uses the built-in template from your stats.'
-                        : ''}
                     </Text>
                   </Box>
                 </>
