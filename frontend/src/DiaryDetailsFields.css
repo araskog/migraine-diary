@@ -1,0 +1,28 @@
+.diary-details-fields {
+  width: 100%;
+  --diary-details-secondary: light-dark(
+    var(--mantine-color-gray-8),
+    var(--mantine-color-dimmed)
+  );
+}
+
+.diary-details-secondary {
+  color: var(--diary-details-secondary);
+}
+
+.diary-details-fields .mantine-Input-description {
+  color: var(--diary-details-secondary);
+}
+
+.diary-details-accordion {
+  background-color: var(--app-control-background);
+}
+
+.diary-details-accordion .mantine-Accordion-control {
+  padding-inline: var(--mantine-spacing-md);
+}
+
+.diary-details-accordion .mantine-Accordion-panel {
+  padding: var(--mantine-spacing-md);
+  padding-block-start: 0;
+}

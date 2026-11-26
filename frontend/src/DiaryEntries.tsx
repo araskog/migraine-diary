@@ -17,6 +17,10 @@ import DiaryStatusPicker from './DiaryStatusPicker'
 import ConfirmDialog from './ConfirmDialog'
 import ErrorMessages from './ErrorMessages'
 import { dateLabel, loadEntries, localDate, statusLabel } from './diary'
+import {
+  clearPhaseAStorage,
+  clearStoredSymptoms,
+} from './phaseAPrototypeStorage'
 import type { DiaryEntry, DiaryStatus } from './diary'
 import type { Session } from './session'
 import './DiaryEntries.css'
@@ -203,12 +207,15 @@ export default function DiaryEntries({
                     disabled={disabled || saving}
                     onCleared={() => {
                       setSelectionOpened(false)
+                      clearPhaseAStorage(date)
                       setEntries((previous) =>
                         previous.filter((entry) => entry.date !== date),
                       )
                     }}
                     onSaved={(saved) => {
                       setSelectionOpened(false)
+                      if (saved.status === 'migraine_free')
+                        clearStoredSymptoms(saved.date)
                       setEntries((previous) => [
                         ...previous.filter(
                           (entry) => entry.date !== saved.date,
@@ -249,18 +256,21 @@ export default function DiaryEntries({
       {current?.status === 'migraine' && (
         <Paper
           component="section"
+          className="diary-day-details"
           bg="var(--app-intro-background)"
           withBorder
           p="lg"
           aria-label={`Details for ${dateLabel(date)}`}
         >
-          <Stack gap="xs">
-            <Title order={2} size="h3">
-              Daily details
-            </Title>
-            <Text c="dimmed" size="sm">
-              {dateLabel(date)}
-            </Text>
+          <Stack gap="lg">
+            <Stack gap={4}>
+              <Title order={2} size="h3">
+                Daily details
+              </Title>
+              <Text size="sm" className="diary-details-secondary">
+                {dateLabel(date)}
+              </Text>
+            </Stack>
             <DiaryEntryForm
               key={`${date}-${current?.status ?? ''}-${revision}`}
               date={date}

@@ -1,12 +1,25 @@
 export type DiaryStatus = 'migraine' | 'migraine_free'
-export type DiaryDetails = {
+
+export type PhaseADiaryDetails = {
+  symptoms: string[]
+  personal_note: string
+}
+
+export type ApiDiaryDetails = {
   medication_taken: boolean | null
   medication_name: string
   sleep: '' | 'poor' | 'okay' | 'good'
   sleep_duration: '' | 'less' | 'usual' | 'more'
   pain_severity: number | null
 }
-export type DiaryEntry = { date: string; status: DiaryStatus } & DiaryDetails
+
+export type DiaryDetails = ApiDiaryDetails & PhaseADiaryDetails
+
+export type DiaryEntry = { date: string; status: DiaryStatus } & ApiDiaryDetails
+
+export function emptyPhaseADetails(): PhaseADiaryDetails {
+  return { symptoms: [], personal_note: '' }
+}
 
 export function emptyDetails(): DiaryDetails {
   return {
@@ -15,6 +28,17 @@ export function emptyDetails(): DiaryDetails {
     sleep: '',
     sleep_duration: '',
     pain_severity: null,
+    ...emptyPhaseADetails(),
+  }
+}
+
+export function apiDetailsFrom(details: DiaryDetails): ApiDiaryDetails {
+  return {
+    medication_taken: details.medication_taken,
+    medication_name: details.medication_name,
+    sleep: details.sleep,
+    sleep_duration: details.sleep_duration,
+    pain_severity: details.pain_severity,
   }
 }
 
@@ -90,6 +114,7 @@ export async function saveEntry(
   csrfToken: string,
   details?: DiaryDetails,
 ): Promise<DiaryEntry> {
+  const apiDetails = details ? apiDetailsFrom(details) : undefined
   const response = await fetch('/api/diary/entries/', {
     method: 'POST',
     headers: {
@@ -99,7 +124,7 @@ export async function saveEntry(
     body: JSON.stringify({
       date,
       status,
-      ...details,
+      ...apiDetails,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }),
   })
