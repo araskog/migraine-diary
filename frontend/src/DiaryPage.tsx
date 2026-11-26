@@ -8,6 +8,7 @@ import {
   Menu,
   Modal,
   PasswordInput,
+  SegmentedControl,
   Stack,
   Text,
 } from '@mantine/core'
@@ -17,6 +18,7 @@ import AppHeader from './AppHeader'
 import PrivacyNotice from './PrivacyNotice'
 import ErrorMessages from './ErrorMessages'
 import DiaryEntries from './DiaryEntries'
+import DiaryInsights from './DiaryInsights'
 import ConfirmDialog from './ConfirmDialog'
 import DemoNotice from './DemoNotice'
 import { DEMO_DISPLAY_NAME } from './demo'
@@ -48,6 +50,7 @@ export default function DiaryPage({
     false | 'sign-out' | 'create-account'
   >(false)
   const [errors, setErrors] = useState<string[]>([])
+  const [section, setSection] = useState<'calendar' | 'insights'>('calendar')
 
   function requestLeave(intent: 'sign-out' | 'create-account') {
     if (busy || saving || statusSaving) return
@@ -217,17 +220,33 @@ export default function DiaryPage({
         gap="lg"
         className={`page diary-page${isDemo ? ' diary-page--demo' : ''}`}
       >
-        <DiaryEntries
-          csrfToken={csrfToken}
+        <SegmentedControl
+          className="diary-section-toggle"
+          value={section}
+          onChange={(value) => {
+            if (value === 'calendar' || value === 'insights') setSection(value)
+          }}
           disabled={busy || statusSaving}
-          saving={saving || statusSaving}
-          onStatusSavingChange={setStatusSaving}
-          dirty={dirty}
-          onDirtyChange={setDirty}
-          onSavingChange={setSaving}
-          onSignedOut={onSignedOut}
-          onSessionRefreshed={onSessionRefreshed}
+          data={[
+            { label: 'Calendar', value: 'calendar' },
+            { label: 'Insights', value: 'insights' },
+          ]}
         />
+        {section === 'calendar' ? (
+          <DiaryEntries
+            csrfToken={csrfToken}
+            disabled={busy || statusSaving}
+            saving={saving || statusSaving}
+            onStatusSavingChange={setStatusSaving}
+            dirty={dirty}
+            onDirtyChange={setDirty}
+            onSavingChange={setSaving}
+            onSignedOut={onSignedOut}
+            onSessionRefreshed={onSessionRefreshed}
+          />
+        ) : (
+          <DiaryInsights active={section === 'insights'} />
+        )}
         <ErrorMessages messages={errors} />
         <Group
           component="footer"

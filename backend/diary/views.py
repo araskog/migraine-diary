@@ -1,9 +1,18 @@
+from datetime import timedelta
+
+from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from .insights import WINDOW_DAYS, compute_insights
 from .models import DiaryEntry
-from .serializers import DiaryDateInput, DiaryEntryInput, DiaryEntryOutput
+from .serializers import (
+    DiaryDateInput,
+    DiaryEntryInput,
+    DiaryEntryOutput,
+    InsightsQuery,
+)
 
 
 @never_cache
@@ -38,3 +47,19 @@ def entries(request):
         defaults=defaults,
     )
     return Response(DiaryEntryOutput(entry).data, status=201 if created else 200)
+
+
+@never_cache
+@api_view(["GET"])
+def insights(request):
+    serializer = InsightsQuery(data=request.query_params)
+    serializer.is_valid(raise_exception=True)
+    tz = serializer.validated_data["timezone"]
+    today = timezone.localdate(timezone.now(), tz)
+    window_start = today - timedelta(days=WINDOW_DAYS - 1)
+    entries = list(
+        DiaryEntry.objects.filter(
+            user=request.user, date__gte=window_start, date__lte=today
+        ).order_by("date")
+    )
+    return Response(compute_insights(entries, today))

@@ -40,6 +40,18 @@ export const theme = createTheme({
     }),
   },
   colors: {
+    migraine: [
+      '#fdeced',
+      '#f9d2d4',
+      '#f3aeb2',
+      '#ec878d',
+      '#e46971',
+      '#e85d65',
+      '#d64f57',
+      '#c43f47',
+      '#a8333a',
+      '#8f2b31',
+    ],
     sage: [
       '#edf2ed',
       '#e1ecdf',

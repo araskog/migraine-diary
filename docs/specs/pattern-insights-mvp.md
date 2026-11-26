@@ -1,0 +1,34 @@
+# Pattern Insights (Deterministic MVP)
+
+Status: Step 1 (deterministic stats) implemented. LLM narrative and MCP chat remain out of scope.
+
+## Goal and Scope
+
+A signed-in user can view descriptive pattern statistics computed from their own diary entries. Insights use existing diary fields only: status, date, sleep, sleep duration, pain severity, and medication taken. No LLM, chat, or MCP tools are included.
+
+Statistics cover a rolling window ending on the user's local today (90 days by default). The calendar still treats a missing entry as unrecorded, not migraine-free. For **migraine share** calculations only, each day in the window counts toward the denominator; unrecorded days contribute zero migraine days (equivalent to non-migraine for the rate). Optional detail fields contribute only on days where the user answered them. The UI states this assumption.
+
+A future step may add a short written summary at the top of the Insights tab, generated from the same structured stats (not replacing them).
+
+## Acceptance Criteria
+
+| ID | Observable outcome |
+|---|---|
+| I1 | A signed-in user can open an Insights view and receive pattern statistics for their own entries only. |
+| I2 | Unauthenticated requests and another user's session cannot read insights. |
+| I3 | The response states calendar days in the window, recorded, unrecorded, and migraine day counts, migraine share (migraine days ÷ calendar days), and flags `insufficient_data` when recorded days are below the minimum threshold (10). |
+| I4 | Weekday, sleep duration, sleep quality, and medication slices include sample sizes and flag slices below the minimum threshold (3 days). |
+| I5 | Step 1: a single window-level pain severity average on migraine days with a pain answer (no grouped pain by sleep or medication). |
+| I6 | The UI hides detailed breakdown tables when `insufficient_data` is set, and downplays individual slice comparisons flagged insufficient (e.g. “Few answers”). |
+
+## API
+
+`GET /api/diary/insights/?timezone=<IANA>`
+
+Requires authentication. Validates timezone like diary saves. Computes `today` in that timezone. Loads only diary rows in the rolling window at the database. Returns JSON with `schema_version`, `window_days`, `today`, coverage counts, summary for the window (including window-level average pain), weekday breakdown, and categorical slices. Responses are not cached (`Cache-Control: no-store, private`).
+
+## Delivery and Verification
+
+Backend unit tests cover computation, thresholds, isolation, and timezone boundaries. Frontend tests cover response validation. Manual verification uses the demo account, which includes varied synthetic entries.
+
+References: [architecture](../architecture.md), [glossary](../../GLOSSARY.md), [coding standards](../../CODING_STANDARDS.md).

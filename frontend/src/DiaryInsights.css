@@ -1,0 +1,41 @@
+.diary-insights-page {
+  min-width: 0;
+}
+
+.diary-insights-narrative-slot {
+  display: none;
+}
+
+.diary-insights-hero {
+  background: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
+}
+
+.diary-insights-stat {
+  background: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-7)
+  );
+}
+
+.diary-insights-section {
+  background: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-7)
+  );
+  min-width: 0;
+}
+
+.diary-insights-chart-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin-inline: calc(-1 * var(--mantine-spacing-md));
+  padding-inline: var(--mantine-spacing-md);
+}
+
+.diary-insights-chart-fit {
+  overflow: hidden;
+  min-width: 0;
+}
