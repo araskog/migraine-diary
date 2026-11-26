@@ -279,7 +279,9 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
             </Accordion.Panel>
           </Accordion.Item>
           <Accordion.Item value="sleep-duration">
-            <Accordion.Control>Migraine days by sleep duration</Accordion.Control>
+            <Accordion.Control>
+              Migraine days by sleep duration
+            </Accordion.Control>
             <Accordion.Panel>
               <SliceTable
                 caption="Migraine days when sleep duration was logged"
@@ -290,7 +292,9 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
             </Accordion.Panel>
           </Accordion.Item>
           <Accordion.Item value="sleep-quality">
-            <Accordion.Control>Migraine days by sleep quality</Accordion.Control>
+            <Accordion.Control>
+              Migraine days by sleep quality
+            </Accordion.Control>
             <Accordion.Panel>
               <SliceTable
                 caption="Migraine days when sleep quality was logged"
