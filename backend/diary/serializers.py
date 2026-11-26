@@ -4,6 +4,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from .models import DiaryEntry
+from .symptom_catalog import SYMPTOM_CODES
 
 
 class DiaryDateInput(serializers.Serializer):
@@ -38,6 +39,20 @@ class DiaryEntryInput(DiaryDateInput):
     pain_severity = serializers.IntegerField(
         required=False, allow_null=True, min_value=0, max_value=10
     )
+    symptoms = serializers.ListField(
+        child=serializers.CharField(max_length=32),
+        required=False,
+        allow_empty=True,
+    )
+    personal_note = serializers.CharField(
+        required=False, allow_blank=True, max_length=2000
+    )
+
+    def validate_symptoms(self, value):
+        invalid = [code for code in value if code not in SYMPTOM_CODES]
+        if invalid:
+            raise serializers.ValidationError("Unknown symptom codes.")
+        return value
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
@@ -51,6 +66,10 @@ class DiaryEntryInput(DiaryDateInput):
         ):
             raise serializers.ValidationError(
                 {"pain_severity": "Pain severity is recorded on migraine days."}
+            )
+        if attrs["status"] == DiaryEntry.Status.MIGRAINE_FREE and attrs.get("symptoms"):
+            raise serializers.ValidationError(
+                {"symptoms": "Symptoms are recorded on migraine days."}
             )
         return attrs
 
@@ -66,4 +85,6 @@ class DiaryEntryOutput(serializers.ModelSerializer):
             "sleep",
             "sleep_duration",
             "pain_severity",
+            "symptoms",
+            "personal_note",
         ]

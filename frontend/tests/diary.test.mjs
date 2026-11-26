@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict'
 import { afterEach, mock, test } from 'node:test'
 import {
-  apiDetailsFrom,
   emptyDetails,
   isDiaryDate,
   clearEntry,
@@ -137,6 +136,8 @@ test('saving optional details retains explicit no and zero and sends clearing va
       sleep: 'okay',
       sleep_duration: 'usual',
       pain_severity: 0,
+      symptoms: ['nausea'],
+      personal_note: 'Synthetic note',
     },
     {
       medication_taken: true,
@@ -144,19 +145,19 @@ test('saving optional details retains explicit no and zero and sends clearing va
       sleep: 'poor',
       sleep_duration: 'less',
       pain_severity: 10,
+      symptoms: [],
+      personal_note: '',
     },
     emptyDetails(),
   ]) {
     mock.method(globalThis, 'fetch', async (_url, options) => {
       const body = JSON.parse(options.body)
-      assert.equal(Object.hasOwn(body, 'symptoms'), false)
-      assert.equal(Object.hasOwn(body, 'personal_note'), false)
-      for (const [key, value] of Object.entries(apiDetailsFrom(details)))
+      for (const [key, value] of Object.entries(details))
         assert.deepEqual(body[key], value)
       return Response.json({
         date: body.date,
         status: body.status,
-        ...apiDetailsFrom(details),
+        ...details,
       })
     })
     assert.deepEqual(
@@ -164,7 +165,7 @@ test('saving optional details retains explicit no and zero and sends clearing va
       {
         date: '2026-11-10',
         status: 'migraine',
-        ...apiDetailsFrom(details),
+        ...details,
       },
     )
     mock.restoreAll()
@@ -181,6 +182,9 @@ test('malformed optional details never become a successful load', async () => {
     { sleep: null },
     { sleep_duration: 'unknown' },
     { sleep_duration: null },
+    { symptoms: 'nausea' },
+    { personal_note: 12 },
+    { personal_note: 'x'.repeat(2001) },
   ]) {
     mock.method(globalThis, 'fetch', async () =>
       Response.json([

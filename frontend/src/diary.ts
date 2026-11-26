@@ -1,25 +1,16 @@
 export type DiaryStatus = 'migraine' | 'migraine_free'
 
-export type PhaseADiaryDetails = {
-  symptoms: string[]
-  personal_note: string
-}
-
-export type ApiDiaryDetails = {
+export type DiaryDetails = {
   medication_taken: boolean | null
   medication_name: string
   sleep: '' | 'poor' | 'okay' | 'good'
   sleep_duration: '' | 'less' | 'usual' | 'more'
   pain_severity: number | null
+  symptoms: string[]
+  personal_note: string
 }
 
-export type DiaryDetails = ApiDiaryDetails & PhaseADiaryDetails
-
-export type DiaryEntry = { date: string; status: DiaryStatus } & ApiDiaryDetails
-
-export function emptyPhaseADetails(): PhaseADiaryDetails {
-  return { symptoms: [], personal_note: '' }
-}
+export type DiaryEntry = { date: string; status: DiaryStatus } & DiaryDetails
 
 export function emptyDetails(): DiaryDetails {
   return {
@@ -28,17 +19,8 @@ export function emptyDetails(): DiaryDetails {
     sleep: '',
     sleep_duration: '',
     pain_severity: null,
-    ...emptyPhaseADetails(),
-  }
-}
-
-export function apiDetailsFrom(details: DiaryDetails): ApiDiaryDetails {
-  return {
-    medication_taken: details.medication_taken,
-    medication_name: details.medication_name,
-    sleep: details.sleep,
-    sleep_duration: details.sleep_duration,
-    pain_severity: details.pain_severity,
+    symptoms: [],
+    personal_note: '',
   }
 }
 
@@ -69,6 +51,13 @@ export function statusLabel(status?: DiaryStatus): string {
       : 'Unrecorded'
 }
 
+function isSymptoms(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.every((item) => typeof item === 'string' && item.length > 0)
+  )
+}
+
 function isEntry(value: unknown): value is DiaryEntry {
   return (
     typeof value === 'object' &&
@@ -93,7 +82,12 @@ function isEntry(value: unknown): value is DiaryEntry {
       (typeof value.pain_severity === 'number' &&
         Number.isInteger(value.pain_severity) &&
         value.pain_severity >= 0 &&
-        value.pain_severity <= 10))
+        value.pain_severity <= 10)) &&
+    'symptoms' in value &&
+    isSymptoms(value.symptoms) &&
+    'personal_note' in value &&
+    typeof value.personal_note === 'string' &&
+    value.personal_note.length <= 2000
   )
 }
 
@@ -114,7 +108,6 @@ export async function saveEntry(
   csrfToken: string,
   details?: DiaryDetails,
 ): Promise<DiaryEntry> {
-  const apiDetails = details ? apiDetailsFrom(details) : undefined
   const response = await fetch('/api/diary/entries/', {
     method: 'POST',
     headers: {
@@ -124,7 +117,7 @@ export async function saveEntry(
     body: JSON.stringify({
       date,
       status,
-      ...apiDetails,
+      ...details,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }),
   })

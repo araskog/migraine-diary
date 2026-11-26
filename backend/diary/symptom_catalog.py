@@ -1,0 +1,27 @@
+SYMPTOM_CODES = frozenset(
+    {
+        "throbbing",
+        "pressure",
+        "stabbing",
+        "one_sided",
+        "both_sides",
+        "neck_pain",
+        "light_sensitivity",
+        "sound_sensitivity",
+        "smell_sensitivity",
+        "visual_aura",
+        "sensory_aura",
+        "nausea",
+        "vomiting",
+        "dizziness",
+        "brain_fog",
+        "fatigue",
+        "difficulty_speaking",
+        "yawning",
+        "food_cravings",
+        "neck_stiffness",
+        "mood_changes",
+        "frequent_urination",
+        "unusual_tiredness",
+    }
+)
