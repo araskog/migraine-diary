@@ -1,16 +1,13 @@
-function usesApiOrigin(pathname) {
-  return (
-    pathname.startsWith('/api/') ||
-    pathname === '/admin' ||
-    pathname.startsWith('/admin/') ||
-    pathname.startsWith('/static/admin/')
-  )
-}
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
-    if (!usesApiOrigin(url.pathname)) {
+    const { pathname } = url
+    const proxied =
+      pathname.startsWith('/api/') ||
+      pathname === '/admin' ||
+      pathname.startsWith('/admin/') ||
+      pathname.startsWith('/static/admin/')
+    if (!proxied) {
       return env.ASSETS.fetch(request)
     }
     let upstream
@@ -45,7 +42,7 @@ export default {
         redirect: 'manual',
       })
       const result = new Response(response.body, response)
-      if (!url.pathname.startsWith('/static/admin/')) {
+      if (!pathname.startsWith('/static/admin/')) {
         result.headers.set('Cache-Control', 'no-store')
       }
       return result

@@ -21,7 +21,7 @@ uv run --env-file .env python manage.py migrate
 uv run --env-file .env python manage.py runserver 127.0.0.1:8000
 ```
 
-Adjust PostgreSQL connection settings in `backend/.env` if needed; the role must be able to create a test database. Keep `.env` untracked. Local `config.settings` defaults `DJANGO_DEBUG` to on (Django admin CSS and debug pages); set `DJANGO_DEBUG=0` in `.env` for production-like behavior.
+Adjust PostgreSQL connection settings in `backend/.env` if needed; the role must be able to create a test database. Keep `.env` untracked. `DJANGO_DEBUG` defaults on in `config.settings`; set `DJANGO_DEBUG=0` to disable.
 
 In another terminal, from the repository root:
 
@@ -36,8 +36,6 @@ Open [Migraine Diary](http://127.0.0.1:5173/static/app/). For [Django admin](htt
 ```sh
 uv run --env-file .env python manage.py createsuperuser
 ```
-
-In production, after the frontend deploys with the Pages worker changes, open Django admin at `/admin/` on the public Pages origin (for example `https://migraine-diary.pages.dev/admin/`). That path is proxied to the Vercel API; the diary UI continues to use `/api/*` on the same origin.
 
 ## Checks
 
