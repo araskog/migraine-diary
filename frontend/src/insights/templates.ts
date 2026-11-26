@@ -1,4 +1,4 @@
-import { MAX_INSIGHT_LINES, MIN_MIGRAINE_DAYS } from './constants.ts'
+import { MAX_INSIGHT_LINES } from './constants.ts'
 import type { InsightAnalysis, InsightFact } from './types.ts'
 
 function percent(share: number): string {
@@ -21,13 +21,8 @@ function renderFact(fact: InsightFact): string {
 }
 
 export function templateInsightLines(analysis: InsightAnalysis): string[] {
-  if (analysis.migraineDayCount < MIN_MIGRAINE_DAYS) {
-    const remaining = MIN_MIGRAINE_DAYS - analysis.migraineDayCount
-    return [
-      remaining === 1
-        ? 'Log one more migraine day to see pattern insights.'
-        : `Log ${remaining} more migraine days to see pattern insights.`,
-    ]
+  if (analysis.migraineDayCount < 1) {
+    return ['Log migraine days in your diary to see pattern insights.']
   }
   if (analysis.facts.length === 0) {
     return [

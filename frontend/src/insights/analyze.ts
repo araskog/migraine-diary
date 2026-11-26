@@ -4,6 +4,7 @@ import {
   MAX_INSIGHT_LINES,
   MIN_COMPOUND_CELL_DAYS,
   MIN_MIGRAINE_DAYS,
+  MIN_MIGRAINE_DAYS_COMPOUND,
   SLEEP_DURATION_LABELS,
   WEEKDAY_LABELS,
 } from './constants.ts'
@@ -84,7 +85,7 @@ function medicationShareFact(days: DiaryEntry[]): InsightFact | null {
 
 function compoundSleepWeekdayFacts(days: DiaryEntry[]): InsightFact[] {
   const total = days.length
-  if (total < MIN_MIGRAINE_DAYS) return []
+  if (total < MIN_MIGRAINE_DAYS_COMPOUND) return []
   const baseline = [0, 0, 0, 0, 0, 0, 0]
   for (const day of days) {
     baseline[weekdayIndexFromDate(day.date)] += 1

@@ -1,5 +1,9 @@
 export { analyzeInsightFacts } from './analyze.ts'
-export { MIN_MIGRAINE_DAYS, MAX_INSIGHT_LINES } from './constants.ts'
+export {
+  MIN_MIGRAINE_DAYS,
+  MIN_MIGRAINE_DAYS_COMPOUND,
+  MAX_INSIGHT_LINES,
+} from './constants.ts'
 export {
   buildInsightsFingerprint,
   hashInsightsFingerprint,

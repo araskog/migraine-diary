@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { analyzeInsightFacts } from '../src/insights/analyze.ts'
-import { MIN_MIGRAINE_DAYS } from '../src/insights/constants.ts'
+import { MIN_MIGRAINE_DAYS_COMPOUND } from '../src/insights/constants.ts'
 import { templateInsightLines } from '../src/insights/templates.ts'
 import { emptyDetails } from '../src/diary.ts'
 
@@ -14,19 +14,37 @@ function migraineDay(date, details = {}) {
   }
 }
 
-test('below minimum migraine days yields guidance templates', () => {
+test('no migraine days yields guidance templates', () => {
+  const analysis = analyzeInsightFacts([])
+  assert.equal(analysis.sufficientData, false)
+  assert.equal(analysis.migraineDayCount, 0)
+  const lines = templateInsightLines(analysis)
+  assert.match(lines[0], /Log migraine days/)
+})
+
+test('one migraine day yields weekday peak for narrate', () => {
+  const analysis = analyzeInsightFacts([migraineDay('2026-01-06')])
+  assert.equal(analysis.migraineDayCount, 1)
+  assert.ok(analysis.facts.length >= 1)
+  const peak = analysis.facts.find((fact) => fact.kind === 'weekday_peak')
+  assert.ok(peak)
+  assert.equal(peak.weekday, 'Tuesday')
+  assert.equal(peak.count, 1)
+  assert.ok(analysis.sufficientData)
+})
+
+test('few migraine days skip compound facts until compound minimum', () => {
   const analysis = analyzeInsightFacts([
     migraineDay('2026-01-06'),
     migraineDay('2026-01-08'),
     migraineDay('2026-01-13'),
   ])
-  assert.equal(analysis.sufficientData, false)
   assert.equal(analysis.migraineDayCount, 3)
-  const lines = templateInsightLines(analysis)
-  assert.match(
-    lines[0],
-    new RegExp(`${MIN_MIGRAINE_DAYS - 3} more migraine days`),
+  assert.ok(analysis.facts.length >= 1)
+  assert.ok(
+    !analysis.facts.some((fact) => fact.kind === 'sleep_duration_weekday'),
   )
+  assert.ok(analysis.migraineDayCount < MIN_MIGRAINE_DAYS_COMPOUND)
 })
 
 test('compound sleep duration and weekday is ranked', () => {

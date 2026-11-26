@@ -19,7 +19,6 @@ import {
   readNarrateCache,
   templateInsightLines,
   writeNarrateCache,
-  MIN_MIGRAINE_DAYS,
 } from './insights/index.ts'
 import type { DiaryEntry } from './diary'
 import LoadingIndicator from './LoadingIndicator'
@@ -89,16 +88,10 @@ export default function InsightsPanel({
     [entries],
   )
   const isOpen = opened === 'insights'
-  const hasFactInsights =
-    analysis.migraineDayCount >= MIN_MIGRAINE_DAYS && analysis.facts.length > 0
+  const hasFactInsights = analysis.facts.length > 0
 
   useEffect(() => {
     if (!isOpen || loading) return
-    if (analysis.migraineDayCount < MIN_MIGRAINE_DAYS) {
-      setLines(templateLines)
-      setAiWorded(false)
-      return
-    }
     if (analysis.facts.length === 0) {
       setLines(templateLines)
       setAiWorded(false)
