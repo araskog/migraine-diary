@@ -91,9 +91,7 @@ function sliceStaples(
   if (logged.length === 0) return []
   return orderStapleRows(logged).map((row) => ({
     key: String(row.value),
-    label: options?.shortLabels
-      ? shortenSleepChartLabel(row.label)
-      : row.label,
+    label: options?.shortLabels ? shortenSleepChartLabel(row.label) : row.label,
     migraineDays: row.migraine_days,
     sufficientData: row.sufficient_data,
   }))
