@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Accordion,
+  Alert,
   Badge,
   Box,
   Group,
@@ -167,12 +168,29 @@ export default function InsightsPanel({
                   From your recorded diary days
                 </Text>
               </Stack>
-              {hasFactInsights ? (
-                <Badge size="sm" variant="light" color="sage" visibleFrom="xs">
-                  {analysis.facts.length}{' '}
-                  {analysis.facts.length === 1 ? 'pattern' : 'patterns'}
-                </Badge>
-              ) : null}
+              <Group gap="xs">
+                {hasFactInsights ? (
+                  <Badge
+                    size="sm"
+                    variant="light"
+                    color="sage"
+                    visibleFrom="xs"
+                  >
+                    {analysis.facts.length}{' '}
+                    {analysis.facts.length === 1 ? 'pattern' : 'patterns'}
+                  </Badge>
+                ) : null}
+                {aiWorded ? (
+                  <Badge
+                    size="sm"
+                    variant="light"
+                    color="sage"
+                    leftSection={<IconSparkles size={12} stroke={1.75} />}
+                  >
+                    AI wording
+                  </Badge>
+                ) : null}
+              </Group>
             </Group>
           </Accordion.Control>
           <Accordion.Panel>
@@ -184,31 +202,25 @@ export default function InsightsPanel({
               ) : (
                 <>
                   {aiWorded ? (
-                    <Group gap={6} mb={-4}>
-                      <ThemeIcon
-                        size="sm"
-                        radius="xl"
-                        color="sage"
-                        variant="transparent"
-                        aria-hidden
-                      >
-                        <IconSparkles size={14} stroke={1.75} />
-                      </ThemeIcon>
-                      <Text
-                        size="xs"
-                        c="light-dark(var(--mantine-color-sage-8), var(--mantine-color-sage-3))"
-                      >
-                        AI wording from your stats
-                      </Text>
-                    </Group>
+                    <Alert
+                      variant="light"
+                      color="sage"
+                      radius="md"
+                      icon={<IconSparkles size={18} stroke={1.75} />}
+                      title="AI-assisted wording"
+                    >
+                      Cloudflare Workers AI rephrased these observations from
+                      aggregated statistics only. The underlying facts match
+                      your diary; nothing new was invented.
+                    </Alert>
                   ) : null}
                   <InsightLineCards lines={displayLines} />
                   <Box className="insights-panel-disclaimer">
                     <Text size="xs" c="dimmed" lh={1.55}>
                       These observations reflect what you logged. They are not
                       medical advice and do not prove cause and effect.
-                      {aiWorded
-                        ? ' Wording may use Cloudflare Workers AI on aggregated counts only.'
+                      {!aiWorded && hasFactInsights
+                        ? ' Wording uses the built-in template from your stats.'
                         : ''}
                     </Text>
                   </Box>
