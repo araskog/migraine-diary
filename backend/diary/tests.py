@@ -382,6 +382,7 @@ class DiaryEntryTests(TestCase):
                     )
 
     def test_phase_a_symptoms_persist_on_migraine_days(self):
+        self.save()
         response = self.save(symptoms=["nausea", "throbbing"])
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["symptoms"], ["nausea", "throbbing"])
@@ -427,4 +428,6 @@ class DiaryEntryTests(TestCase):
 
     def test_phase_a_symptoms_rejected_on_migraine_free(self):
         self.save(status="migraine_free")
-        self.assertEqual(self.save(symptoms=["nausea"]).status_code, 400)
+        self.assertEqual(
+            self.save(status="migraine_free", symptoms=["nausea"]).status_code, 400
+        )
