@@ -135,7 +135,11 @@ function MigraineStapleChart({
           data={chartData}
           dataKey="category"
           series={[
-            { name: 'migraineDays', color: 'migraine.6', label: 'Migraine days' },
+            {
+              name: 'migraineDays',
+              color: 'migraine.6',
+              label: 'Migraine days',
+            },
           ]}
           withLegend={false}
           withTooltip
