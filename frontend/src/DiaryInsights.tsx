@@ -20,7 +20,7 @@ import {
   type DiaryInsights,
   type InsightsSlice,
   type InsightsWeekdaySlice,
-} from './insights'
+} from './patternInsights'
 import './DiaryInsights.css'
 
 type DiaryInsightsProps = {

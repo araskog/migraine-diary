@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from .demo import create_demo_user
 from .models import User
 
-PRIVACY_POLICY_VERSION = "2026-11-13"
+PRIVACY_POLICY_VERSION = "2026-11-26"
 
 
 class RegistrationConsent(serializers.Serializer):

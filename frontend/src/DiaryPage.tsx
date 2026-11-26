@@ -229,7 +229,7 @@ export default function DiaryPage({
           disabled={busy || statusSaving}
           data={[
             { label: 'Calendar', value: 'calendar' },
-            { label: 'Insights', value: 'insights' },
+            { label: 'Insights Details', value: 'insights' },
           ]}
         />
         {section === 'calendar' ? (

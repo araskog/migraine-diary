@@ -17,6 +17,7 @@ import DiaryStatusPicker from './DiaryStatusPicker'
 import ConfirmDialog from './ConfirmDialog'
 import ErrorMessages from './ErrorMessages'
 import { dateLabel, loadEntries, localDate, statusLabel } from './diary'
+import InsightsPanel from './InsightsPanel'
 import type { DiaryEntry, DiaryStatus } from './diary'
 import type { Session } from './session'
 import './DiaryEntries.css'
@@ -100,190 +101,192 @@ export default function DiaryEntries({
     )
 
   return (
-    <SimpleGrid
-      cols={{ base: 1, sm: 2 }}
-      spacing="xl"
-      verticalSpacing="xl"
-      className="diary-entries"
-    >
-      <ConfirmDialog
-        opened={pendingDate !== null}
-        title="Unsaved details"
-        message="Discard your unfinished details and choose another day?"
-        confirmLabel="Discard and continue"
-        onClose={() => setPendingDate(null)}
-        onConfirm={() => {
-          if (pendingDate) setDate(pendingDate)
-          setRevision((value) => value + 1)
-          setSelectionOpened(true)
-          setPendingDate(null)
-        }}
+    <Stack gap="lg" className="diary-entries">
+      <InsightsPanel
+        entries={entries}
+        loading={loading}
+        csrfToken={csrfToken}
       />
-      <Box>
-        <DatePicker
-          aria-label="Diary calendar"
-          value={date}
-          date={visibleMonth}
-          onDateChange={(month) => {
-            if (!disabled && !saving) {
-              setVisibleMonth(month)
-              setSelectionOpened(false)
-            }
-          }}
-          onChange={(value) => {
-            if (!disabled && !saving && value && value <= localDate()) {
-              if (dirty) {
-                setPendingDate(value)
-                return
-              }
-              setDate(value)
-              setSelectionOpened(true)
-            }
-          }}
-          firstDayOfWeek={1}
-          fullWidth
-          maxLevel="year"
-          onLevelChange={() => setSelectionOpened(false)}
-          ariaLabels={{
-            monthLevelControl: 'Choose month',
-            previousMonth: 'Previous month',
-            nextMonth: 'Next month',
-            previousYear: 'Previous year',
-            nextYear: 'Next year',
-          }}
-          maxDate={today}
-          size="lg"
-          withCellSpacing={false}
-          weekendDays={[]}
-          getDayProps={(day) => ({
-            disabled: day > today,
-            'aria-disabled': disabled || saving || day > today,
-            className:
-              (disabled || saving) && day <= today
-                ? 'calendar-day-busy'
-                : undefined,
-            'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
-          })}
-          renderDay={(day) => {
-            const status = statuses.get(day)
-            const content = (
-              <span className="calendar-day">
-                <span>{Number(day.slice(-2))}</span>
-                <span
-                  className={`calendar-marker ${day > today ? 'future' : (status ?? 'unrecorded')}`}
-                  aria-hidden="true"
-                >
-                  {status ? statusIcons[status] : null}
-                </span>
-              </span>
-            )
-            if (day !== date) return content
-            return (
-              <Popover
-                opened={selectionOpened}
-                onChange={(opened) => {
-                  if (!disabled) setSelectionOpened(opened)
-                }}
-                position="bottom"
-                width={190}
-                shadow="sm"
-                trapFocus
-                returnFocus
-              >
-                <Popover.Target>{content}</Popover.Target>
-                <Popover.Dropdown
-                  p="xs"
-                  aria-label={`Status for ${dateLabel(date)}`}
-                >
-                  <DiaryStatusPicker
-                    key={date}
-                    date={date}
-                    entry={current}
-                    csrfToken={csrfToken}
-                    disabled={disabled || saving}
-                    onCleared={() => {
-                      setSelectionOpened(false)
-                      setEntries((previous) =>
-                        previous.filter((entry) => entry.date !== date),
-                      )
-                    }}
-                    onSaved={(saved) => {
-                      setSelectionOpened(false)
-                      setEntries((previous) => [
-                        ...previous.filter(
-                          (entry) => entry.date !== saved.date,
-                        ),
-                        saved,
-                      ])
-                    }}
-                    onSavingChange={onStatusSavingChange}
-                    onSignedOut={onSignedOut}
-                    onSessionRefreshed={onSessionRefreshed}
-                  />
-                </Popover.Dropdown>
-              </Popover>
-            )
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xl" verticalSpacing="xl">
+        <ConfirmDialog
+          opened={pendingDate !== null}
+          title="Unsaved details"
+          message="Discard your unfinished details and choose another day?"
+          confirmLabel="Discard and continue"
+          onClose={() => setPendingDate(null)}
+          onConfirm={() => {
+            if (pendingDate) setDate(pendingDate)
+            setRevision((value) => value + 1)
+            setSelectionOpened(true)
+            setPendingDate(null)
           }}
         />
-        <Group gap="lg" mt="md" wrap="wrap">
-          <Group gap="xs">
-            <Text span size="xs" fw={700} c="var(--app-migraine)" aria-hidden>
-              ●
-            </Text>
-            <Text size="xs">Migraine</Text>
-          </Group>
-          <Group gap="xs">
-            <Text
-              span
-              size="xs"
-              fw={700}
-              c="light-dark(var(--mantine-color-sage-7), var(--mantine-color-sage-3))"
-              aria-hidden
-            >
-              ○
-            </Text>
-            <Text size="xs">Migraine-free</Text>
-          </Group>
-        </Group>
-      </Box>
-      {current && (
-        <Paper
-          component="section"
-          className="diary-day-details"
-          bg="var(--app-intro-background)"
-          withBorder
-          p="lg"
-          aria-label={`Details for ${dateLabel(date)}`}
-        >
-          <Stack gap="lg">
-            <Stack gap={4}>
-              <Title order={2} size="h3">
-                Daily details
-              </Title>
-              <Text size="sm" className="diary-details-secondary">
-                {dateLabel(date)}
-              </Text>
-            </Stack>
-            <DiaryEntryForm
-              key={`${date}-${current?.status ?? ''}-${revision}`}
-              date={date}
-              entry={current}
-              csrfToken={csrfToken}
-              disabled={disabled}
-              onSaved={(saved) =>
-                setEntries((previous) => [
-                  ...previous.filter((entry) => entry.date !== saved.date),
-                  saved,
-                ])
+        <Box>
+          <DatePicker
+            aria-label="Diary calendar"
+            value={date}
+            date={visibleMonth}
+            onDateChange={(month) => {
+              if (!disabled && !saving) {
+                setVisibleMonth(month)
+                setSelectionOpened(false)
               }
-              onDirtyChange={onDirtyChange}
-              onSavingChange={onSavingChange}
-              onSignedOut={onSignedOut}
-              onSessionRefreshed={onSessionRefreshed}
-            />
-          </Stack>
-        </Paper>
-      )}
-    </SimpleGrid>
+            }}
+            onChange={(value) => {
+              if (!disabled && !saving && value && value <= localDate()) {
+                if (dirty) {
+                  setPendingDate(value)
+                  return
+                }
+                setDate(value)
+                setSelectionOpened(true)
+              }
+            }}
+            firstDayOfWeek={1}
+            fullWidth
+            maxLevel="year"
+            onLevelChange={() => setSelectionOpened(false)}
+            ariaLabels={{
+              monthLevelControl: 'Choose month',
+              previousMonth: 'Previous month',
+              nextMonth: 'Next month',
+              previousYear: 'Previous year',
+              nextYear: 'Next year',
+            }}
+            maxDate={today}
+            size="lg"
+            withCellSpacing={false}
+            weekendDays={[]}
+            getDayProps={(day) => ({
+              disabled: day > today,
+              'aria-disabled': disabled || saving || day > today,
+              className:
+                (disabled || saving) && day <= today
+                  ? 'calendar-day-busy'
+                  : undefined,
+              'aria-label': `${dateLabel(day)}, ${day > today ? 'Future date' : statusLabel(statuses.get(day))}`,
+            })}
+            renderDay={(day) => {
+              const status = statuses.get(day)
+              const content = (
+                <span className="calendar-day">
+                  <span>{Number(day.slice(-2))}</span>
+                  <span
+                    className={`calendar-marker ${day > today ? 'future' : (status ?? 'unrecorded')}`}
+                    aria-hidden="true"
+                  >
+                    {status ? statusIcons[status] : null}
+                  </span>
+                </span>
+              )
+              if (day !== date) return content
+              return (
+                <Popover
+                  opened={selectionOpened}
+                  onChange={(opened) => {
+                    if (!disabled) setSelectionOpened(opened)
+                  }}
+                  position="bottom"
+                  width={190}
+                  shadow="sm"
+                  trapFocus
+                  returnFocus
+                >
+                  <Popover.Target>{content}</Popover.Target>
+                  <Popover.Dropdown
+                    p="xs"
+                    aria-label={`Status for ${dateLabel(date)}`}
+                  >
+                    <DiaryStatusPicker
+                      key={date}
+                      date={date}
+                      entry={current}
+                      csrfToken={csrfToken}
+                      disabled={disabled || saving}
+                      onCleared={() => {
+                        setSelectionOpened(false)
+                        setEntries((previous) =>
+                          previous.filter((entry) => entry.date !== date),
+                        )
+                      }}
+                      onSaved={(saved) => {
+                        setSelectionOpened(false)
+                        setEntries((previous) => [
+                          ...previous.filter(
+                            (entry) => entry.date !== saved.date,
+                          ),
+                          saved,
+                        ])
+                      }}
+                      onSavingChange={onStatusSavingChange}
+                      onSignedOut={onSignedOut}
+                      onSessionRefreshed={onSessionRefreshed}
+                    />
+                  </Popover.Dropdown>
+                </Popover>
+              )
+            }}
+          />
+          <Group gap="lg" mt="md" wrap="wrap">
+            <Group gap="xs">
+              <Text span size="xs" fw={700} c="var(--app-migraine)" aria-hidden>
+                ●
+              </Text>
+              <Text size="xs">Migraine</Text>
+            </Group>
+            <Group gap="xs">
+              <Text
+                span
+                size="xs"
+                fw={700}
+                c="light-dark(var(--mantine-color-sage-7), var(--mantine-color-sage-3))"
+                aria-hidden
+              >
+                ○
+              </Text>
+              <Text size="xs">Migraine-free</Text>
+            </Group>
+          </Group>
+        </Box>
+        {current && (
+          <Paper
+            component="section"
+            className="diary-day-details"
+            bg="var(--app-intro-background)"
+            withBorder
+            p="lg"
+            aria-label={`Details for ${dateLabel(date)}`}
+          >
+            <Stack gap="lg">
+              <Stack gap={4}>
+                <Title order={2} size="h3">
+                  Daily details
+                </Title>
+                <Text size="sm" className="diary-details-secondary">
+                  {dateLabel(date)}
+                </Text>
+              </Stack>
+              <DiaryEntryForm
+                key={`${date}-${current?.status ?? ''}-${revision}`}
+                date={date}
+                entry={current}
+                csrfToken={csrfToken}
+                disabled={disabled}
+                onSaved={(saved) =>
+                  setEntries((previous) => [
+                    ...previous.filter((entry) => entry.date !== saved.date),
+                    saved,
+                  ])
+                }
+                onDirtyChange={onDirtyChange}
+                onSavingChange={onSavingChange}
+                onSignedOut={onSignedOut}
+                onSessionRefreshed={onSessionRefreshed}
+              />
+            </Stack>
+          </Paper>
+        )}
+      </SimpleGrid>
+    </Stack>
   )
 }

@@ -1,7 +1,7 @@
 import { Anchor, Modal, ScrollArea, Stack, Text } from '@mantine/core'
 import { useState } from 'react'
 
-export const privacyVersion = '2026-11-13'
+export const privacyVersion = '2026-11-26'
 
 export default function PrivacyNotice() {
   const [opened, setOpened] = useState(false)
@@ -41,7 +41,9 @@ export default function PrivacyNotice() {
           <Text>
             Migraine Diary is operated by Amanda Araskog. Contact:
             amanda.araskog@gmail.com. Hosting providers are Neon (database),
-            Vercel (API) and Cloudflare (website).
+            Vercel (API) and Cloudflare (website). Optional Insights wording may
+            use Cloudflare Workers AI on aggregated diary statistics only, not
+            your personal notes or medication names.
           </Text>
           <Text>
             We retain your account and diary until you delete your account or

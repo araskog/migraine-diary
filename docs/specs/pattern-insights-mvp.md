@@ -8,7 +8,7 @@ A signed-in user can open **Insights** and see descriptive statistics from **the
 
 Statistics use a rolling window ending on the user's **local today** (90 days by default). The calendar still treats a missing entry as **unrecorded**, not migraine-free. **Migraine share** uses calendar days in the window as the denominator; unrecorded days add no migraine days to the numerator. Optional fields contribute only on days where the user answered them.
 
-A later step may add a short written summary at the top of Insights, generated from the same stats (not replacing them).
+Narrative insight cards on the calendar (client facts + optional Cloudflare Workers AI wording) are specified in [diary-insights.md](diary-insights.md); this document remains the statistics API and charts tab.
 
 ## Acceptance Criteria
 

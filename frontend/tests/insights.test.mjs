@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { afterEach, mock, test } from 'node:test'
-import { isDiaryInsights, loadInsights } from '../src/insights.ts'
+import { isDiaryInsights, loadInsights } from '../src/patternInsights.ts'
 
 const sampleInsights = {
   schema_version: 2,

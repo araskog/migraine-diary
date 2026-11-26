@@ -71,3 +71,89 @@ test('static requests use Pages assets and invalid API configuration fails close
   )
   assert.equal(unavailable.status, 503)
 })
+
+test('insights narrate requires authentication and AI binding', async () => {
+  const original = globalThis.fetch
+  globalThis.fetch = async (url) => {
+    if (url.pathname === '/api/session/') {
+      return Response.json({
+        user: { email: 'demo@test.example', isDemo: true },
+      })
+    }
+    throw new Error(`Unexpected fetch: ${url.href}`)
+  }
+  const facts = [
+    {
+      kind: 'weekday_peak',
+      weekday: 'Monday',
+      count: 3,
+      total: 5,
+      share: 0.6,
+      score: 1.8,
+    },
+  ]
+  try {
+    const withoutAi = await worker.fetch(
+      new Request('https://diary.example.test/api/insights/narrate/', {
+        method: 'POST',
+        headers: {
+          cookie: 'sessionid=synthetic',
+          'x-csrftoken': 'token',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ fingerprint: 'abc', facts }),
+      }),
+      { API_ORIGIN: 'https://api.example.test' },
+    )
+    assert.equal(withoutAi.status, 200)
+    assert.deepEqual(await withoutAi.json(), { useFallback: true })
+
+    globalThis.fetch = async (url) => {
+      if (url.pathname === '/api/session/') {
+        return Response.json({
+          user: { email: 'demo@test.example', isDemo: true },
+        })
+      }
+      throw new Error(`Unexpected fetch: ${url.href}`)
+    }
+    const withAi = await worker.fetch(
+      new Request('https://diary.example.test/api/insights/narrate/', {
+        method: 'POST',
+        headers: {
+          cookie: 'sessionid=synthetic',
+          'x-csrftoken': 'token',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ fingerprint: 'abc', facts }),
+      }),
+      {
+        API_ORIGIN: 'https://api.example.test',
+        AI: {
+          run: async () => ({
+            response:
+              'Mondays stand out in your migraine days.\nSleep patterns vary across the week.',
+          }),
+        },
+      },
+    )
+    const body = await withAi.json()
+    assert.equal(body.lines.length, 2)
+  } finally {
+    globalThis.fetch = original
+  }
+})
+
+test('insights narrate rejects missing csrf', async () => {
+  const response = await worker.fetch(
+    new Request('https://diary.example.test/api/insights/narrate/', {
+      method: 'POST',
+      headers: {
+        cookie: 'sessionid=synthetic',
+        'content-type': 'application/json',
+      },
+      body: '{}',
+    }),
+    { API_ORIGIN: 'https://api.example.test' },
+  )
+  assert.equal(response.status, 403)
+})
