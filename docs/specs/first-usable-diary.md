@@ -12,7 +12,7 @@ Include sign-out and correcting entries. Entries record migraine status only; in
 
 | ID | Observable outcome |
 |---|---|
-| D1 | A user can register, sign in, and sign out. Signing out prevents further access to protected diary data until they sign in again. |
+| D1 | A user can register, sign in, and sign out. Registration follows [Account and privacy](account-and-privacy.md). Signing out prevents further access to protected diary data until they sign in again. |
 | D3 | A user can record either migraine or migraine-free status for today or a past date. Each user/date has one current status; changing it updates that record. Success and failed saves are visibly distinguishable. |
 | D4 | Saved entries and corrections remain after closing/reopening the app and signing in again. Verification exercises backend persistence, not only browser state. |
 | D5 | Another user cannot read or change these records, including through direct API requests. |
@@ -25,4 +25,4 @@ Include sign-out and correcting entries. Entries record migraine status only; in
 
 Build in focused increments: runnable local foundation, accounts, then diary recording. Each PR links to the criteria it implements. Agree test boundaries before implementing each feature; check ownership, validation, and persistence through the backend, and verify the core user interactions in the browser.
 
-References: [architecture](../architecture.md), [glossary](../../GLOSSARY.md), [coding standards](../../CODING_STANDARDS.md), and [workflow](../agents/workflow.md).
+References: [architecture](../architecture.md), [account and privacy](account-and-privacy.md), [glossary](../../GLOSSARY.md), [coding standards](../../CODING_STANDARDS.md), and [workflow](../agents/workflow.md).
