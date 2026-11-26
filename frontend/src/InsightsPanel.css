@@ -1,0 +1,38 @@
+.insights-panel {
+  background: var(--app-intro-background);
+  border: 1px solid
+    light-dark(var(--mantine-color-sage-2), var(--mantine-color-dark-4));
+}
+
+.insights-panel .mantine-Accordion-control {
+  padding-inline: var(--mantine-spacing-md);
+}
+
+.insights-panel .mantine-Accordion-panel {
+  padding-inline: var(--mantine-spacing-md);
+  padding-bottom: var(--mantine-spacing-md);
+}
+
+.insights-panel-line {
+  border-inline-start: 3px solid var(--mantine-color-sage-6);
+  background: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-7)
+  );
+}
+
+.insights-panel-line--lead {
+  border-inline-start-color: var(--app-migraine);
+  background: light-dark(
+    color-mix(in srgb, var(--mantine-color-sage-1) 70%, white),
+    color-mix(in srgb, var(--mantine-color-dark-7) 90%, var(--app-migraine) 8%)
+  );
+}
+
+.insights-panel-disclaimer {
+  background: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
+  border-radius: var(--mantine-radius-md);
+}
