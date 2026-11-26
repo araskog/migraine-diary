@@ -4,6 +4,10 @@
     light-dark(var(--mantine-color-sage-2), var(--mantine-color-dark-4));
   border-radius: var(--mantine-radius-lg);
   overflow: hidden;
+  box-shadow: light-dark(
+    0 1px 2px color-mix(in srgb, var(--mantine-color-sage-9) 6%, transparent),
+    none
+  );
 }
 
 .insights-panel .mantine-Accordion-root {
@@ -15,36 +19,62 @@
   background: transparent;
 }
 
+.insights-panel-control {
+  cursor: pointer;
+}
+
 .insights-panel .mantine-Accordion-control {
   padding: var(--mantine-spacing-md);
   border-radius: 0;
-  transition: background-color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.insights-panel .mantine-Accordion-control:not([data-active]) {
+  background: light-dark(
+    color-mix(in srgb, var(--mantine-color-sage-0) 45%, white),
+    var(--mantine-color-dark-6)
+  );
+}
+
+.insights-panel .mantine-Accordion-control:not([data-active]):hover {
+  background: light-dark(
+    color-mix(in srgb, var(--mantine-color-sage-1) 70%, white),
+    var(--mantine-color-dark-5)
+  );
 }
 
 .insights-panel .mantine-Accordion-control[data-active] {
-  background: transparent;
-}
-
-.insights-panel .mantine-Accordion-control:hover {
   background: light-dark(
-    color-mix(in srgb, var(--mantine-color-sage-1) 55%, white),
-    var(--mantine-color-dark-6)
+    var(--mantine-color-white),
+    var(--mantine-color-dark-7)
   );
+  border-block-end: 1px solid
+    light-dark(var(--mantine-color-sage-2), var(--mantine-color-dark-4));
 }
 
 .insights-panel .mantine-Accordion-control[data-active]:hover {
   background: light-dark(
-    color-mix(in srgb, var(--mantine-color-sage-1) 35%, white),
-    var(--mantine-color-dark-6)
+    var(--mantine-color-white),
+    var(--mantine-color-dark-7)
   );
 }
 
+.insights-panel .mantine-Accordion-chevron {
+  color: light-dark(var(--mantine-color-sage-7), var(--mantine-color-sage-3));
+}
+
 .insights-panel .mantine-Accordion-panel {
-  padding: 0 var(--mantine-spacing-md) var(--mantine-spacing-md);
+  padding: 0;
+  background: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-7)
+  );
 }
 
 .insights-panel-body {
-  padding-block-start: var(--mantine-spacing-xs);
+  padding: var(--mantine-spacing-md);
 }
 
 .insights-panel-line {
@@ -54,8 +84,12 @@
   border-inline-start-color: var(--mantine-color-sage-6);
   border-radius: var(--mantine-radius-md);
   background: light-dark(
-    var(--mantine-color-white),
-    var(--mantine-color-dark-7)
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
+  box-shadow: light-dark(
+    0 1px 2px color-mix(in srgb, var(--mantine-color-sage-9) 4%, transparent),
+    none
   );
 }
 
@@ -65,7 +99,7 @@
 
 .insights-panel-disclaimer {
   margin-block-start: var(--mantine-spacing-xs);
-  padding-block-start: var(--mantine-spacing-sm);
+  padding-block-start: var(--mantine-spacing-md);
   border-block-start: 1px solid
     light-dark(var(--mantine-color-sage-2), var(--mantine-color-dark-4));
 }

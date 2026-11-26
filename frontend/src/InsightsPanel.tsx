@@ -149,14 +149,22 @@ export default function InsightsPanel({
       >
         <Accordion.Item value="insights">
           <Accordion.Control
+            className="insights-panel-control"
             icon={
               <ThemeIcon size={32} radius="md" color="sage" variant="light">
                 <IconBulb size={18} stroke={1.75} aria-hidden />
               </ThemeIcon>
             }
           >
-            <Group gap="sm" wrap="wrap" align="center">
-              <Stack gap={2}>
+            <Group
+              justify="space-between"
+              wrap="nowrap"
+              align="center"
+              gap="md"
+              w="100%"
+              pr="xs"
+            >
+              <Stack gap={2} mih={0} style={{ flex: 1, minWidth: 0 }}>
                 <Text
                   fw={700}
                   size="sm"
@@ -168,7 +176,7 @@ export default function InsightsPanel({
                   From your recorded diary days
                 </Text>
               </Stack>
-              <Group gap="xs">
+              <Group gap="xs" wrap="nowrap">
                 {hasFactInsights ? (
                   <Badge
                     size="sm"
@@ -180,7 +188,7 @@ export default function InsightsPanel({
                     {analysis.facts.length === 1 ? 'pattern' : 'patterns'}
                   </Badge>
                 ) : null}
-                {aiWorded ? (
+                {aiWorded && isOpen ? (
                   <Badge
                     size="sm"
                     variant="light"
@@ -219,9 +227,6 @@ export default function InsightsPanel({
                     <Text size="xs" c="dimmed" lh={1.55}>
                       These observations reflect what you logged. They are not
                       medical advice and do not prove cause and effect.
-                      {!aiWorded && hasFactInsights
-                        ? ' Wording uses the built-in template from your stats.'
-                        : ''}
                     </Text>
                   </Box>
                 </>
