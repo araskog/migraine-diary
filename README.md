@@ -21,7 +21,7 @@ uv run --env-file .env python manage.py migrate
 uv run --env-file .env python manage.py runserver 127.0.0.1:8000
 ```
 
-Adjust PostgreSQL connection settings in `backend/.env` if needed; the role must be able to create a test database. Keep `.env` untracked. `DJANGO_DEBUG=1` enables local development static assets and error pages; it defaults to off when unset.
+Adjust PostgreSQL connection settings in `backend/.env` if needed; the role must be able to create a test database. Keep `.env` untracked. `DJANGO_DEBUG` defaults on in `config.settings`; set `DJANGO_DEBUG=0` to disable.
 
 In another terminal, from the repository root:
 
@@ -31,7 +31,7 @@ npm ci
 npm run dev
 ```
 
-Open [Migraine Diary](http://127.0.0.1:5173). For [Django admin](http://127.0.0.1:8000/admin/), create your own local administrator interactively from `backend/`:
+Open [Migraine Diary](http://127.0.0.1:5173/static/app/). For [Django admin](http://127.0.0.1:8000/admin/), create your own local administrator interactively from `backend/`:
 
 ```sh
 uv run --env-file .env python manage.py createsuperuser

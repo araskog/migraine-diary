@@ -1,7 +1,13 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
-    if (!url.pathname.startsWith('/api/')) {
+    const { pathname } = url
+    const proxied =
+      pathname.startsWith('/api/') ||
+      pathname === '/admin' ||
+      pathname.startsWith('/admin/') ||
+      pathname.startsWith('/static/admin/')
+    if (!proxied) {
       return env.ASSETS.fetch(request)
     }
     let upstream
@@ -24,7 +30,7 @@ export default {
     upstream.search = url.search
     const headers = new Headers(request.headers)
     headers.delete('host')
-    headers.delete('x-forwarded-host')
+    headers.set('x-forwarded-host', url.host)
     headers.set('x-forwarded-proto', 'https')
     try {
       const response = await fetch(upstream, {
@@ -36,7 +42,9 @@ export default {
         redirect: 'manual',
       })
       const result = new Response(response.body, response)
-      result.headers.set('Cache-Control', 'no-store')
+      if (!pathname.startsWith('/static/admin/')) {
+        result.headers.set('Cache-Control', 'no-store')
+      }
       return result
     } catch {
       return new Response('API unavailable', { status: 502 })
