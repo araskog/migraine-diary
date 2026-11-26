@@ -239,11 +239,7 @@ export default function DiaryDetailsFields({
           onChange({ ...value, pain_severity }, save)
         }
       />
-      <SymptomsSection
-        value={value}
-        disabled={disabled}
-        onChange={onChange}
-      />
+      <SymptomsSection value={value} disabled={disabled} onChange={onChange} />
       <Stack gap="md">
         <Checkbox
           label="I took migraine medication"

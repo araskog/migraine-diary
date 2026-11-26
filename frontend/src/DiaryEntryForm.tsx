@@ -124,8 +124,7 @@ export default function DiaryEntryForm({
   function applyChange(value: DiaryDetails, commit = true) {
     latest.current = value
     setDetails(value)
-    const changed =
-      JSON.stringify(value) !== JSON.stringify(savedDetails)
+    const changed = JSON.stringify(value) !== JSON.stringify(savedDetails)
     if (commit && changed) void save(value)
     else if (commit && !changed) setSavedDetails(value)
   }
