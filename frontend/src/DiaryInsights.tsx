@@ -77,12 +77,23 @@ function weekdayStaples(rows: InsightsWeekdaySlice[]): StapleRow[] {
   }))
 }
 
-function sliceStaples(rows: InsightsSlice[]): StapleRow[] {
+function shortenSleepChartLabel(label: string): string {
+  if (label === 'Less than usual') return 'Less'
+  if (label === 'More than usual') return 'More'
+  return label
+}
+
+function sliceStaples(
+  rows: InsightsSlice[],
+  options?: { shortLabels?: boolean },
+): StapleRow[] {
   const logged = rows.filter((row) => row.recorded_days > 0)
   if (logged.length === 0) return []
   return orderStapleRows(logged).map((row) => ({
     key: String(row.value),
-    label: row.label,
+    label: options?.shortLabels
+      ? shortenSleepChartLabel(row.label)
+      : row.label,
     migraineDays: row.migraine_days,
     sufficientData: row.sufficient_data,
   }))
@@ -92,12 +103,12 @@ function MigraineStapleChart({
   title,
   description,
   staples,
-  compactXLabels = false,
+  layout = 'wide',
 }: {
   title: string
   description: string
   staples: StapleRow[]
-  compactXLabels?: boolean
+  layout?: 'wide' | 'compact'
 }) {
   if (staples.length === 0) {
     return (
@@ -116,9 +127,9 @@ function MigraineStapleChart({
     category: row.label,
     migraineDays: row.migraineDays,
   }))
-  const needsAngledLabels =
-    compactXLabels || staples.some((row) => row.label.length > 8)
+  const isCompact = layout === 'compact'
   const hasSparseSlices = staples.some((row) => !row.sufficientData)
+  const chartHeight = isCompact ? 148 : 168
 
   return (
     <Paper withBorder radius="md" p="md" className="diary-insights-section">
@@ -128,10 +139,15 @@ function MigraineStapleChart({
       <Text size="xs" c="dimmed" mt={4} mb="sm">
         {description}
       </Text>
-      <Box className="diary-insights-chart-scroll">
+      <Box
+        className={
+          isCompact ? 'diary-insights-chart-fit' : 'diary-insights-chart-scroll'
+        }
+      >
         <BarChart
-          h={220}
-          miw={Math.max(staples.length * 52, 280)}
+          w="100%"
+          h={chartHeight}
+          miw={isCompact ? undefined : Math.max(staples.length * 44, 260)}
           data={chartData}
           dataKey="category"
           series={[
@@ -146,14 +162,10 @@ function MigraineStapleChart({
           withBarValueLabel
           tickLine="x"
           gridAxis="y"
-          maxBarWidth={36}
+          maxBarWidth={isCompact ? 28 : 36}
           barProps={{ radius: 8 }}
-          yAxisProps={{ allowDecimals: false, width: 32 }}
-          xAxisProps={
-            needsAngledLabels
-              ? { height: 64, angle: -32, textAnchor: 'end', interval: 0 }
-              : { interval: 0, tickMargin: 10 }
-          }
+          yAxisProps={{ allowDecimals: false, width: 28 }}
+          xAxisProps={{ interval: 0, tickMargin: 6, height: 36 }}
         />
       </Box>
       {hasSparseSlices ? (
@@ -268,18 +280,24 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
             description="Migraine days per weekday (highest on the left)."
             staples={weekdayStaples(insights.weekdays)}
           />
-          <MigraineStapleChart
-            title="Sleep duration"
-            description="Migraine days when each sleep duration was logged."
-            staples={sliceStaples(insights.sleep_duration)}
-            compactXLabels
-          />
-          <MigraineStapleChart
-            title="Sleep quality"
-            description="Migraine days when each sleep quality was logged."
-            staples={sliceStaples(insights.sleep_quality)}
-            compactXLabels
-          />
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+            <MigraineStapleChart
+              title="Sleep duration"
+              description="Migraine days per logged sleep duration."
+              staples={sliceStaples(insights.sleep_duration, {
+                shortLabels: true,
+              })}
+              layout="compact"
+            />
+            <MigraineStapleChart
+              title="Sleep quality"
+              description="Migraine days per logged sleep quality."
+              staples={sliceStaples(insights.sleep_quality, {
+                shortLabels: true,
+              })}
+              layout="compact"
+            />
+          </SimpleGrid>
         </Stack>
       ) : null}
     </Stack>
