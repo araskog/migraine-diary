@@ -23,9 +23,9 @@ For Mantine usage, theming, API clients, and related implementation rules, see [
 
 ## Deployment
 
-The React frontend runs on Cloudflare Pages, the Django API runs on Vercel, and Neon PostgreSQL stores accounts, sessions, and diary records. The browser calls `/api/*` on the frontend origin; a Pages Function forwards those requests to Vercel, preserving session cookies, request origins, and CSRF headers. API responses are not cached.
+The React frontend runs on Cloudflare Pages, the Django API runs on Vercel, and Neon PostgreSQL stores accounts, sessions, and diary records. The browser calls `/api/*` on the frontend origin; a Pages Function forwards those requests to Vercel, preserving session cookies, request origins, and CSRF headers. API responses are not cached. The same function also forwards `/admin/`, `/admin/*`, and `/static/admin/*` so Django admin is available on the public Pages origin (for example `/admin/login/`).
 
-Vercel uses API-only Django settings with explicit allowed hosts and trusted frontend origins. Application traffic uses Neon's pooled connection; migrations use a separate direct connection. Django admin is accessed on the Vercel origin, with its own session cookies and static assets.
+Vercel uses API-only Django settings with explicit allowed hosts and trusted frontend origins. Application traffic uses Neon's pooled connection; migrations use a separate direct connection. Django admin static assets are collected at deploy time and served from the API host; the Pages proxy re-exposes them under `/static/admin/` when operators use admin through the frontend origin.
 
 Production traffic uses [Migraine Diary](https://migraine-diary.pages.dev/) on Cloudflare Pages. The legacy Render monolith configuration is removed from the repository; delete any remaining Render service in the Render dashboard so traffic and builds do not drift.
 

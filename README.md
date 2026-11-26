@@ -31,11 +31,13 @@ npm ci
 npm run dev
 ```
 
-Open [Migraine Diary](http://127.0.0.1:5173). For [Django admin](http://127.0.0.1:8000/admin/), create your own local administrator interactively from `backend/`:
+Open [Migraine Diary](http://127.0.0.1:5173/static/app/). For [Django admin](http://127.0.0.1:8000/admin/), create your own local administrator interactively from `backend/`:
 
 ```sh
 uv run --env-file .env python manage.py createsuperuser
 ```
+
+In production, after the frontend deploys with the Pages worker changes, open Django admin at `/admin/` on the public Pages origin (for example `https://migraine-diary.pages.dev/admin/`). That path is proxied to the Vercel API; the diary UI continues to use `/api/*` on the same origin.
 
 ## Checks
 

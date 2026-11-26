@@ -37,6 +37,38 @@ test('API proxy preserves protected writes, cookies and uncached responses', asy
   }
 })
 
+test('admin and admin static proxy to the API origin', async () => {
+  const original = globalThis.fetch
+  const seen = []
+  globalThis.fetch = async (url, options) => {
+    seen.push(url.pathname)
+    assert.equal(url.origin, 'https://api.example.test')
+    assert.equal(options.headers.get('x-forwarded-host'), 'diary.example.test')
+    return new Response('admin')
+  }
+  try {
+    for (const path of [
+      '/admin',
+      '/admin/login/',
+      '/static/admin/css/base.css',
+    ]) {
+      const response = await worker.fetch(
+        new Request(`https://diary.example.test${path}`),
+        { API_ORIGIN: 'https://api.example.test' },
+      )
+      assert.equal(response.status, 200)
+      assert.equal(await response.text(), 'admin')
+    }
+    assert.deepEqual(seen, [
+      '/admin',
+      '/admin/login/',
+      '/static/admin/css/base.css',
+    ])
+  } finally {
+    globalThis.fetch = original
+  }
+})
+
 test('static requests use Pages assets and invalid API configuration fails closed', async () => {
   const response = await worker.fetch(
     new Request('https://diary.example.test/'),
