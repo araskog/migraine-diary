@@ -38,7 +38,7 @@ function InsightLineCards({ lines }: { lines: string[] }) {
           key={line}
           component="article"
           p="sm"
-          radius="md"
+          radius="lg"
           withBorder
           className={
             index === 0
@@ -141,8 +141,7 @@ export default function InsightsPanel({
   return (
     <Box component="section" aria-label="Insights" className="insights-panel">
       <Accordion
-        variant="contained"
-        radius="lg"
+      radius="lg"
         value={opened}
         onChange={setOpened}
         chevronPosition="right"
@@ -207,13 +206,12 @@ export default function InsightsPanel({
                   <Paper
                     component="p"
                     p="sm"
-                    radius="md"
+                    radius="lg"
                     className="insights-panel-disclaimer"
                   >
                     <Text size="xs" c="dimmed" lh={1.55}>
                       These observations reflect what you logged. They are not
-                      medical advice and do not prove cause and effect. Optional
-                      fields count only when you answered them.
+                      medical advice and do not prove cause and effect.
                       {aiWorded
                         ? ' Wording may use Cloudflare Workers AI on aggregated counts only.'
                         : ''}

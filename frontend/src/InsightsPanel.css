@@ -2,10 +2,22 @@
   background: var(--app-intro-background);
   border: 1px solid
     light-dark(var(--mantine-color-sage-2), var(--mantine-color-dark-4));
+  border-radius: var(--mantine-radius-lg);
+  overflow: hidden;
+}
+
+.insights-panel .mantine-Accordion-root {
+  background: transparent;
+}
+
+.insights-panel .mantine-Accordion-item {
+  border: none;
+  background: transparent;
 }
 
 .insights-panel .mantine-Accordion-control {
   padding-inline: var(--mantine-spacing-md);
+  border-radius: 0;
 }
 
 .insights-panel .mantine-Accordion-panel {
@@ -15,6 +27,8 @@
 
 .insights-panel-line {
   border-inline-start: 3px solid var(--mantine-color-sage-6);
+  border-radius: var(--mantine-radius-lg);
+  overflow: hidden;
   background: light-dark(
     var(--mantine-color-white),
     var(--mantine-color-dark-7)
@@ -34,5 +48,5 @@
     var(--mantine-color-gray-0),
     var(--mantine-color-dark-6)
   );
-  border-radius: var(--mantine-radius-md);
+  border-radius: var(--mantine-radius-lg);
 }
