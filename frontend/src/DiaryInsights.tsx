@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import {
-  Accordion,
   Alert,
   Badge,
   Group,
@@ -9,7 +8,6 @@ import {
   RingProgress,
   SimpleGrid,
   Stack,
-  Table,
   Text,
   Title,
 } from '@mantine/core'
@@ -18,7 +16,6 @@ import ErrorMessages from './ErrorMessages'
 import {
   formatRate,
   loadInsights,
-  periodPercentLabel,
   type DiaryInsights,
   type InsightsSlice,
   type InsightsWeekdaySlice,
@@ -27,6 +24,13 @@ import './DiaryInsights.css'
 
 type DiaryInsightsProps = {
   active: boolean
+}
+
+type StapleRow = {
+  key: string
+  label: string
+  migraineDays: number
+  sufficientData: boolean
 }
 
 function StatCard({
@@ -46,131 +50,112 @@ function StatCard({
       <Text size="xl" fw={700} mt={4}>
         {value}
       </Text>
-      {hint && (
+      {hint ? (
         <Text size="xs" c="dimmed" mt={4}>
           {hint}
         </Text>
-      )}
+      ) : null}
     </Paper>
   )
 }
 
-function PeriodPercentCell({
-  rate,
-  sufficient,
-}: {
-  rate: number | null
-  sufficient: boolean
-}) {
-  return (
-    <Group gap="xs" wrap="nowrap">
-      <Text size="sm">{formatRate(rate)}</Text>
-      {!sufficient && (
-        <Badge size="xs" variant="light" color="gray">
-          Few answers
-        </Badge>
-      )}
-    </Group>
-  )
+function orderStapleRows<T extends { migraine_days: number }>(rows: T[]): T[] {
+  const withMigraine = rows
+    .filter((row) => row.migraine_days > 0)
+    .sort((a, b) => b.migraine_days - a.migraine_days)
+  const withoutMigraine = rows.filter((row) => row.migraine_days === 0)
+  return [...withMigraine, ...withoutMigraine]
 }
 
-function SliceTable({
-  caption,
-  rows,
-  valueLabel,
-  calendarDays,
-}: {
-  caption: string
-  rows: InsightsSlice[]
-  valueLabel: string
-  calendarDays: number
-}) {
-  const visible = rows.filter((row) => row.recorded_days > 0)
-  if (visible.length === 0) return null
-  const percentLabel = periodPercentLabel(calendarDays)
-  return (
-    <Table
-      captionSide="top"
-      withTableBorder
-      striped
-      highlightOnHover
-      className="diary-insights-table"
-    >
-      <Table.Caption className="visually-hidden">{caption}</Table.Caption>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th scope="col">{valueLabel}</Table.Th>
-          <Table.Th scope="col">Days you logged this</Table.Th>
-          <Table.Th scope="col">Migraine days</Table.Th>
-          <Table.Th scope="col">{percentLabel}</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {visible.map((row) => (
-          <Table.Tr key={String(row.value)}>
-            <Table.Td>{row.label}</Table.Td>
-            <Table.Td>{row.recorded_days}</Table.Td>
-            <Table.Td>{row.migraine_days}</Table.Td>
-            <Table.Td>
-              <PeriodPercentCell
-                rate={row.migraine_rate}
-                sufficient={row.sufficient_data}
-              />
-            </Table.Td>
-          </Table.Tr>
-        ))}
-      </Table.Tbody>
-    </Table>
-  )
+function weekdayStaples(rows: InsightsWeekdaySlice[]): StapleRow[] {
+  return orderStapleRows(rows).map((row) => ({
+    key: String(row.weekday),
+    label: row.label.slice(0, 3),
+    migraineDays: row.migraine_days,
+    sufficientData: row.sufficient_data,
+  }))
 }
 
-function WeekdayTable({
-  rows,
-  calendarDays,
+function sliceStaples(rows: InsightsSlice[]): StapleRow[] {
+  const logged = rows.filter((row) => row.recorded_days > 0)
+  if (logged.length === 0) return []
+  return orderStapleRows(logged).map((row) => ({
+    key: String(row.value),
+    label: row.label,
+    migraineDays: row.migraine_days,
+    sufficientData: row.sufficient_data,
+  }))
+}
+
+function MigraineStapleChart({
+  title,
+  description,
+  staples,
 }: {
-  rows: InsightsWeekdaySlice[]
-  calendarDays: number
+  title: string
+  description: string
+  staples: StapleRow[]
 }) {
-  const visible = rows.filter((row) => row.calendar_days > 0)
-  if (visible.length === 0) return null
-  const percentLabel = periodPercentLabel(calendarDays)
+  if (staples.length === 0) {
+    return (
+      <Paper withBorder radius="md" p="md" className="diary-insights-section">
+        <Text fw={600} size="sm">
+          {title}
+        </Text>
+        <Text size="sm" c="dimmed" mt="xs">
+          Log more days with this detail to see a pattern.
+        </Text>
+      </Paper>
+    )
+  }
+
+  const maxMigraineDays = Math.max(...staples.map((row) => row.migraineDays), 1)
+
   return (
-    <Table
-      captionSide="top"
-      withTableBorder
-      striped
-      highlightOnHover
-      className="diary-insights-table"
-    >
-      <Table.Caption className="visually-hidden">
-        Migraine days by weekday
-      </Table.Caption>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th scope="col">Weekday</Table.Th>
-          <Table.Th scope="col">Days in period</Table.Th>
-          <Table.Th scope="col">Recorded</Table.Th>
-          <Table.Th scope="col">Migraine days</Table.Th>
-          <Table.Th scope="col">{percentLabel}</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {visible.map((row) => (
-          <Table.Tr key={row.weekday}>
-            <Table.Td>{row.label}</Table.Td>
-            <Table.Td>{row.calendar_days}</Table.Td>
-            <Table.Td>{row.recorded_days}</Table.Td>
-            <Table.Td>{row.migraine_days}</Table.Td>
-            <Table.Td>
-              <PeriodPercentCell
-                rate={row.migraine_rate}
-                sufficient={row.sufficient_data}
-              />
-            </Table.Td>
-          </Table.Tr>
-        ))}
-      </Table.Tbody>
-    </Table>
+    <Paper withBorder radius="md" p="md" className="diary-insights-section">
+      <Text fw={600} size="sm">
+        {title}
+      </Text>
+      <Text size="xs" c="dimmed" mt={4}>
+        {description}
+      </Text>
+      <div className="diary-insights-staples" role="list">
+        {staples.map((row) => {
+          const heightPercent = (row.migraineDays / maxMigraineDays) * 100
+          return (
+            <div key={row.key} className="diary-insights-staple" role="listitem">
+              <Text size="sm" fw={600} ta="center" className="diary-insights-staple-count">
+                {row.migraineDays}
+              </Text>
+              <div
+                className="diary-insights-staple-track"
+                aria-label={`${row.label}: ${row.migraineDays} migraine days`}
+              >
+                <div
+                  className="diary-insights-staple-bar"
+                  style={{
+                    height:
+                      row.migraineDays === 0
+                        ? 0
+                        : `${Math.max(heightPercent, 4)}%`,
+                  }}
+                />
+              </div>
+              <Stack gap={2} align="center" mt={6}>
+                <Text size="xs" ta="center" className="diary-insights-staple-label">
+                  {row.label}
+                </Text>
+                {!row.sufficientData ? (
+                  <Badge size="xs" variant="light" color="gray">
+                    Few answers
+                  </Badge>
+                ) : null}
+              </Stack>
+            </div>
+          )
+        })}
+      </div>
+    </Paper>
   )
 }
 
@@ -182,9 +167,15 @@ function formatAveragePain(
   return `${average} / 10`
 }
 
+function medicationTakenDays(insights: DiaryInsights): number {
+  const taken = insights.medication.find((row) => row.value === true)
+  return taken?.recorded_days ?? 0
+}
+
 function InsightsContent({ insights }: { insights: DiaryInsights }) {
   const { summary, window_days } = insights
   const ratePercent = Math.round((summary.migraine_rate ?? 0) * 100)
+  const medDays = medicationTakenDays(insights)
 
   return (
     <Stack gap="lg" className="diary-insights">
@@ -240,14 +231,14 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
         </Group>
       </Paper>
 
+      <StatCard
+        label="Medication taken"
+        value={medDays}
+        hint={`Days you logged taking medication in the last ${window_days} days`}
+      />
+
       <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="md">
-        <StatCard label="Recorded" value={summary.recorded_days} />
-        <StatCard label="Unrecorded" value={summary.unrecorded_days} />
-        <StatCard
-          label="Migraine-free"
-          value={summary.migraine_free_days}
-          hint="Explicitly recorded"
-        />
+        <StatCard label="Migraine-free" value={summary.migraine_free_days} />
         <StatCard label="Migraine" value={summary.migraine_days} />
         <StatCard
           label="Average pain"
@@ -264,6 +255,7 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
       </SimpleGrid>
 
       {!summary.insufficient_data ? (
+<<<<<<< HEAD
         <Accordion
           variant="separated"
           radius="md"
@@ -316,6 +308,25 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>
+=======
+        <Stack gap="md">
+          <MigraineStapleChart
+            title="By weekday"
+            description="Migraine days per weekday (highest on the left)."
+            staples={weekdayStaples(insights.weekdays)}
+          />
+          <MigraineStapleChart
+            title="Sleep duration"
+            description="Migraine days when each sleep duration was logged."
+            staples={sliceStaples(insights.sleep_duration)}
+          />
+          <MigraineStapleChart
+            title="Sleep quality"
+            description="Migraine days when each sleep quality was logged."
+            staples={sliceStaples(insights.sleep_quality)}
+          />
+        </Stack>
+>>>>>>> 849751f (feat(diary): simplify insights stats and staple bar breakdowns)
       ) : null}
     </Stack>
   )
