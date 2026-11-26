@@ -26,7 +26,7 @@ class AccountTests(TestCase):
                 "email": email,
                 "password": self.password,
                 "health_consent": True,
-                "privacy_policy_version": "2026-11-13",
+                "privacy_policy_version": "2026-11-26",
             },
         )
         if response.status_code == 201:
@@ -182,7 +182,7 @@ class PrivacyTests(AccountTests):
         self.assertEqual(self.register().status_code, 201)
         user = User.objects.get()
         self.assertIsNotNone(user.health_consent_at)
-        self.assertEqual(user.privacy_policy_version, "2026-11-13")
+        self.assertEqual(user.privacy_policy_version, "2026-11-26")
 
     def test_deletion_requires_password_csrf_and_preserves_other_owner(self):
         from diary.models import DiaryEntry
