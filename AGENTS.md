@@ -4,7 +4,7 @@
 
 `AGENTS.md` is the entry point for every agent in this repo (Cursor, Cloud Agents, and others that read it). **All agents share one process** — the ordered steps live in [workflow](docs/agents/workflow.md); follow that file for implementation, review, and PRs. Read it at the start of those tasks; do not skip steps unless the user limits scope (for example, questions only, no PR).
 
-When a named skill applies (`/implement`, `/tdd`, `/code-review`, `/pr`, intake skills, or **`review-pr`** on an open PR), read that skill’s [`SKILL.md`](.agents/skills/) and follow it.
+When [workflow](docs/agents/workflow.md) names a skill, or the user invokes one, read **`.agents/skills/<skill-name>/SKILL.md`** (for example `implement`, `tdd`, `code-review`, `pr`, intake skills, or `review-pr` on an open PR) and follow it. Workflow slash names are the usual Cursor invocations; they are not the only trigger — the workflow step still means read that skill file.
 
 ## Project and Navigation
 
