@@ -219,6 +219,23 @@ class InsightsApiTests(TestCase):
         self.assertEqual(utc["summary"]["recorded_days"], 1)
         self.assertEqual(sydney["summary"]["recorded_days"], 1)
 
+    def test_api_ignores_entries_before_window_start(self):
+        window_start = date(2026, 1, 15) - timedelta(days=89)
+        DiaryEntry.objects.create(
+            user=self.user,
+            date=window_start - timedelta(days=1),
+            status=DiaryEntry.Status.MIGRAINE,
+        )
+        DiaryEntry.objects.create(
+            user=self.user,
+            date=window_start,
+            status=DiaryEntry.Status.MIGRAINE_FREE,
+        )
+        response = self.client.get(self.path, {"timezone": "UTC"})
+        body = response.json()
+        self.assertEqual(body["summary"]["recorded_days"], 1)
+        self.assertEqual(body["summary"]["migraine_days"], 0)
+
     def test_response_includes_weekday_and_summary_pain(self):
         self.seed_window()
         monday = date(2026, 1, 12)

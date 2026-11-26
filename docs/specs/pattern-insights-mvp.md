@@ -18,14 +18,14 @@ A future step may add a short written summary at the top of the Insights tab, ge
 | I2 | Unauthenticated requests and another user's session cannot read insights. |
 | I3 | The response states calendar days in the window, recorded, unrecorded, and migraine day counts, migraine share (migraine days ÷ calendar days), and flags `insufficient_data` when recorded days are below the minimum threshold (10). |
 | I4 | Weekday, sleep duration, sleep quality, and medication slices include sample sizes and flag slices below the minimum threshold (3 days). |
-| I5 | Pain severity averages appear only on migraine days with a pain answer, grouped where sleep or medication answers exist. |
-| I6 | The UI presents the statistics with a non-medical disclaimer and hides or downplays comparisons marked insufficient. |
+| I5 | Step 1: a single window-level pain severity average on migraine days with a pain answer (no grouped pain by sleep or medication). |
+| I6 | The UI hides detailed breakdown tables when `insufficient_data` is set, and downplays individual slice comparisons flagged insufficient (e.g. “Few answers”). |
 
 ## API
 
 `GET /api/diary/insights/?timezone=<IANA>`
 
-Requires authentication. Validates timezone like diary saves. Computes `today` in that timezone. Returns JSON with `schema_version`, `window_days`, `today`, coverage counts, summary for the window, weekday breakdown, categorical slices, and pain averages. Responses are not cached (`Cache-Control: no-store, private`).
+Requires authentication. Validates timezone like diary saves. Computes `today` in that timezone. Loads only diary rows in the rolling window at the database. Returns JSON with `schema_version`, `window_days`, `today`, coverage counts, summary for the window (including window-level average pain), weekday breakdown, and categorical slices. Responses are not cached (`Cache-Control: no-store, private`).
 
 ## Delivery and Verification
 
