@@ -123,8 +123,17 @@ function MigraineStapleChart({
         {staples.map((row) => {
           const heightPercent = (row.migraineDays / maxMigraineDays) * 100
           return (
-            <div key={row.key} className="diary-insights-staple" role="listitem">
-              <Text size="sm" fw={600} ta="center" className="diary-insights-staple-count">
+            <div
+              key={row.key}
+              className="diary-insights-staple"
+              role="listitem"
+            >
+              <Text
+                size="sm"
+                fw={600}
+                ta="center"
+                className="diary-insights-staple-count"
+              >
                 {row.migraineDays}
               </Text>
               <div
@@ -142,7 +151,11 @@ function MigraineStapleChart({
                 />
               </div>
               <Stack gap={2} align="center" mt={6}>
-                <Text size="xs" ta="center" className="diary-insights-staple-label">
+                <Text
+                  size="xs"
+                  ta="center"
+                  className="diary-insights-staple-label"
+                >
                   {row.label}
                 </Text>
                 {!row.sufficientData ? (
@@ -255,60 +268,6 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
       </SimpleGrid>
 
       {!summary.insufficient_data ? (
-<<<<<<< HEAD
-        <Accordion
-          variant="separated"
-          radius="md"
-          className="diary-insights-accordion"
-        >
-          <Accordion.Item value="weekday">
-            <Accordion.Control>By weekday</Accordion.Control>
-            <Accordion.Panel>
-              <WeekdayTable
-                rows={insights.weekdays}
-                calendarDays={summary.calendar_days}
-              />
-            </Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item value="sleep-duration">
-            <Accordion.Control>
-              Migraine days by sleep duration
-            </Accordion.Control>
-            <Accordion.Panel>
-              <SliceTable
-                caption="Migraine days when sleep duration was logged"
-                valueLabel="Sleep duration"
-                calendarDays={summary.calendar_days}
-                rows={insights.sleep_duration}
-              />
-            </Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item value="sleep-quality">
-            <Accordion.Control>
-              Migraine days by sleep quality
-            </Accordion.Control>
-            <Accordion.Panel>
-              <SliceTable
-                caption="Migraine days when sleep quality was logged"
-                valueLabel="Sleep quality"
-                calendarDays={summary.calendar_days}
-                rows={insights.sleep_quality}
-              />
-            </Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item value="medication">
-            <Accordion.Control>Migraine days by medication</Accordion.Control>
-            <Accordion.Panel>
-              <SliceTable
-                caption="Migraine days when medication was logged"
-                valueLabel="Medication"
-                calendarDays={summary.calendar_days}
-                rows={insights.medication}
-              />
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion>
-=======
         <Stack gap="md">
           <MigraineStapleChart
             title="By weekday"
@@ -326,7 +285,6 @@ function InsightsContent({ insights }: { insights: DiaryInsights }) {
             staples={sliceStaples(insights.sleep_quality)}
           />
         </Stack>
->>>>>>> 849751f (feat(diary): simplify insights stats and staple bar breakdowns)
       ) : null}
     </Stack>
   )
