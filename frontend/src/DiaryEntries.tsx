@@ -256,6 +256,7 @@ export default function DiaryEntries({
       {current?.status === 'migraine' && (
         <Paper
           component="section"
+          className="diary-day-details"
           bg="var(--app-intro-background)"
           withBorder
           p="lg"
@@ -266,7 +267,7 @@ export default function DiaryEntries({
               <Title order={2} size="h3">
                 Daily details
               </Title>
-              <Text c="dimmed" size="sm">
+              <Text size="sm" className="diary-details-secondary">
                 {dateLabel(date)}
               </Text>
             </Stack>

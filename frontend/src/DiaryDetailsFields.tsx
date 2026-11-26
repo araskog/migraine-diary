@@ -89,9 +89,7 @@ function SymptomsSection({
   disabled: boolean
   onChange: (value: DiaryDetails, save?: boolean) => void
 }) {
-  const [accordion, setAccordion] = useState<string | null>(
-    value.symptoms.length > 0 ? 'symptoms' : null,
-  )
+  const [accordion, setAccordion] = useState<string | null>(null)
   const selectedCount = value.symptoms.length
   const summary =
     selectedCount === 0
@@ -121,7 +119,7 @@ function SymptomsSection({
             <Text size="sm" fw={500}>
               Symptoms
             </Text>
-            <Text size="xs" c="dimmed">
+            <Text size="xs" className="diary-details-secondary">
               {summary}
             </Text>
           </Group>

@@ -26,7 +26,12 @@ export default function SymptomChipGroups({
         <Stack gap="md">
           {SYMPTOM_GROUPS.map((group) => (
             <Stack key={group.label} gap="xs">
-              <Text size="xs" fw={600} tt="uppercase" c="dimmed">
+              <Text
+                size="xs"
+                fw={600}
+                tt="uppercase"
+                className="diary-details-secondary"
+              >
                 {group.label}
               </Text>
               <Group gap="xs" className="symptom-chip-row">
