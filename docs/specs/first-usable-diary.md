@@ -6,7 +6,7 @@ Status: Complete. Password recovery is deferred outside this milestone.
 
 A user can create an account, sign in, record migraine or migraine-free days, and return to their saved private diary. The first version runs locally and works on mobile-sized screens.
 
-Include sign-out and correcting entries. Entries record migraine status only; intensity, medication, and notes are outside this milestone, along with AI summaries, reports, trigger analysis, deployment, and use of real health data.
+Include sign-out and correcting entries. Each saved date has one required migraine status. Optional medication, sleep, and pain answers are defined in [Diary details](diary-details.md). Free-text notes, AI summaries, reports, trigger analysis, deployment, and use of real health data are outside this milestone.
 
 ## Acceptance Criteria
 
@@ -25,4 +25,4 @@ Include sign-out and correcting entries. Entries record migraine status only; in
 
 Build in focused increments: runnable local foundation, accounts, then diary recording. Each PR links to the criteria it implements. Agree test boundaries before implementing each feature; check ownership, validation, and persistence through the backend, and verify the core user interactions in the browser.
 
-References: [architecture](../architecture.md), [account and privacy](account-and-privacy.md), [glossary](../../GLOSSARY.md), [coding standards](../../CODING_STANDARDS.md), and [workflow](../agents/workflow.md).
+References: [architecture](../architecture.md), [diary details](diary-details.md), [account and privacy](account-and-privacy.md), [glossary](../../GLOSSARY.md), [coding standards](../../CODING_STANDARDS.md), and [workflow](../agents/workflow.md).

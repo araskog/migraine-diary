@@ -16,7 +16,7 @@ Password recovery is out of scope for this feature. Hosting and performance work
 |---|---|
 | DM1 | From the account entry screen, a visitor can start a demo without registering. The app opens the diary with sample entries visible on the calendar. |
 | DM2 | The demo is clearly labeled in everyday language (demo account and sample diary), not as technical test data. |
-| DM3 | A visitor can record, correct, clear, and edit details in the demo diary; changes persist while the same demo session remains active and after reload while still signed in. |
+| DM3 | A visitor can record, correct, clear, and edit [diary details](diary-details.md) in the demo diary; changes persist while the same demo session remains active and after reload while still signed in. |
 | DM4 | Starting demo creates a separate session per visitor; two browsers do not share one editable demo diary. |
 | DM5 | Create account in the demo opens the normal registration form after sign-out. The new account starts with an empty diary; demo edits are not copied. |
 | DM6 | Demo sessions cannot be reopened with email and password sign-in; visitors who sign out of a demo must start a new demo or create an account. |
@@ -27,4 +27,4 @@ Password recovery is out of scope for this feature. Hosting and performance work
 Backend tests in `accounts.test_demo_mode` cover demo start, sample seeding,
 isolation, session persistence, and sign-in rejection for demo accounts. Frontend tests cover session typing for demo users where applicable. Manual verification uses synthetic data only.
 
-References: [architecture](../architecture.md), [first usable diary](first-usable-diary.md), [account and privacy](account-and-privacy.md), [workflow](../agents/workflow.md).
+References: [architecture](../architecture.md), [first usable diary](first-usable-diary.md), [diary details](diary-details.md), [account and privacy](account-and-privacy.md), [workflow](../agents/workflow.md).
