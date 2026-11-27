@@ -32,6 +32,17 @@ Required before merge for non-trivial work (issue or spec link), and after any p
 
 Use the PR head **commit SHA** (`headRefOid` from `gh pr view`).
 
+#### Cloud Agents (`gh` 403)
+
+On Cursor Cloud Agent VMs, shell `gh` uses a restricted GitHub App installation token. Calls such as `gh api …/pulls/…/reviews`, `gh pr review`, and `gh pr comment` often return **403** (`Resource not accessible by integration`). That is expected; do not treat it as a misconfigured repo.
+
+Publish layer-3 reviews with the agent **ManagePullRequest** tool instead (`post_comment` on the open PR):
+
+1. Post **two** top-level comments on the PR — first **Standards**, then **Spec** — each with the axis heading, short `base`..`head` SHAs, summary, limitations, and the intended review event (`COMMENT`, `REQUEST_CHANGES`, or note “no blocking findings”).
+2. For inline findings, call `post_comment` with `path`, `line`, and `side=RIGHT` (line on the **head** side of the diff). That creates review comments under the Cursor GitHub App.
+
+Local runs with your own `gh` auth (personal OAuth) may still use the `gh api` flow below.
+
 **Inspect the diff for line anchors**
 
 ```sh
@@ -69,7 +80,9 @@ Add one `comments[]` entry per inline finding (path, **line on the new file**, `
 - `REQUEST_CHANGES` — unresolved defects on that axis
 - `APPROVE` — only when that axis has no unresolved defects
 
-If inline submission fails (permissions, line mismatch), fall back to `gh pr review <number> --comment --body-file <file>` for that axis and note missing inlines in the body.
+If inline submission fails (line mismatch) locally, fall back to `gh pr review <number> --comment --body-file <file>` for that axis and note missing inlines in the body.
+
+On Cloud Agents, when `gh` returns **403** for review APIs, use **ManagePullRequest** `post_comment` as described above — do not claim reviews were published until those comments exist on the PR.
 
 **Check reviews on the PR**
 

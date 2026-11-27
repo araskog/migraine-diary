@@ -45,7 +45,12 @@ Publish **two** pull request reviews on the same PR (Standards first, then Spec)
 - Put actionable items on the **correct diff line** as review comments where possible.
 - Put findings that cannot be anchored inline in that review's body.
 - Choose `COMMENT`, `REQUEST_CHANGES`, or `APPROVE` per review based on findings (`APPROVE` only when that axis has no unresolved defects).
-- If the token cannot post reviews, state the limitation in chat; do not claim they were published.
+
+**Cloud Agents:** VM `gh` often cannot write reviews (403 `Resource not accessible by integration`). Use the **ManagePullRequest** tool — two `post_comment` calls (Standards, then Spec) on the PR URL, plus `post_comment` with `path`/`line` for inline findings. See [reviews.md § Cloud Agents](../../../docs/agents/reviews.md#cloud-agents-gh-403).
+
+**Local / user `gh`:** Prefer `gh api` or `gh pr review` as in [reviews.md](../../../docs/agents/reviews.md#publish-to-github).
+
+If neither path can post, state the limitation in chat; do not claim reviews were published.
 
 Never merge. Do not request auto-merge.
 
