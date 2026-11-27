@@ -50,7 +50,7 @@ Matt Pocock skills are **not** vendored in git (except [`review-pr`](../../.agen
 npx skills@latest add mattpocock/skills
 ```
 
-Restore from the lockfile and Cloud Agent setup: see [Skills in `AGENTS.md`](../../AGENTS.md#agent-skills).
+Restore from the lockfile and environment setup: see [Skills in `AGENTS.md`](../../AGENTS.md#agent-skills).
 
 Pin versions with [`skills-lock.json`](../../skills-lock.json) at the repo root.
 

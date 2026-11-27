@@ -2,9 +2,9 @@
 
 ## How agents work
 
-`AGENTS.md` is the entry point for every agent in this repo (Cursor, Cloud Agents, and others that read it). **All agents share one process** — the ordered steps live in [workflow](docs/agents/workflow.md); follow that file for implementation, review, and PRs. Read it at the start of those tasks; do not skip steps unless the user limits scope (for example, questions only, no PR).
+`AGENTS.md` is the entry point for every agent that works in this repo. **All agents share one process** — the ordered steps live in [workflow](docs/agents/workflow.md); follow that file for implementation, review, and PRs. Read it at the start of those tasks; do not skip steps unless the user limits scope (for example, questions only, no PR).
 
-When [workflow](docs/agents/workflow.md) names a skill, or the user invokes one, read **`.agents/skills/<skill-name>/SKILL.md`** (for example `implement`, `tdd`, `code-review`, `pr`, intake skills, or `review-pr` on an open PR) and follow it. Workflow slash names are the usual Cursor invocations; they are not the only trigger — the workflow step still means read that skill file.
+When [workflow](docs/agents/workflow.md) names a skill, or the user invokes one (for example `/implement` or the `review-pr` skill on an open PR), read **`.agents/skills/<skill-name>/SKILL.md`** and follow it. A slash command is one way to invoke a skill; the workflow step still means read that skill file even when nobody typed a slash.
 
 ## Project and Navigation
 
@@ -33,11 +33,7 @@ Check relevant official guidance when changing tools, frameworks, or agent workf
 
 Agree test boundaries per feature. Completion requires acceptance criteria and required checks to pass, and review findings to be resolved or explicitly accepted by the owner. Report unavailable checks and remaining limitations; do not claim they passed.
 
-Keep this guide current as the repository develops. Use these sources when changing agent instructions:
-
-- [OpenAI AGENTS.md guidance](https://learn.chatgpt.com/docs/agent-configuration/agents-md) — root `AGENTS.md` as the shared entry point; detailed process in linked docs.
-- [OpenAI best practices](https://learn.chatgpt.com/docs/learn/best-practices)
-- [Writing for agents](https://github.com/mattpocock/skills/blob/main/skills/productivity/writing-for-agents/SKILL.md)
+Keep this guide current as the repository develops. When changing agent instructions, follow the [`writing-for-agents`](.agents/skills/writing-for-agents/SKILL.md) skill after it is installed.
 
 ## Agent skills
 
@@ -45,7 +41,7 @@ Matt Pocock skills install into `.agents/skills/` (gitignored; only [`review-pr`
 
 **Install or refresh:** `npx skills@latest add mattpocock/skills`, or restore from the lockfile: `npx skills@latest experimental_install -a cursor -y --frozen-lockfile`.
 
-**Cloud Agents:** [`.cursor/environment.json`](.cursor/environment.json) runs the restore command during environment builds so every agent has the same skills on disk. Wire the environment to that file, or run the same command once in a fresh VM.
+**Environment builds:** [`.cursor/environment.json`](.cursor/environment.json) runs the restore command during the image build so every fresh workspace has the same skills on disk. Point your remote agent environment at that file, or run the same restore command once in a fresh VM.
 
 **In git:** [`review-pr`](.agents/skills/review-pr/SKILL.md) — PR review history on GitHub.
 
