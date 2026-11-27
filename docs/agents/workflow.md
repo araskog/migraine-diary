@@ -4,7 +4,7 @@ This repo uses a **three-layer** agent workflow. Layers 1–2 are in git; Matt P
 
 | Layer | What | Where |
 | ----- | ---- | ----- |
-| 1. Process | What agents do, in order | This file + `AGENTS.md` |
+| 1. Process | What agents do, in order | [`AGENTS.md`](../../AGENTS.md) (entry) → this file (steps) |
 | 2. CI | Lint, tests, build | `.github/workflows/checks.yml` |
 | 3. Review | Standards + spec; history on GitHub | [`reviews.md`](reviews.md), [`review-pr`](../../.agents/skills/review-pr/SKILL.md) |
 
@@ -49,6 +49,8 @@ Matt Pocock skills are **not** vendored in git (except [`review-pr`](../../.agen
 ```sh
 npx skills@latest add mattpocock/skills
 ```
+
+Restore from the lockfile and environment setup: see [Skills in `AGENTS.md`](../../AGENTS.md#agent-skills).
 
 Pin versions with [`skills-lock.json`](../../skills-lock.json) at the repo root.
 

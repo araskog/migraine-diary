@@ -1,20 +1,21 @@
 # Repository Guidelines
 
+## How agents work
+
+`AGENTS.md` is the entry point for every agent that works in this repo. **All agents share one process** — the ordered steps live in [workflow](docs/agents/workflow.md); follow that file for implementation, review, and PRs. Read it at the start of those tasks; do not skip steps unless the user limits scope (for example, questions only, no PR).
+
+When [workflow](docs/agents/workflow.md) names a skill, or the user invokes one (for example `/implement` or the `review-pr` skill on an open PR), read **`.agents/skills/<skill-name>/SKILL.md`** and follow it. A slash command is one way to invoke a skill; the workflow step still means read that skill file even when nobody typed a slash.
+
 ## Project and Navigation
 
 Migraine Diary tracks migraine days. The application lives in `frontend/` (React/TypeScript/Vite) and `backend/` (Django REST Framework/PostgreSQL). See [README](README.md) for verified setup and checks.
 
-- Read the [workflow](docs/agents/workflow.md) for the full agent process (plan → implement → review → PR → merge).
-- Read [reviews](docs/agents/reviews.md) for **`/code-review`** (local) and **[`review-pr`](.agents/skills/review-pr/SKILL.md)** (publish Standards + Spec to GitHub).
-- Install Matt Pocock skills locally: `npx skills@latest add mattpocock/skills` (pinned in `skills-lock.json`).
-- **Skills (local install):** [`implement`](.agents/skills/implement/SKILL.md), [`tdd`](.agents/skills/tdd/SKILL.md), [`code-review`](.agents/skills/code-review/SKILL.md), [`pr`](.agents/skills/pr/SKILL.md); intake: [`triage`](.agents/skills/triage/SKILL.md), [`to-spec`](.agents/skills/to-spec/SKILL.md), [`to-tickets`](.agents/skills/to-tickets/SKILL.md).
-- **Skill (in git):** [`review-pr`](.agents/skills/review-pr/SKILL.md) — PR review history on GitHub.
-- For structure and design, read [architecture](docs/architecture.md).
-- For code style, read [coding standards](CODING_STANDARDS.md).
-- For behavior and tests, read the relevant [specification](docs/specs/) and [glossary](GLOSSARY.md).
+- [Workflow](docs/agents/workflow.md) — plan → implement → review → PR → merge (layer 1).
+- [Reviews](docs/agents/reviews.md) — **`/code-review`** (local) and [`review-pr`](.agents/skills/review-pr/SKILL.md) (Standards + Spec on GitHub).
+- [Architecture](docs/architecture.md), [coding standards](CODING_STANDARDS.md), [specifications](docs/specs/), [glossary](GLOSSARY.md).
 - Shipped milestones include [First Usable Diary](docs/specs/first-usable-diary.md), [Diary details](docs/specs/diary-details.md), [Account and privacy](docs/specs/account-and-privacy.md), and [Demo mode](docs/specs/demo-mode.md). Planned work includes [Expanded diary fields](docs/specs/expanded-diary-fields.md) and [Diary insights narrative](docs/specs/diary-insights.md) (see [Pattern insights MVP](docs/specs/pattern-insights-mvp.md) for statistics).
 
-README covers setup and checks; AGENTS.md provides repository context; specifications define agreed behavior; PR descriptions cover the problem, final behavior, and scope. Commit messages and review comments hold rationale, verification results, and review follow-ups. Avoid duplicating these sources.
+README covers setup and checks; specifications define agreed behavior; PR descriptions cover the problem, final behavior, and scope. Commit messages and review comments hold rationale, verification results, and review follow-ups. Avoid duplicating these sources.
 
 ## Working Rules
 
@@ -32,13 +33,19 @@ Check relevant official guidance when changing tools, frameworks, or agent workf
 
 Agree test boundaries per feature. Completion requires acceptance criteria and required checks to pass, and review findings to be resolved or explicitly accepted by the owner. Report unavailable checks and remaining limitations; do not claim they passed.
 
-Keep this guide current as the repository develops. Use these sources when changing agent instructions:
-
-- [OpenAI best practices](https://learn.chatgpt.com/docs/learn/best-practices)
-- [OpenAI AGENTS.md guidance](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
-- [Writing for agents](https://github.com/mattpocock/skills/blob/main/skills/productivity/writing-for-agents/SKILL.md)
+Keep this guide current as the repository develops. When changing agent instructions, follow the [`writing-for-agents`](.agents/skills/writing-for-agents/SKILL.md) skill after it is installed.
 
 ## Agent skills
+
+Matt Pocock skills install into `.agents/skills/` (gitignored; only [`review-pr`](.agents/skills/review-pr/SKILL.md) is committed). Pin versions in [`skills-lock.json`](skills-lock.json).
+
+**Install or refresh:** `npx skills@latest add mattpocock/skills`, or restore from the lockfile: `npx skills@latest experimental_install -a cursor -y --frozen-lockfile`.
+
+**Environment builds:** [`.cursor/environment.json`](.cursor/environment.json) runs the restore command during the image build so every fresh workspace has the same skills on disk. Point your remote agent environment at that file, or run the same restore command once in a fresh VM.
+
+**In git:** [`review-pr`](.agents/skills/review-pr/SKILL.md) — PR review history on GitHub.
+
+**After install:** [`implement`](.agents/skills/implement/SKILL.md), [`tdd`](.agents/skills/tdd/SKILL.md), [`code-review`](.agents/skills/code-review/SKILL.md), [`pr`](.agents/skills/pr/SKILL.md); intake: [`triage`](.agents/skills/triage/SKILL.md), [`to-spec`](.agents/skills/to-spec/SKILL.md), [`to-tickets`](.agents/skills/to-tickets/SKILL.md).
 
 ### Issue tracker
 
