@@ -14,7 +14,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .demo import create_demo_user
-from .models import User
+from .models import PasswordRecoveryRequest, User
+from .password_recovery import PASSWORD_RECOVERY_CONFIRMATION
 
 PRIVACY_POLICY_VERSION = "2026-11-26"
 
@@ -34,6 +35,13 @@ class RegistrationConsent(serializers.Serializer):
 class Credentials(serializers.Serializer):
     email = serializers.EmailField(max_length=254)
     password = serializers.CharField(trim_whitespace=False, max_length=1024)
+
+    def validate_email(self, value):
+        return value.lower()
+
+
+class RecoveryEmail(serializers.Serializer):
+    email = serializers.EmailField(max_length=254)
 
     def validate_email(self, value):
         return value.lower()
@@ -89,6 +97,17 @@ def register(request):
         )
     login(request, user)
     return Response(identity(request), status=201)
+
+
+@never_cache
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def request_password_recovery(request):
+    SessionAuthentication().enforce_csrf(request)
+    data = RecoveryEmail(data=request.data)
+    data.is_valid(raise_exception=True)
+    PasswordRecoveryRequest.objects.create(email=data.validated_data["email"])
+    return Response({"detail": PASSWORD_RECOVERY_CONFIRMATION})
 
 
 @never_cache

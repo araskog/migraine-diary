@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  Anchor,
   Button,
   Checkbox,
   Paper,
@@ -16,6 +17,7 @@ import ErrorMessages from './ErrorMessages'
 import PrivacyNotice, { privacyVersion } from './PrivacyNotice'
 import { getSession, isSession } from './session'
 import type { Session } from './session'
+import PasswordRecoveryForm from './PasswordRecoveryForm'
 
 type AccountFormProps = {
   initialMode?: 'sign-in' | 'register'
@@ -56,6 +58,7 @@ export default function AccountForm({
   onBusyChange,
 }: AccountFormProps) {
   const [mode, setMode] = useState<'sign-in' | 'register'>(initialMode)
+  const [recoveryOpen, setRecoveryOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
   const inactive = busy || demoBusy
@@ -108,6 +111,16 @@ export default function AccountForm({
 
   const allErrors = [...demoErrors, ...errors]
 
+  if (recoveryOpen && mode === 'sign-in') {
+    return (
+      <PasswordRecoveryForm
+        csrfToken={csrfToken}
+        disabled={demoBusy}
+        onBack={() => setRecoveryOpen(false)}
+      />
+    )
+  }
+
   return (
     <Stack gap="md" className="account-shell">
       <Paper withBorder className="account-page">
@@ -144,6 +157,7 @@ export default function AccountForm({
               onChange={(value) => {
                 if (value !== 'sign-in' && value !== 'register') return
                 setMode(value)
+                setRecoveryOpen(false)
                 setErrors([])
               }}
             />
@@ -191,6 +205,19 @@ export default function AccountForm({
                     Use at least 8 characters. Avoid common passwords, only
                     numbers, or a password similar to your email.
                   </Text>
+                  {mode === 'sign-in' && (
+                    <Anchor
+                      component="button"
+                      type="button"
+                      fs="italic"
+                      c="dimmed"
+                      size="sm"
+                      disabled={inactive}
+                      onClick={() => setRecoveryOpen(true)}
+                    >
+                      Forgot your password?
+                    </Anchor>
+                  )}
                 </Stack>
                 <PrivacyNotice />
                 {mode === 'register' && (

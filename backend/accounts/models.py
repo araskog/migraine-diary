@@ -43,3 +43,14 @@ class User(AbstractBaseUser, PermissionsMixin):
                 Lower("email"), name="accounts_user_email_ci_unique"
             )
         ]
+
+
+class PasswordRecoveryRequest(models.Model):
+    email = models.EmailField(max_length=254)
+    requested_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-requested_at",)
+
+    def __str__(self):
+        return f"{self.email} ({self.requested_at:%Y-%m-%d %H:%M UTC})"

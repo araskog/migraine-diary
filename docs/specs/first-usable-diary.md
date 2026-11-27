@@ -1,6 +1,6 @@
 # First Usable Diary
 
-Status: Complete. Password recovery is deferred outside this milestone.
+Status: Complete. [Admin-assisted password recovery](password-recovery-admin.md) is implemented separately from this milestone.
 
 ## Goal and Scope
 
