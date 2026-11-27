@@ -6,7 +6,7 @@ Status: Complete.
 
 Real accounts require explicit consent to store health entries under the in-app privacy notice. Users can read that notice during registration and from the diary. Account deletion withdraws consent and removes the user's account and diary from the active database.
 
-Demo sessions are started without this registration flow; they do not offer account deletion. Password recovery, export/self-service download, and re-consent flows for existing users after a policy change are out of scope.
+Demo sessions are started without this registration flow; they do not offer account deletion. [Admin-assisted password recovery](password-recovery-admin.md) is the supported reset path (no automated email). Export/self-service download and re-consent flows for existing users after a policy change are out of scope.
 
 ## Acceptance Criteria
 

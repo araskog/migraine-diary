@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.core.exceptions import ValidationError
 
-from .models import User
+from .models import PasswordRecoveryRequest, User
 
 
 class AccountCreationForm(UserCreationForm):
@@ -32,6 +32,16 @@ class AccountChangeForm(UserChangeForm):
         ):
             raise ValidationError("An account with this email already exists.")
         return email
+
+
+@admin.register(PasswordRecoveryRequest)
+class PasswordRecoveryRequestAdmin(admin.ModelAdmin):
+    list_display = ("email", "requested_at")
+    search_fields = ("email",)
+    readonly_fields = ("email", "requested_at")
+
+    def has_add_permission(self, request):
+        return False
 
 
 @admin.register(User)
